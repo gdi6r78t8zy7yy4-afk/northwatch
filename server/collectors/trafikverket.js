@@ -1,6 +1,14 @@
 // Trafikverket öppna API för trafikinformation (DOC_VERIFIED).
 // XML-fråga i request-body, JSON i svaret. API-nyckel i .env (TRAFIKVERKET_KEY),
 // konto + licens enligt Trafikverkets dokumentation.
+//
+// OBS 2026-11-01: den gamla "Situation"-datamodellen är inte längre tillgänglig.
+// schemaversion 2.1 svarar "ObjectType 'Situation' does not exists" och 1.4–1.6
+// avvisar alla kända attribut ("Invalid query attribute Situation.*"). Den nya
+// datamodellen hanteras via data.trafikverket.se (datacache) och kräver
+// tillträdesansöknin per datamängd; frågeformatet är inte offentligt
+// dokumenterat. Kollektorn behåller M1-frågan tills nytt format verifieras –
+// felet visas synligt i källhälsan (status: error) i stället för döljas.
 import { j, now } from '../lib/http.js';
 
 export default {

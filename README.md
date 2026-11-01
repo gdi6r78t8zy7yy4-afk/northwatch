@@ -41,7 +41,7 @@ källhälsa och kända luckor. Landsskick väljs i toppraden (sparas i webbläsa
 ## Arkitektur
 
 ```
-server/                 backend – inga runtime-beroenden (Node >= 20.6)
+server/                 backend – ett enda JS-beroende: fast-xml-parser (ENTSO-E XML)
   app.js                HTTP: /api/* + statisk servering av web/dist
   areas.js              de 12 dashboardområdena (namn, scope, luckor, geo-flagga)
   lib/env.js            läser .env
@@ -72,19 +72,28 @@ asset  { t:'a', area, country, source, type, name, id?, geometry, attrs?, update
 - `GET /api/assets?country=&type=` – geolager (fylls i M3)
 - `GET /api/health` – källhälsa
 
-## Källor (M1)
+## Källor (M1 + M2, 18 st)
 
 | Källa | Område | Status |
 |-------|--------|--------|
 | SMHI observationsdata (metobs) | 11 Miljö/Väder (SE) | ok |
-| SMHI vädervarningar (ibww) | 11 Miljö/Väder (SE) | endpoint-verifiering (503 vid test) |
+| SMHI vädervarningar (ibww) | 11 Miljö/Väder (SE) | endpoint-verifiering (503 – värdnamnet ej reserbart från testnätet) |
 | MET Norway Weather API | 11 Miljö/Väder (NO) | ok – kräver `CONTACT` i .env |
+| DMI climate data (station 06180) | 11 Miljö/Väder (DK) | ok – verifierad 2026-11-01 |
 | CISA KEV | 5 Cyber (Nordiskt) | ok |
 | NIST NVD CVE API 2.0 | 5 Cyber (Nordiskt) | ok |
+| FIRST EPSS | 5 Cyber (Nordiskt) | ok – nyckelfri, daglig |
+| MITRE ATT&CK (Enterprise) | 5 Cyber (Nordiskt) | ok – veckovis, ETag-cache |
 | Svenska kraftnät Data Service (CKAN) | 1 Energi (SE) | kräver `SVK_RESOURCE_ID` |
 | Fingrid Open Data | 1 Energi (FI) | kräver `FINGRID_KEY` + `FINGRID_DATASETS` |
-| Trafikverket öppna API | 3 Transport (SE) | kräver `TRAFIKVERKET_KEY` |
-| Digitraffic vägtrafikmeddelanden | 3 Transport (FI) | endpoint-verifiering (404 – v2-på väg) |
+| ENTSO-E Transparency Platform | 1 Energi (SE/NO/FI) | struktur verifierad; datalagret tomt 2026-11-01 (kollektorn aktiverar sig automatiskt när data finns) |
+| Statnett driftsdata (gränsflöden) | 1 Energi (NO) | ok – verifierad 2026-11-01 |
+| Energi Data Service | 1 Energi (DK) | ok – verifierad 2026-11-01 |
+| Trafikverket öppna API | 3 Transport (SE) | kräver `TRAFIKVERKET_KEY` – gammal datamodell nedlagd server-side (se kollektorn) |
+| Digitraffic vägtrafikmeddelanden | 3 Transport (FI) | ok – v1/messages verifierad 2026-11-01 |
+| PeeringDB (IX) | 2 Digital infrastruktur (Nordiskt) | ok – verifierad 2026-11-01 |
+| Eurostat (BNP, SDMX 2.1) | 7 Industri (Nordiskt) | ok – verifierad 2026-11-01 |
+| NOAA SWPC (Kp, F10.7) | 10 GNSS/Rymd (Nordiskt) | ok – verifierad 2026-11-01 |
 
 Källor utan nyckel visas som **"Saknar …"** i källhälsan och aktiveras automatiskt
 när nyckeln läggs i `.env`.
@@ -107,9 +116,11 @@ NVD_API_KEY=…        # valfri
 
 - **M1 (klart):** ramverk – omdirigerad collector-backend, React SPA, översiktssida,
   landsskick, gemensam dashboard-mall, källhälsa.
-- **M2:** övriga klass A-källor: ENTSO-E (XML, gränsflöden/avbrott/priser), Statnett,
-  Energi Data Service, DMI, PeeringDB, Eurostat, NOAA SWPC (aurora), FIRST EPSS,
-  MITRE ATT&CK + verifiering av SMHI-varningar och Digitraffic v2.
+- **M2 (klart 2026-11-01):** övriga klass A-källor (18 totalt): ENTSO-E (nya REST-API:t,
+  IEC XML – struktur verifierad, datalagret tomt vid tidpunkten), Statnett, Energi Data
+  Service, DMI (observations), PeeringDB, Eurostat (SDMX 2.1), NOAA SWPC, FIRST EPSS,
+  MITRE ATT&CK + fix av Digitraffic (v1/messages). Trafikverkets gamla API är
+  nedlagt server-side; SMHI-varningar kvarstår som endpoint-verifiering.
 - **M3:** kartor – Leaflet + OSM-tiles, geolager per område (bidding zones,
   IXPs, händelser, varningspolygona), OSM Overpass-utdrag av kritiska anläggningar
   (veckovis cache, ODbL-tillstånd).

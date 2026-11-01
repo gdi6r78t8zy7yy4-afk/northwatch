@@ -1,18 +1,28 @@
 // Digitraffic (Fintraffic) vägtrafikmeddelanden – ÖPNA API, ingen nyckel.
 // IDENTIFIERING: Digitraffic-User-headern krävs; gzip krävs (Accept-Encoding).
-// OBS 2026-11-01: v1/v2-på vägarna ger 404 i produktion – Digitraffic har
-// flyttat sina API (v2 dokumenteras i deras swagger, som inte är öppet
-// anropbart). DIGITRAFFIC_MESSAGES_URL sätter rätt väg när den verifieras (M2).
+// Verifierad 2026-11-01: v1/messages är den fungerande endpointen –
+// GeoJSON FeatureCollection (~400–450 features, ~871 KB) med properties:
+//   situationId, situationType, trafficAnnouncementType, releaseTime,
+//   versionTime, announcements[] {language, title, location, locationDetails};
+//   toppfält dataUpdatedTime. v2-endpointen (DATEX-II) finns i dokumentationen
+//   men levererar i nuläget tomma payload.
+// 871 KB per anrop + ToS (max 1 anrop/s) → pollar var 5:e minut.
 import { j, now } from '../lib/http.js';
 
-const DEFAULT_URL = 'https://tie.digitraffic.fi/api/traffic-message/v1/traffic-messages?inactiveHours=0&includeAreaGeometry=false';
+const DEFAULT_URL = 'https://tie.digitraffic.fi/api/traffic-message/v1/messages?inactiveHours=0&includeAreaGeometry=false';
+
+// Föredrar svensk meddelandetext, annars första tillgängliga.
+const ann = f => {
+  const list = f.properties?.announcements ?? [];
+  return list.find(a => a.language === 'sv') ?? list[0] ?? null;
+};
 
 export default {
   id: 'digitraffic',
   name: 'Digitraffic (väg)',
   area: 3,
   country: 'FI',
-  every: 120,
+  every: 300,
   fetch: async () => {
     const url = process.env.DIGITRAFFIC_MESSAGES_URL || DEFAULT_URL;
     const r = await j(url, {
@@ -28,18 +38,23 @@ export default {
       {
         t: 'm', area: 3, country: 'FI', source: 'digitraffic',
         indicator: 'Aktiva trafikmeddelanden (väg, FI)',
-        value: feats.length, unit: 'st', ts: now(),
+        value: feats.length, unit: 'st',
+        ts: geojson.dataUpdatedTime ?? now(),
       },
-      ...feats.slice(0, 50).map(f => ({
-        t: 'e', area: 3, country: 'FI', source: 'digitraffic',
-        kind: 'trafikmeddelande',
-        severity: (f.properties.severity ?? 'info').toLowerCase(),
-        title: `${f.properties.situationType ?? 'Händelse'}${f.properties.severity ? ' (' + f.properties.severity + ')' : ''}`,
-        detail: f.properties.description ?? '',
-        start: f.properties.issueTime ?? now(),
-        end: f.properties.expectedClearTime ?? null,
-        geo: f.geometry ?? null,
-      })),
+      ...feats.slice(0, 50).map(f => {
+        const a = ann(f);
+        const title = f.properties.situationType ?? 'Händelse';
+        return {
+          t: 'e', area: 3, country: 'FI', source: 'digitraffic',
+          kind: 'trafikmeddelande',
+          severity: 'info',
+          title: a?.title ? `${title}: ${a.title}` : title,
+          detail: a ? [a.location, a.locationDetails].filter(Boolean).join(' – ') : '',
+          start: f.properties.releaseTime ?? now(),
+          end: null,
+          geo: f.geometry ?? null,
+        };
+      }),
     ];
   },
 };
