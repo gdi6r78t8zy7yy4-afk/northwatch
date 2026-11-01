@@ -1,1 +1,17 @@
-{"name":"nordic-dashboard","version":"0.1.0","type":"module","scripts":{"start":"node --env-file=.env server.js"},"engines":{"node":">=20.6"}}
+{
+  "name": "northwatch",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "concurrently -n server,web -c blue,green \"node server/app.js\" \"npm --prefix web run dev\"",
+    "build": "npm --prefix web run build",
+    "start": "node server/app.js"
+  },
+  "engines": {
+    "node": ">=20.6"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.0"
+  }
+}
