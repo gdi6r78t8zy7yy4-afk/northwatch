@@ -17,7 +17,7 @@ export const AREAS = [
     gaps: 'Bara PeeringDB (struktur). Ingen driftstatus, DNS, datacenter eller kablar' },
   { id: 3, slug: 'transport', name: 'Transport och logistik', short: 'Transport', geo: true,
     scope: 'Väg, järnväg, hamn, flyg, sjöfart, broar, tunnlar, gods, kollektivtrafik',
-    gaps: 'Flyg/EMSA kräver behörighet; DK saknar valt trafik-API; broar/tunnlar ej täckta. FI: väg (Digitraffic), järnväg (Rata) och AIS-sjöfart (Meri)' },
+    gaps: 'Flyg/EMSA kräver behörighet; DK saknar valt trafik-API; broar/tunnlar ej täckta. SE: väg, väglag, trafikflöden, vägväder, järnväg (valda stationer) och påverkade färjeavgångar via Trafikverket (kräver TRAFIKVERKET_KEY). FI: väg (Digitraffic), järnväg (Rata) och AIS-sjöfart (Meri)' },
   { id: 4, slug: 'vatten', name: 'Vatten och avloppshantering', short: 'Vatten', geo: true,
     scope: 'Dricksvatten, vattenverk, reserver, avlopp, översvämning, vattenkvalitet',
     gaps: 'Nästan bara portaler; dricksvatten/avlopp saknas. NO: vattenstånd via NVE HydAPI (kräver NVE_API_KEY)' },

@@ -1,0 +1,190 @@
+{
+ "fetchedAt": "2026-11-02T16:32:31.915Z",
+ "status": 200,
+ "info": null,
+ "rows": [
+  {
+   "CountryCode": "SE",
+   "Deleted": false,
+   "Deviation": [
+    {
+     "AffectedDirection": "Båda riktningarna",
+     "AffectedDirectionValue": "BothDirections",
+     "CountyNo": [
+      3
+     ],
+     "Creator": "Trafikverket",
+     "CreationTime": "2000-03-01T15:55:22.207+01:00",
+     "Geometry": {
+      "SWEREF99TM": "POINT (690189 6694314)",
+      "WGS84": "POINT (18.4463019078204 60.3405755642325)",
+      "Point": {
+       "SWEREF99TM": "POINT (690189 6694314)",
+       "WGS84": "POINT (18.4463019078204 60.3405755642325)"
+      },
+      "Line": {
+       "SWEREF99TM": "LINESTRING (690178.06984015 6694294.463063738, 690195.9498401361 6694326.193063684, 690203.6398401292 6694332.043063683)",
+       "WGS84": "LINESTRING (18.44608578198353 60.340405562219594, 18.446439113579636 60.34068155794398, 18.446583701162098 60.340730381825466)"
+      }
+     },
+     "Header": "Gräsöleden",
+     "IconId": "ferryDepartureOnSchedule",
+     "Id": "SE_STA_TRISSID_1_1030734",
+     "ManagedCause": true,
+     "MessageCode": "Färja",
+     "MessageCodeValue": "ferry",
+     "MessageType": "Färjor",
+     "MessageTypeValue": "TransitInformation",
+     "RoadName": "Skatgränd",
+     "RoadNumber": "Väg 1184",
+     "RoadNumberNumeric": 1184,
+     "StartTime": "2025-08-31T10:30:59.000+02:00",
+     "LocationDescriptor": "Väg 1184 mellan Gräsöleden, Öregrund och Gräsöleden, Gräsö, i båda riktningar.",
+     "ValidUntilFurtherNotice": true,
+     "WebLink": "http://www.trafikverket.se/grasoleden",
+     "VersionTime": "2025-08-31T10:31:00.360+02:00"
+    }
+   ],
+   "Id": "GUID123804e2-dcdb-496d-811e-c5b04b61ce19",
+   "PublicationTime": "2025-08-31T10:31:12.802+02:00",
+   "VersionTime": "2025-08-31T10:31:00.360+02:00",
+   "ModifiedTime": "2025-08-31T08:31:12.886Z"
+  },
+  {
+   "CountryCode": "SE",
+   "Deleted": false,
+   "Deviation": [
+    {
+     "AffectedDirection": "Båda riktningarna",
+     "AffectedDirectionValue": "BothDirections",
+     "CountyNo": [
+      2,
+      1
+     ],
+     "Creator": "Trafikverket",
+     "CreationTime": "1999-03-02T16:22:23.920+01:00",
+     "Geometry": {
+      "SWEREF99TM": "POINT (644026 6586375)",
+      "WGS84": "POINT (17.5361113743875 59.39135468988)",
+      "Point": {
+       "SWEREF99TM": "POINT (644026 6586375)",
+       "WGS84": "POINT (17.5361113743875 59.39135468988)"
+      },
+      "Line": {
+       "SWEREF99TM": "LINESTRING (644029.1998767504 6586380.423239365, 644024.1098767549 6586370.783239375)",
+       "WGS84": "LINESTRING (17.536171292364617 59.391402219935706, 17.536075302310447 59.391317477352885)"
+      }
+     },
+     "Header": "Adelsöleden",
+     "IconId": "ferryDepartureOnSchedule",
+     "Id": "SE_STA_TRISSID_1_136532",
+     "ManagedCause": true,
+     "MessageCode": "Färja",
+     "MessageCodeValue": "ferry",
+     "MessageType": "Färjor",
+     "MessageTypeValue": "TransitInformation",
+     "RoadName": "Ekerövägen",
+     "StartTime": "2026-09-14T20:00:54.000+02:00",
+     "LocationDescriptor": "Väg 816 vid Adelsöleden, i båda riktningar.",
+     "ValidUntilFurtherNotice": true,
+     "WebLink": "http://www.trafikverket.se/adelsoleden",
+     "VersionTime": "2026-10-13T09:15:00.497+02:00"
+    }
+   ],
+   "Id": "GUID7b23df32-72ed-47dd-bb63-674364acefe0",
+   "PublicationTime": "2026-10-13T09:15:37.265+02:00",
+   "VersionTime": "2026-10-13T09:15:00.497+02:00",
+   "ModifiedTime": "2026-10-13T07:15:37.316Z"
+  },
+  {
+   "CountryCode": "SE",
+   "Deleted": false,
+   "Deviation": [
+    {
+     "AffectedDirection": "Båda riktningarna",
+     "AffectedDirectionValue": "BothDirections",
+     "Suspended": true,
+     "CountyNo": [
+      22
+     ],
+     "Creator": "Trafikverket",
+     "CreationTime": "2022-04-29T10:58:26.123+02:00",
+     "EndTime": "2027-11-30T23:59:00.000+01:00",
+     "Geometry": {
+      "SWEREF99TM": "POINT (623427 6899348)",
+      "WGS84": "POINT (17.3728864991125 62.2056182307363)",
+      "Point": {
+       "SWEREF99TM": "POINT (623427 6899348)",
+       "WGS84": "POINT (17.3728864991125 62.2056182307363)"
+      },
+      "Line": {
+       "SWEREF99TM": "LINESTRING (622381.2499013675 6893516.432724498, 622672.4999011507 6894251.282723265, 622706.8399011273 6894420.992722979, 622676.9199011677 6895115.442721797, 622719.8499011584 6896144.5927200485, 622654.399901228 6896842.492718859, 622667.4599012237 6897068.472718476, 622756.6599011581 6897331.42271803, 623158.9599008479 6897918.042717053, 623274.2099007618 6898157.90271665, 623332.4599007207 6898402.982716232, 623458.1399006518 6899728.232713984, 623290.459900831 6901512.292710944, 623407.2799007616 6902523.632709231, 623398.0799007795 6902938.782708523, 623137.2799010312 6904637.712705622, 623005.0999011467 6905022.342704966, 622832.2199012935 6905317.412704453)",
+       "WGS84": "LINESTRING (17.348739279006573 62.15365846623678, 17.35483565242493 62.160154337169814, 17.355612569141982 62.16166522828255, 17.355523216367573 62.167903357087255, 17.35706529030689 62.17711954802393, 17.356296794905266 62.183400204696625, 17.356705300707183 62.18542269862282, 17.358601153771748 62.18775189478988, 17.366734598333714 62.19288143712117, 17.369115608340987 62.19499485258432, 17.370406219949803 62.1971737642548, 17.37375234834052 62.20901812440835, 17.371787329501686 62.225073772101815, 17.374745529470218 62.234105633230016, 17.374861549089772 62.237831958928886, 17.371044298517862 62.253154690034194, 17.3687725885772 62.256647691347105, 17.3656542784887 62.25935077876801)"
+      }
+     },
+     "IconId": "roadwork",
+     "Id": "SE_STA_TRISSID_1_5813502",
+     "ManagedCause": true,
+     "Message": "Beläggningsarbetet är klart, trafik regleras med signal, bom och lots. Väntetid upp till 10 min",
+     "MessageCode": "Beläggningsarbete",
+     "MessageCodeValue": "resurfacingWork",
+     "MessageType": "Vägarbete",
+     "MessageTypeValue": "MaintenanceWorks",
+     "NumberOfLanesRestricted": 1,
+     "RoadNumber": "E4",
+     "RoadNumberNumeric": 4,
+     "SeverityCode": 4,
+     "SeverityText": "Stor påverkan",
+     "StartTime": "2022-06-15T04:36:00.000+02:00",
+     "LocationDescriptor": "E4 från Länsgr. Gävleborgs/Västernorrlands län vid Armsjön till Trafikplats Njurunda (222) båda riktningarna i Gävleborgs län (X)",
+     "TrafficRestrictionType": "Körfält blockerade",
+     "VersionTime": "2023-08-16T10:33:22.810+02:00"
+    },
+    {
+     "AffectedDirection": "Båda riktningarna",
+     "AffectedDirectionValue": "BothDirections",
+     "Suspended": true,
+     "CountyNo": [
+      22
+     ],
+     "Creator": "Trafikverket",
+     "CreationTime": "2022-04-29T10:58:26.123+02:00",
+     "EndTime": "2027-11-30T23:59:00.000+01:00",
+     "Geometry": {
+      "SWEREF99TM": "POINT (623427 6899348)",
+      "WGS84": "POINT (17.3728864991125 62.2056182307363)",
+      "Point": {
+       "SWEREF99TM": "POINT (623427 6899348)",
+       "WGS84": "POINT (17.3728864991125 62.2056182307363)"
+      },
+      "Line": {
+       "SWEREF99TM": "LINESTRING (622381.2499013675 6893516.432724498, 622672.4999011507 6894251.282723265, 622706.8399011273 6894420.992722979, 622676.9199011677 6895115.442721797, 622719.8499011584 6896144.5927200485, 622654.399901228 6896842.492718859, 622667.4599012237 6897068.472718476, 622756.6599011581 6897331.42271803, 623158.9599008479 6897918.042717053, 623274.2099007618 6898157.90271665, 623332.4599007207 6898402.982716232, 623458.1399006518 6899728.232713984, 623290.459900831 6901512.292710944, 623407.2799007616 6902523.632709231, 623398.0799007795 6902938.782708523, 623137.2799010312 6904637.712705622, 623005.0999011467 6905022.342704966, 622832.2199012935 6905317.412704453)",
+       "WGS84": "LINESTRING (17.348739279006573 62.15365846623678, 17.35483565242493 62.160154337169814, 17.355612569141982 62.16166522828255, 17.355523216367573 62.167903357087255, 17.35706529030689 62.17711954802393, 17.356296794905266 62.183400204696625, 17.356705300707183 62.18542269862282, 17.358601153771748 62.18775189478988, 17.366734598333714 62.19288143712117, 17.369115608340987 62.19499485258432, 17.370406219949803 62.1971737642548, 17.37375234834052 62.20901812440835, 17.371787329501686 62.225073772101815, 17.374745529470218 62.234105633230016, 17.374861549089772 62.237831958928886, 17.371044298517862 62.253154690034194, 17.3687725885772 62.256647691347105, 17.3656542784887 62.25935077876801)"
+      }
+     },
+     "IconId": "trafficMessage",
+     "Id": "SE_STA_TRISSID_2_5813502",
+     "Message": "Beläggningsarbetet är klart, trafik regleras med signal, bom och lots. Väntetid upp till 10 min",
+     "MessageCode": "Körfältsavstängningar",
+     "MessageCodeValue": "laneClosures",
+     "MessageType": "Trafikmeddelande",
+     "MessageTypeValue": "RoadOrCarriagewayOrLaneManagement",
+     "NumberOfLanesRestricted": 1,
+     "RoadNumber": "E4",
+     "RoadNumberNumeric": 4,
+     "SeverityCode": 4,
+     "SeverityText": "Stor påverkan",
+     "StartTime": "2022-06-15T04:36:00.000+02:00",
+     "LocationDescriptor": "E4 från Länsgr. Gävleborgs/Västernorrlands län vid Armsjön till Trafikplats Njurunda (222) båda riktningarna i Gävleborgs län (X)",
+     "TrafficRestrictionType": "Körfält blockerade",
+     "VersionTime": "2023-08-16T10:33:22.810+02:00"
+    }
+   ],
+   "Id": "GUID12698ded-5777-4a6b-b7dd-82b1e995c2d6",
+   "PublicationTime": "2025-06-10T10:01:26.622+02:00",
+   "VersionTime": "2023-08-16T10:33:22.810+02:00",
+   "ModifiedTime": "2025-06-10T08:01:26.730Z"
+  }
+ ],
+ "rowCount": 3300
+}

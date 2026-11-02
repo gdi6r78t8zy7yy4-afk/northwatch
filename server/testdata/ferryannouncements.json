@@ -1,0 +1,80 @@
+{
+ "fetchedAt": "2026-11-02T16:32:34.302Z",
+ "status": 200,
+ "info": null,
+ "rows": [
+  {
+   "Deleted": false,
+   "DepartureTime": "2026-11-02T06:00:00.000+01:00",
+   "DeviationId": "SE_STA_TRISSID_1_136762",
+   "Id": 12026110206002,
+   "FromHarbor": {
+    "Id": 1,
+    "Name": "Västra Rödupp"
+   },
+   "ToHarbor": {
+    "Id": 2,
+    "Name": "Östra Rödupp"
+   },
+   "Route": {
+    "Id": 1,
+    "Name": "Röduppleden",
+    "Shortname": "FolRö",
+    "Type": {
+     "Id": 1,
+     "Name": "Vändande"
+    }
+   },
+   "ModifiedTime": "2026-11-02T11:02:27.098Z"
+  },
+  {
+   "Deleted": false,
+   "DepartureTime": "2026-11-02T06:20:00.000+01:00",
+   "DeviationId": "SE_STA_TRISSID_1_136762",
+   "Id": 12026110206202,
+   "FromHarbor": {
+    "Id": 1,
+    "Name": "Västra Rödupp"
+   },
+   "ToHarbor": {
+    "Id": 2,
+    "Name": "Östra Rödupp"
+   },
+   "Route": {
+    "Id": 1,
+    "Name": "Röduppleden",
+    "Shortname": "FolRö",
+    "Type": {
+     "Id": 1,
+     "Name": "Vändande"
+    }
+   },
+   "ModifiedTime": "2026-11-02T11:02:27.103Z"
+  },
+  {
+   "Deleted": false,
+   "DepartureTime": "2026-11-02T06:40:00.000+01:00",
+   "DeviationId": "SE_STA_TRISSID_1_136762",
+   "Id": 12026110206402,
+   "FromHarbor": {
+    "Id": 1,
+    "Name": "Västra Rödupp"
+   },
+   "ToHarbor": {
+    "Id": 2,
+    "Name": "Östra Rödupp"
+   },
+   "Route": {
+    "Id": 1,
+    "Name": "Röduppleden",
+    "Shortname": "FolRö",
+    "Type": {
+     "Id": 1,
+     "Name": "Vändande"
+    }
+   },
+   "ModifiedTime": "2026-11-02T11:02:27.103Z"
+  }
+ ],
+ "rowCount": 200
+}

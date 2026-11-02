@@ -1,0 +1,313 @@
+{
+ "fetchedAt": "2026-11-02T16:32:33.548Z",
+ "status": 200,
+ "info": null,
+ "rows": [
+  {
+   "Sample": "2026-11-02T17:15:03.000+01:00",
+   "Weather": {
+    "Precipitation": "no"
+   },
+   "Surface": {
+    "Temperature": {
+     "Origin": "measured",
+     "SensorNames": "DTS12G_2",
+     "Value": -2
+    }
+   },
+   "Air": {
+    "Temperature": {
+     "Origin": "measured",
+     "SensorNames": "HMP155_1",
+     "Value": -0.8
+    },
+    "Dewpoint": {
+     "SensorNames": "HMP155_1",
+     "Value": -0.8
+    },
+    "RelativeHumidity": {
+     "Origin": "measured",
+     "SensorNames": "HMP155_1",
+     "Value": 100
+    },
+    "VisibleDistance": {
+     "Origin": "measured",
+     "SensorNames": "PWD22_1",
+     "Value": 20000
+    }
+   },
+   "Wind": [
+    {
+     "Height": 6,
+     "Speed": {
+      "Origin": "measured",
+      "SensorNames": "WMT700_1",
+      "Value": 0.3
+     },
+     "Direction": {
+      "Origin": "measured",
+      "SensorNames": "WMT700_1",
+      "Value": 4
+     }
+    }
+   ],
+   "Aggregated5minutes": {
+    "Precipitation": {
+     "Rain": false,
+     "Snow": false,
+     "RainSum": {
+      "Origin": "measured",
+      "SensorNames": "PWD22_1",
+      "Value": 0
+     },
+     "SnowSum": {
+      "Solid": {
+       "Value": 0
+      },
+      "WaterEquivalent": {
+       "Origin": "measured",
+       "SensorNames": "PWD22_1",
+       "Value": 0
+      }
+     },
+     "TotalWaterEquivalent": {
+      "Value": 0
+     }
+    }
+   },
+   "Aggregated10minutes": {
+    "Wind": {
+     "SpeedMax": {
+      "Origin": "measured",
+      "SensorNames": "WMT700_1",
+      "Value": 1
+     },
+     "SpeedAverage": {
+      "Origin": "measured",
+      "SensorNames": "WMT700_1",
+      "Value": 0.3
+     }
+    },
+    "Precipitation": {
+     "Rain": false,
+     "Snow": false,
+     "RainSum": {
+      "Origin": "measured",
+      "SensorNames": "PWD22_1",
+      "Value": 0
+     },
+     "SnowSum": {
+      "Solid": {
+       "Value": 0
+      },
+      "WaterEquivalent": {
+       "Origin": "measured",
+       "SensorNames": "PWD22_1",
+       "Value": 0
+      }
+     },
+     "TotalWaterEquivalent": {
+      "Value": 0
+     }
+    }
+   },
+   "Aggregated30minutes": {
+    "Wind": {
+     "SpeedMax": {
+      "Origin": "measured",
+      "SensorNames": "WMT700_1",
+      "Value": 2.8
+     },
+     "SpeedAverage": {
+      "Origin": "measured",
+      "SensorNames": "WMT700_1",
+      "Value": 0.8
+     }
+    },
+    "Precipitation": {
+     "Rain": false,
+     "Snow": false,
+     "RainSum": {
+      "Origin": "measured",
+      "SensorNames": "PWD22_1",
+      "Value": 0
+     },
+     "SnowSum": {
+      "Solid": {
+       "Value": 0
+      },
+      "WaterEquivalent": {
+       "Origin": "measured",
+       "SensorNames": "PWD22_1",
+       "Value": 0
+      }
+     },
+     "TotalWaterEquivalent": {
+      "Value": 0
+     }
+    }
+   },
+   "Id": "436297250",
+   "Measurepoint": {
+    "Id": 2419,
+    "Name": "Renström",
+    "Geometry": {
+     "SWEREF99TM": "POINT (749414.666 7206368.901)",
+     "WGS84": "POINT (20.27178 64.88797)"
+    }
+   },
+   "Deleted": false,
+   "ModifiedTime": "2026-11-02T16:20:03.828Z"
+  },
+  {
+   "Sample": "2026-11-02T17:15:03.001+01:00",
+   "Weather": {
+    "Precipitation": "no"
+   },
+   "Air": {
+    "Temperature": {
+     "Origin": "measured",
+     "SensorNames": "HMP155_1",
+     "Value": 1.6
+    },
+    "Dewpoint": {
+     "SensorNames": "HMP155_1",
+     "Value": -0.4
+    },
+    "RelativeHumidity": {
+     "Origin": "measured",
+     "SensorNames": "HMP155_1",
+     "Value": 84.8
+    },
+    "VisibleDistance": {
+     "Origin": "measured",
+     "SensorNames": "PWD22_1",
+     "Value": 20000
+    }
+   },
+   "Wind": [
+    {
+     "Height": 6,
+     "Speed": {
+      "Origin": "measured",
+      "SensorNames": "WMT700_1",
+      "Value": 4.5
+     },
+     "Direction": {
+      "Origin": "measured",
+      "SensorNames": "WMT700_1",
+      "Value": 254
+     }
+    }
+   ],
+   "Aggregated5minutes": {
+    "Precipitation": {
+     "Rain": false,
+     "Snow": false,
+     "RainSum": {
+      "Origin": "measured",
+      "SensorNames": "PWD22_1",
+      "Value": 0
+     },
+     "SnowSum": {
+      "Solid": {
+       "Value": 0
+      },
+      "WaterEquivalent": {
+       "Origin": "measured",
+       "SensorNames": "PWD22_1",
+       "Value": 0
+      }
+     },
+     "TotalWaterEquivalent": {
+      "Value": 0
+     }
+    }
+   },
+   "Aggregated10minutes": {
+    "Wind": {
+     "SpeedMax": {
+      "Origin": "measured",
+      "SensorNames": "WMT700_1",
+      "Value": 8
+     },
+     "SpeedAverage": {
+      "Origin": "measured",
+      "SensorNames": "WMT700_1",
+      "Value": 4.5
+     }
+    },
+    "Precipitation": {
+     "Rain": false,
+     "Snow": false,
+     "RainSum": {
+      "Origin": "measured",
+      "SensorNames": "PWD22_1",
+      "Value": 0
+     },
+     "SnowSum": {
+      "Solid": {
+       "Value": 0
+      },
+      "WaterEquivalent": {
+       "Origin": "measured",
+       "SensorNames": "PWD22_1",
+       "Value": 0
+      }
+     },
+     "TotalWaterEquivalent": {
+      "Value": 0
+     }
+    }
+   },
+   "Aggregated30minutes": {
+    "Wind": {
+     "SpeedMax": {
+      "Origin": "measured",
+      "SensorNames": "WMT700_1",
+      "Value": 8
+     },
+     "SpeedAverage": {
+      "Origin": "measured",
+      "SensorNames": "WMT700_1",
+      "Value": 3.5
+     }
+    },
+    "Precipitation": {
+     "Rain": false,
+     "Snow": false,
+     "RainSum": {
+      "Origin": "measured",
+      "SensorNames": "PWD22_1",
+      "Value": 0
+     },
+     "SnowSum": {
+      "Solid": {
+       "Value": 0
+      },
+      "WaterEquivalent": {
+       "Origin": "measured",
+       "SensorNames": "PWD22_1",
+       "Value": 0
+      }
+     },
+     "TotalWaterEquivalent": {
+      "Value": 0
+     }
+    }
+   },
+   "Id": "436297251",
+   "Measurepoint": {
+    "Id": 2441,
+    "Name": "Fällfors",
+    "Geometry": {
+     "SWEREF99TM": "POINT (765542.096 7235574.173)",
+     "WGS84": "POINT (20.6659 65.13633)"
+    }
+   },
+   "Deleted": false,
+   "ModifiedTime": "2026-11-02T16:20:03.830Z"
+  }
+ ],
+ "rowCount": 600
+}

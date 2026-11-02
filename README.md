@@ -95,7 +95,7 @@ asset  { t:'a', area, country, source, type, name, id?, geometry, attrs?, update
 | ENTSO-E Transparency Platform | 1 Energi (SE/NO/FI) | struktur verifierad; datalagret tomt 2026-11-01 (kollektorn aktiverar sig automatiskt när data finns) |
 | Statnett driftsdata (gränsflöden) | 1 Energi (NO) | ok – verifierad 2026-11-01 |
 | Energi Data Service | 1 Energi (DK) | ok – verifierad 2026-11-01 |
-| Trafikverket öppna API | 3 Transport (SE) | kräver `TRAFIKVERKET_KEY` – gammal datamodell nedlagd server-side (se kollektorn) |
+| Trafikverket öppna dataplattform (datacache v2) | 3 Transport (SE) | kräver `TRAFIKVERKET_KEY` – omskriven till datacache-API:t 2026-11-02 (M5); väg, väglag, trafikflöden, vägväder, järnväg, färjor |
 | Digitraffic vägtrafikmeddelanden | 3 Transport (FI) | ok – v1/messages verifierad 2026-11-01 |
 | PeeringDB (IX) | 2 Digital infrastruktur (Nordiskt) | ok – verifierad 2026-11-01 |
 | Eurostat (BNP, SDMX 2.1) | 7 Industri (Nordiskt) | ok – verifierad 2026-11-01 |
@@ -155,6 +155,52 @@ schema-noteringar finns i respektive kollektors headerkommentar.
 | 72 | NORDIC · 11 Miljö | Copernicus EMS | Ej tagits upp – portal (katasofprodukter via klientansökan; skild process från CDS) |
 | 76 | NORDIC · 11 Miljö | Copernicus Climate Data Store | Tagits upp (M4) – `cds` ERA5 2m-temperatur över Norden; kräver gratis `CDS_TOKEN` + `CDS_EMAIL` |
 
+## Trafikverket (M5)
+
+M1/M2 använde Trafikverkets gamla API, vilket lades ned server-side (alla 400:or).
+M5 (2026-11-02) omskriver kollektorn till **datacache-API:t v2**
+(`https://api.trafikinfo.trafikverket.se/v2/data.json`, verifierat live 2026-11-02):
+
+- **Autentisering:** nyckeln skickas som `<LOGIN authenticationkey='…'/>` i XML-bodyn,
+  *inte* som HTTP-header. POST med `Content-Type: text/xml` + `Referer`-header.
+- **Frågespråk:** `<QUERY objecttype='X' namespace='Y' schemaversion='SV' [limit=] [orderby=]>`
+  med `<FILTER>` (operatorer `EQ/GT/GTE/LT/IN`, `AND`/`OR`-nestning, `$now` och
+  `$dateadd(±HH:MM:SS)`-tidsuttryck) och `<INCLUDE>`-fältrader. Rå svar och
+  intellisense-katalog (110 typer) finns i kollektorns headerkommentar.
+- **Objekttyper (schemaversioner verifierade):** `Situation` 1.6 (~3 300 rader),
+  `RoadCondition` 1.3 (~820), `TrafficFlow` 1.5 (~3 200 i fönster),
+  `TrainAnnouncement` 2.0 (tidsfönsterrädd; ofiltrerat svar returnerar föråldrade
+  rader), `WeatherObservation` 2.1, `TrainStation` 1.0 (1 757), `FerryAnnouncement` 1.2.
+- **Uppdateringsstrategi (API:s egen delta-markör är odokumenterad och ger 400 – vi
+  hanterar vattenmärkena själva):**
+  - Situation + RoadCondition: fullast vid start och var 30:e min; däremellan
+    `ModifiedTime <15 min`-fönster (limit 1 000, tak detektering → tvångsfullast).
+  - TrafficFlow: `MeasurementTime −20 min`, limit 5 000, `orderby MeasurementTime`;
+    latest-per-SiteId hålls i minneslagret. **Fordonsflöde (fordon/h) + snittfart
+    per mätstation ingår som metriskt datalag** (KPI:er + topp 25 mätare som
+    kartpunkter `flowmatning`) enligt beslut 2026-11-02.
+  - TrainAnnouncement: *obligatoriskt* tidsfönster −15 min…+2 h med `IN`-filter på
+    följda `LocationSignature` (`TRAFIKVERKET_STATIONS`, standard
+    `Cst,G,Mc,U,Lu,Ör,Vå` – Stockholm C är `Cst`, *inte* `Stl` = Ställdalen).
+  - WeatherObservation: `ModifiedTime −15 min`, limit 600 (KPI:er: stationer,
+    snitt vägtamperatur, is/snö-räknare).
+  - TrainStation: daglig (följda stationer visas på kartan även om de är
+    `Prognosticated` = ombyggda i datakatalogen, t.ex. Stockholm C).
+  - **CountyNo är API:ets egen numrering, ej SCB:s länskoder** (kod 1 =
+    Stockholm, 12 = Skåne, 14 = Västra Götaland, 100 = danska gränsstationer).
+    Mappningen i kollektorn är empiriskt verifierad mot kända stationer och
+    per-kods mätarbbox 2026-11-02.
+  - FerryAnnouncement: `DepartureTime −6 h…+12 h`, limit 2 500
+    (hela flödet bär `DeviationId` – inget filter behövs).
+- **SSE (valfritt, `TRAFIKVERKET_SSE=1`):** `sseurl='true'` ger en
+  `…/data.json?ssereqid=…`-ström (`text/event-stream`, CRLF-ramad) som mergas in i
+  minneslagret. Strömstarten avser en *full replay* (~12 MB) som ignorerar limit –
+  default är därför polling; SSE faller tillbaka på polling efter 5 minuters tystnad.
+- **Felfall:** delvis fel serverar sista goda data per typ; källan markeras `error`
+  först när *inga* frågor lyckats (eller alla vid start). Enhetstester
+  (`node --test "server/test/trafikverket.test.js"`) körs mot live-verifierade
+  fixtures i `server/testdata/` – inget nätverk.
+
 ## Nycklar och kredensials (`.env`)
 
 ```
@@ -163,7 +209,10 @@ CONTACT=…            # User-Agent-identifiering (krävs av bl.a. MET Norway; a
 FINGRID_KEY=…        # https://data.fingrid.fi/en/instructions
 FINGRID_DATASETS=    # "datasetId:Indikator,..."
 SVK_RESOURCE_ID=…    # resource_id per dataset på data.svk.se
-TRAFIKVERKET_KEY=…   # konto + licens hos Trafikverket
+TRAFIKVERKET_KEY=…   # M5 – datacache v2; autentisering sker i XML-bodyn (<LOGIN>), ej header
+TRAFIKVERKET_STATIONS=  # M5 – valfria följda järnvägsstationer (LocationSignature);
+                        #   standard Cst,G,Mc,U,Lu,Ör,Vå (OBS: 'Stl' = Ställdalen)
+TRAFIKVERKET_SSE=…     # M5 – 1 = SSE-ström (valfritt; default polling)
 ENTSO_E_TOKEN=…      # M2 – Transparency Platform
 NVD_API_KEY=…        # valfri
 NVE_API_KEY=…        # M4 – NVE HydAPI, gratis: https://hydapi.nve.no (header X-API-Key)
@@ -197,6 +246,12 @@ CDS_EMAIL=…          # M4 – kontots e-post (CDS kräver token + e-post per a
   9 ej – dokumenterade med skäl (se "Klass B-verifiering (M4)"). Gemensam json-stat 2.0-parser
   (`lib/jsonstat.js`, SCB v2 + SSB v2), AIS-fartygslager på kartan (`fartyg` i MapPanel),
   luckotexter uppdaterade per område (areas.js), nyckeldokumentation (NVE, CDS).
+- **M5 (klart 2026-11-02):** Trafikverket omskrivet till datacache-API:t v2 – LOGIN-
+  autentisering i XML-bodyn, per-typ vattenmärkespolling (ModifiedTime-fönster,
+  fullast som tak), fordonsflöde (TrafficFlow) som metriskt datalag med topp-25-
+  kartpunkter, tåganmälningar för valda stationer (LocationSignature), vägväder-KPI:er,
+  påverkade färjeavgångar, valfri SSE-ström; enhetstester mot live-fixtures
+  (server/testdata/), felfelhantering per typ. Se "Trafikverket (M5)".
 
 ## Datakällor och villkor
 
@@ -212,5 +267,8 @@ CDS_EMAIL=…          # M4 – kontots e-post (CDS kräver token + e-post per a
   10 min anropstid.
 - `api.stats.dk` (M4): TLS-mellanhänt (certifikatfel) från testnätet – anmärkt, ej
   API-brist; källan är därför ej tagits upp (se Klass B-tabellen).
+- Trafikverket datacache (M5): licenserad API-nyckel skickas i XML-bodyn
+  (`<LOGIN authenticationkey='…'/>`), `Referer`-header sätts per anrop; rate-limit
+  `100;w=1` (100 anrop/60 s) respekteras av pollningsintervallen (~7 frågor/minut).
 - Övrigt enligt respektive källas villkor – se API-katalogen
   (`nordic_critical_infrastructure_api_catalog_utokad.xlsx`).

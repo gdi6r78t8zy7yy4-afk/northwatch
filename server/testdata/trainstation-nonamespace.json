@@ -1,0 +1,23 @@
+{
+ "fetchedAt": "2026-11-02T16:32:34.209Z",
+ "status": 200,
+ "info": null,
+ "rows": [
+  {
+   "AdvertisedLocationName": "Alingsås",
+   "LocationSignature": "A",
+   "Prognosticated": true
+  },
+  {
+   "AdvertisedLocationName": "Annedal",
+   "LocationSignature": "Aal",
+   "Prognosticated": false
+  },
+  {
+   "AdvertisedLocationName": "Arbrå",
+   "LocationSignature": "Ab",
+   "Prognosticated": true
+  }
+ ],
+ "rowCount": 1000
+}

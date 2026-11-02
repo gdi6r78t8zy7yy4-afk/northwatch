@@ -1,0 +1,65 @@
+{
+ "fetchedAt": "2026-11-02T16:32:33.303Z",
+ "status": 200,
+ "info": null,
+ "rows": [
+  {
+   "SiteId": 4834,
+   "MeasurementTime": "2026-11-02T17:13:00.000+01:00",
+   "MeasurementOrCalculationPeriod": 60,
+   "VehicleType": "anyVehicle",
+   "VehicleFlowRate": 60,
+   "AverageVehicleSpeed": 72,
+   "CountyNo": 1,
+   "Deleted": false,
+   "Geometry": {
+    "SWEREF99TM": "POINT (674123.01 6597453.09)",
+    "WGS84": "POINT (18.07428 59.47933)"
+   },
+   "RegionId": 4,
+   "DataQuality": "good",
+   "SpecificLane": "lane1",
+   "MeasurementSide": "unknown",
+   "ModifiedTime": "2026-11-02T16:13:23.986Z"
+  },
+  {
+   "SiteId": 4836,
+   "MeasurementTime": "2026-11-02T17:14:00.000+01:00",
+   "MeasurementOrCalculationPeriod": 60,
+   "VehicleType": "anyVehicle",
+   "VehicleFlowRate": 60,
+   "AverageVehicleSpeed": 83,
+   "CountyNo": 1,
+   "Deleted": false,
+   "Geometry": {
+    "SWEREF99TM": "POINT (674372.96 6597525.92)",
+    "WGS84": "POINT (18.078745 59.479877)"
+   },
+   "RegionId": 4,
+   "DataQuality": "good",
+   "SpecificLane": "lane1",
+   "MeasurementSide": "unknown",
+   "ModifiedTime": "2026-11-02T16:14:22.851Z"
+  },
+  {
+   "SiteId": 4838,
+   "MeasurementTime": "2026-11-02T17:14:00.000+01:00",
+   "MeasurementOrCalculationPeriod": 60,
+   "VehicleType": "anyVehicle",
+   "VehicleFlowRate": 60,
+   "AverageVehicleSpeed": 88,
+   "CountyNo": 1,
+   "Deleted": false,
+   "Geometry": {
+    "SWEREF99TM": "POINT (674592.96 6597591)",
+    "WGS84": "POINT (18.082676 59.48037)"
+   },
+   "RegionId": 4,
+   "DataQuality": "good",
+   "SpecificLane": "lane1",
+   "MeasurementSide": "unknown",
+   "ModifiedTime": "2026-11-02T16:14:22.851Z"
+  }
+ ],
+ "rowCount": 3188
+}

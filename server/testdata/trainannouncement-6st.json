@@ -1,0 +1,77 @@
+{
+ "fetchedAt": "2026-11-02T16:32:33.325Z",
+ "status": 200,
+ "info": null,
+ "rows": [
+  {
+   "ActivityType": "Ankomst",
+   "AdvertisedTimeAtLocation": "2026-11-02T17:55:00.000+01:00",
+   "Canceled": false,
+   "FromLocation": [
+    {
+     "LocationName": "Gä"
+    }
+   ],
+   "LocationSignature": "Stl",
+   "OperationalTrainNumber": "8193",
+   "ProductInformation": [
+    {
+     "Description": "TiB"
+    }
+   ],
+   "ToLocation": [
+    {
+     "LocationName": "Ör"
+    }
+   ],
+   "TrackAtLocation": "1"
+  },
+  {
+   "ActivityType": "Avgang",
+   "AdvertisedTimeAtLocation": "2026-11-02T17:55:00.000+01:00",
+   "Canceled": false,
+   "FromLocation": [
+    {
+     "LocationName": "Gä"
+    }
+   ],
+   "LocationSignature": "Stl",
+   "OperationalTrainNumber": "8193",
+   "ProductInformation": [
+    {
+     "Description": "TiB"
+    }
+   ],
+   "ToLocation": [
+    {
+     "LocationName": "Ör"
+    }
+   ],
+   "TrackAtLocation": "1"
+  },
+  {
+   "ActivityType": "Ankomst",
+   "AdvertisedTimeAtLocation": "2026-11-02T18:09:00.000+01:00",
+   "Canceled": false,
+   "FromLocation": [
+    {
+     "LocationName": "Hpbg"
+    }
+   ],
+   "LocationSignature": "Stl",
+   "OperationalTrainNumber": "8176",
+   "ProductInformation": [
+    {
+     "Description": "TiB"
+    }
+   ],
+   "ToLocation": [
+    {
+     "LocationName": "Gä"
+    }
+   ],
+   "TrackAtLocation": "1"
+  }
+ ],
+ "rowCount": 8
+}

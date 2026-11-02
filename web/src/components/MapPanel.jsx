@@ -3,8 +3,9 @@
 //   – landsgränser (statisk GeoJSON via backend, Natural Earth)
 //   – energilagret: HVDC-länkar + schematiska zonskilda (område 1)
 //   – zonflöden i realtid (Statnett, live-mittade MW)
-//   – anläggningspunkter: IX (PeeringDB), OSM (kraft/datacenter/flyg/vatten)
-//   – händelser med geografi (t.ex. Digitraffic vägtrafik, FI)
+//   – anläggningspunkter: IX (PeeringDB), OSM (kraft/datacenter/flyg/vatten),
+//     Trafikverket flödesmätare (topp 25) + följda järnvägsstationer (M5)
+//   – händelser med geografi (t.ex. Digitraffic vägtrafik, FI, Trafikverket)
 // Allt servas av backend – frontend pratar aldrig med externa källor.
 import React, { useEffect, useRef } from 'react';
 import L from 'leaflet';
@@ -20,6 +21,8 @@ const TYPE_COLORS = {
   flygplats: '#2e86c1',
   vattenverk: '#14b8a6',
   fartyg: '#0f8b8d',
+  flowmatning: '#e0a52e',
+  station: '#c2418f',
 };
 
 const TYPE_LABELS = {
@@ -30,6 +33,8 @@ const TYPE_LABELS = {
   vattenverk: 'Vattenverk (OSM)',
   fartyg: 'Fartyg i rörelse (AIS, Digitraffic Meri)',
   flow: 'Zonflöde (Statnett)',
+  flowmatning: 'Flödesmätare (Trafikverket)',
+  station: 'Järnvägsstation (Trafikverket)',
 };
 
 const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -168,8 +173,10 @@ export default function MapPanel({ area, country, assets = [], staticGeo = null,
   const hasOsm = assets.some(a => a.source === 'osm');
   const hasFlow = assets.some(a => a.type === 'flow');
   const hasFartyg = assets.some(a => a.type === 'fartyg');
+  const hasFlowmatning = assets.some(a => a.type === 'flowmatning');
+  const hasStation = assets.some(a => a.type === 'station');
   const hasEvents = events.length > 0;
-  const empty = !hasIx && !hasOsm && !hasFlow && !hasFartyg && !hasEvents;
+  const empty = !hasIx && !hasOsm && !hasFlow && !hasFartyg && !hasFlowmatning && !hasStation && !hasEvents;
 
   return (
     <div className="card">
@@ -184,6 +191,8 @@ export default function MapPanel({ area, country, assets = [], staticGeo = null,
         {hasIx && <span><i className="pt" style={{ background: '#7c5cd6' }} />Internetutbyte (IX)</span>}
         {hasOsm && <span><i className="pt" style={{ background: '#e0662e' }} />Anläggning (OSM)</span>}
         {hasFartyg && <span><i className="pt" style={{ background: '#0f8b8d' }} />Fartyg (AIS)</span>}
+        {hasFlowmatning && <span><i className="pt" style={{ background: '#e0a52e' }} />Flödesmätare (topp 25)</span>}
+        {hasStation && <span><i className="pt" style={{ background: '#c2418f' }} />Järnvägsstation</span>}
         {hasEvents && <span><i style={{ background: '#d4574a' }} />Trafikhändelse</span>}
       </div>
       {empty && (

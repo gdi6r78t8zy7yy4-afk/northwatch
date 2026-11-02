@@ -1,7 +1,9 @@
 // Källregistret – 32 källor: M1 (9) + M2 (9) + M3 (4 OSM/Overpass) + M4 (10).
 // M2 (2026-11-01): entsoe, statnett, energidataservice, peeringdb, eurostat,
 // noaa, epss, attack, dmi. Digitraffic verifierad mot v1/messages;
-// Trafikverkets gamla API är nedlagt server-side (se kollektorn).
+// M5 (2026-11-02): Trafikverket-omskrivning till datacache-API:t (v2) med
+// LOGIN-auth i XML-bodyn, ModifiedTime-polling och TrafficFlow-mätdata;
+// se README "Trafikverket (M5)" och kollektorn.
 // M3 (2026-11-01): osm-energi/digital/transport/vatten – veckohämtning av
 // anläggningspunkter för kartlagren (se osm.js + lib/geolayers.js).
 // M4 (2026-11-02): klass B-verifiering enligt API-katalogen – energinet,
