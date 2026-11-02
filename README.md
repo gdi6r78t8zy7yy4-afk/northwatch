@@ -48,11 +48,14 @@ server/                 backend – ett enda JS-beroende: fast-xml-parser (ENTSO
   lib/http.js           fetch-hjälp (User-Agent med kontakt, timeout)
   lib/store.js          minneslager: normaliserade poster + källhälsa
   lib/scheduler.js      pollar varje källa med sitt intervall (staggerad uppstart)
+  lib/geolayers.js      statiska kartlager, zonmittpunkter, OSM/Overpass-utdrag (veckocache)
+  assets/*.geojson      landsgränser (Natural Earth) + energilager (HVDC, zonankar)
+  cache/                OSM-veckocache på disk (gitignorerad)
   collectors/*.js       en modul per källa → normaliserade poster
 web/                    Vite + React SPA (svenskt gränssnitt)
   src/App.jsx           routing (HashRouter), globalt landsskick, 30 s-refresh
   src/pages/            SummaryPage (statusmatris), DashboardPage (gemensam mall)
-  src/components/       TopBar, StatusPill, HealthTable, tabeller
+  src/components/       TopBar, StatusPill, HealthTable, tabeller, MapPanel (Leaflet)
   src/status.js         statusmodell (ok/stale/no_key/error/none)
 ```
 
@@ -69,10 +72,12 @@ asset  { t:'a', area, country, source, type, name, id?, geometry, attrs?, update
 - `GET /api/summary` – KPI, statusmatris per område×land, senaste händelser, källhälsa
 - `GET /api/dashboards` – områdesregistret med beräknad status
 - `GET /api/dashboard/:id?country=ALL|SE|NO|DK|FI|IS` – poster + källor för ett område
-- `GET /api/assets?country=&type=` – geolager (fylls i M3)
+- `GET /api/assets?area=&country=` – geolager som poster (kraftanläggningar, datacenter,
+  flygplatser, vattenverk, IX-positioner, zonflöden); `NORDIC` ingår alltid i country-filtret
+- `GET /api/geo/static` – statiska kartlager (landsgränser + energilager), ändras sällan
 - `GET /api/health` – källhälsa
 
-## Källor (M1 + M2, 18 st)
+## Källor (M1 + M2 + M3, 22 st)
 
 | Källa | Område | Status |
 |-------|--------|--------|
@@ -94,6 +99,14 @@ asset  { t:'a', area, country, source, type, name, id?, geometry, attrs?, update
 | PeeringDB (IX) | 2 Digital infrastruktur (Nordiskt) | ok – verifierad 2026-11-01 |
 | Eurostat (BNP, SDMX 2.1) | 7 Industri (Nordiskt) | ok – verifierad 2026-11-01 |
 | NOAA SWPC (Kp, F10.7) | 10 GNSS/Rymd (Nordiskt) | ok – verifierad 2026-11-01 |
+| OSM/Overpass: kraft & nät | 1 Energi (Nordiskt) | veckovis – kraftverk (`power=plant`) + kraftstationer ≥100 kV; verifierad 2026-11-02 |
+| OSM/Overpass: datacenter | 2 Digital (Nordiskt) | veckovis – `building=data_center(-centre)`; verifierad 2026-11-02 |
+| OSM/Overpass: flygplatser | 3 Transport (Nordiskt) | veckovis – `aeroway=airport/aerodrome` (utan militära); verifierad 2026-11-02 |
+| OSM/Overpass: vattenverk | 4 Vatten (Nordiskt) | veckovis – `man_made=water_works`, `sewage=works`; verifierad 2026-11-02 |
+
+OSM-källorna köas internt (den publika instansen 429:ar vid samtidighet) och återförs med
+backoff. Vid fortgående nätverksmisse återanvänds den senaste diskcachen och källan
+står i `error` i hälsan (kartan fungerar utan anläggningspunkterna).
 
 Källor utan nyckel visas som **"Saknar …"** i källhälsan och aktiveras automatiskt
 när nyckeln läggs i `.env`.
@@ -121,9 +134,13 @@ NVD_API_KEY=…        # valfri
   Service, DMI (observations), PeeringDB, Eurostat (SDMX 2.1), NOAA SWPC, FIRST EPSS,
   MITRE ATT&CK + fix av Digitraffic (v1/messages). Trafikverkets gamla API är
   nedlagt server-side; SMHI-varningar kvarstår som endpoint-verifiering.
-- **M3:** kartor – Leaflet + OSM-tiles, geolager per område (bidding zones,
-  IXPs, händelser, varningspolygona), OSM Overpass-utdrag av kritiska anläggningar
-  (veckovis cache, ODbL-tillstånd).
+- **M3 (klart 2026-11-02):** kartor – Leaflet + OSM-tiles (OSM attribution), interaktiv
+  karta på de geo-markerade områdena (1, 2, 3, 4, 10, 11). Geolager per område:
+  landsgränser (Natural Earth 50m), HVDC-länkar + schematiska zonmittpunkter (statiskt
+  lager, explicit markerat som approximativt), internetutbyten (PeeringDB),
+  gränsflöden per spotzon (Statnett), vägtrafikevemeddelanden med geografi (Digitraffic)
+  samt veckovisa OSM/Overpass-utdrag av kritiska anläggningar – kraftverk/kraftstationer,
+  datacenter, flygplatser, vattenverk (diskcache, ODbL-tillstånd, sparsamt attributval).
 - **M4:** klass B-verifiering enligt API-katalogen, polish, dokumentation.
 
 ## Datakällor och villkor

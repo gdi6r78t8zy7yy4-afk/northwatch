@@ -97,7 +97,26 @@ tr.area-row:hover td { background: var(--mut-bg); }
 .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; }
 .row { display: flex; justify-content: space-between; gap: 8px; padding: 2px 0; }
 .gapcard { border-left: 3px solid var(--warn); }
+/* M3: Leaflet-karta */
 .mapbox {
-  min-height: 120px; display: flex; align-items: center; justify-content: center;
-  color: var(--mut); font-size: 13px; border: 1px dashed var(--bd); border-radius: 8px;
+  width: 100%; height: 420px; border: 1px solid var(--bd);
+  border-radius: 8px; background: var(--mut-bg);
+}
+.leaflet-container { border-radius: 8px; font: inherit; }
+.maplegend {
+  display: flex; gap: 14px; flex-wrap: wrap; margin-top: 8px; font-size: 12px;
+}
+.maplegend span { display: inline-flex; align-items: center; gap: 5px; }
+.maplegend i {
+  display: inline-block; width: 12px; height: 4px; border-radius: 2px;
+}
+.maplegend i.pt { width: 9px; height: 9px; border-radius: 50%; }
+.zone-label {
+  background: transparent; border: none; box-shadow: none;
+  font-weight: 700; font-size: 11px; color: #3c4654;
+  text-shadow: 0 0 3px #fff, 0 0 3px #fff;
+}
+.leaflet-popup-content .pop { font-size: 12.5px; line-height: 1.4; }
+.leaflet-popup-content .poprow {
+  display: flex; justify-content: space-between; gap: 14px; margin-top: 2px;
 }

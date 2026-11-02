@@ -12,6 +12,7 @@ import { startScheduler } from './lib/scheduler.js';
 import { state, healthList, areaSources, areaStatus, cellStatus, sourceStatus } from './lib/store.js';
 import { AREAS, COUNTRIES } from './areas.js';
 import { now } from './lib/http.js';
+import { staticGeo } from './lib/geolayers.js';
 
 for (const c of COLLECTORS) registerSource(c);
 startScheduler(COLLECTORS);
@@ -94,7 +95,26 @@ const routes = {
     return { generatedAt: now(), kpis, areas: areaMatrix(), top: enrich(topRecords()), health };
   },
 
-  '/api/assets': (u) => ({ assets: [] }), // fylls i M3 (OSM/PeeringDB-geolager)
+  // M3: geolager som poster (t:'a') från alla källor – OSM/Overpass
+  // (anläggningar), PeeringDB (IX), Statnett (zonflöden), Digitraffic (geografi
+  // i händelser). Filtreras på ?area= och ?country= (NORDIC ingår alltid).
+  '/api/assets': (u) => {
+    const area = u.searchParams.get('area');
+    const country = (u.searchParams.get('country') || 'ALL').toUpperCase();
+    const assets = [];
+    for (const s of state.sources.values()) {
+      for (const r of s.records) {
+        if (r.t !== 'a') continue;
+        if (area && String(r.area) !== area) continue;
+        if (country !== 'ALL' && r.country !== country && r.country !== 'NORDIC') continue;
+        assets.push(r);
+      }
+    }
+    return { assets };
+  },
+
+  // M3: statiska kartlager (landsgränser + energilager) – ändras sällan.
+  '/api/geo/static': () => ({ generatedAt: now(), ...staticGeo() }),
 };
 
 function sendJson(res, obj) {

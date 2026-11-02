@@ -1,7 +1,9 @@
-// Källregistret – 18 källor: M1 (9) + M2 (9).
+// Källregistret – 22 källor: M1 (9) + M2 (9) + M3 (4 OSM/Overpass).
 // M2 (2026-11-01): entsoe, statnett, energidataservice, peeringdb, eurostat,
 // noaa, epss, attack, dmi. Digitraffic verifierad mot v1/messages;
 // Trafikverkets gamla API är nedlagt server-side (se kollektorn).
+// M3 (2026-11-01): osm-energi/digital/transport/vatten – veckohämtning av
+// anläggningspunkter för kartlagren (se osm.js + lib/geolayers.js).
 import smhi from './smhi.js';
 import smhiWarnings from './smhi-warnings.js';
 import metno from './metno.js';
@@ -20,6 +22,7 @@ import noaa from './noaa.js';
 import epss from './epss.js';
 import attack from './attack.js';
 import dmi from './dmi.js';
+import osm from './osm.js';
 
 export const COLLECTORS = [
   smhi,
@@ -40,4 +43,5 @@ export const COLLECTORS = [
   peeringdb,
   eurostat,
   noaa,
+  ...osm,
 ];

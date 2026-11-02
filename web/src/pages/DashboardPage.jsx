@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { fetchDashboard } from '../api.js';
+import { fetchDashboard, fetchAssets, fetchStaticGeo } from '../api.js';
 import { COUNTRY_NAMES } from '../status.js';
 import StatusPill from '../components/StatusPill.jsx';
+import MapPanel from '../components/MapPanel.jsx';
 import { MetricsTable, EventsTable } from '../components/RecordsTables.jsx';
 
 export default function DashboardPage({ country }) {
@@ -10,6 +11,8 @@ export default function DashboardPage({ country }) {
   const areaId = Number(id);
   const [data, setData] = useState(null);
   const [err, setErr] = useState(null);
+  const [assets, setAssets] = useState([]);
+  const [staticGeo, setStaticGeo] = useState(null);
 
   useEffect(() => {
     let stop = false;
@@ -25,6 +28,31 @@ export default function DashboardPage({ country }) {
     const t = setInterval(load, 30000);
     return () => { stop = true; clearInterval(t); };
   }, [areaId, country]);
+
+  // M3: geolager (OSM/PeeringDB/Statnett-asset) pollas parallellt.
+  useEffect(() => {
+    let stop = false;
+    const load = async () => {
+      try {
+        const d = await fetchAssets(areaId, country);
+        if (!stop) setAssets(d.assets ?? []);
+      } catch {
+        if (!stop) setAssets([]);
+      }
+    };
+    load();
+    const t = setInterval(load, 30000);
+    return () => { stop = true; clearInterval(t); };
+  }, [areaId, country]);
+
+  // M3: statiska kartlager (landsgränser + energi) hämtas en gång.
+  useEffect(() => {
+    let stop = false;
+    fetchStaticGeo()
+      .then(d => { if (!stop) setStaticGeo(d); })
+      .catch(() => {});
+    return () => { stop = true; };
+  }, []);
 
   if (Number.isNaN(areaId)) {
     return <div className="card"><span className="pill st-err">Okänt område</span></div>;
@@ -54,10 +82,13 @@ export default function DashboardPage({ country }) {
       <div className="mut" style={{ marginBottom: 12 }}>{area.scope}</div>
 
       {area.geo && (
-        <div className="card">
-          <h2>Karta</h2>
-          <div className="mapbox">Interaktiv karta med geo-data kommer i M3 (Leaflet + geolager från backend)</div>
-        </div>
+        <MapPanel
+          area={area}
+          country={country}
+          assets={assets}
+          staticGeo={staticGeo}
+          events={records.filter(r => r.t === 'e' && r.geo)}
+        />
       )}
 
       <div className="grid">
