@@ -19,6 +19,7 @@ const TYPE_COLORS = {
   datacenter: '#9b3fd4',
   flygplats: '#2e86c1',
   vattenverk: '#14b8a6',
+  fartyg: '#0f8b8d',
 };
 
 const TYPE_LABELS = {
@@ -27,6 +28,7 @@ const TYPE_LABELS = {
   datacenter: 'Datacenter (OSM)',
   flygplats: 'Flygplats (OSM)',
   vattenverk: 'Vattenverk (OSM)',
+  fartyg: 'Fartyg i rörelse (AIS, Digitraffic Meri)',
   flow: 'Zonflöde (Statnett)',
 };
 
@@ -165,8 +167,9 @@ export default function MapPanel({ area, country, assets = [], staticGeo = null,
   const hasIx = assets.some(a => a.type === 'ix');
   const hasOsm = assets.some(a => a.source === 'osm');
   const hasFlow = assets.some(a => a.type === 'flow');
+  const hasFartyg = assets.some(a => a.type === 'fartyg');
   const hasEvents = events.length > 0;
-  const empty = !hasIx && !hasOsm && !hasFlow && !hasEvents;
+  const empty = !hasIx && !hasOsm && !hasFlow && !hasFartyg && !hasEvents;
 
   return (
     <div className="card">
@@ -180,6 +183,7 @@ export default function MapPanel({ area, country, assets = [], staticGeo = null,
         {hasFlow && <span><i style={{ background: '#d4574a' }} />Import/motriktning</span>}
         {hasIx && <span><i className="pt" style={{ background: '#7c5cd6' }} />Internetutbyte (IX)</span>}
         {hasOsm && <span><i className="pt" style={{ background: '#e0662e' }} />Anläggning (OSM)</span>}
+        {hasFartyg && <span><i className="pt" style={{ background: '#0f8b8d' }} />Fartyg (AIS)</span>}
         {hasEvents && <span><i style={{ background: '#d4574a' }} />Trafikhändelse</span>}
       </div>
       {empty && (
