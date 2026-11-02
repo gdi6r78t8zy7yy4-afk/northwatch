@@ -21,10 +21,14 @@ export default {
     const rows = await jjson(FLOW_URL);
     const list = Array.isArray(rows) ? rows : rows?.flows ?? [];
     if (!list.length) throw new Error('GetFlow returnerade ingen flödesrad');
+    // 'EN' (England & Wales) är statnetts elspotkod för Storbritannien;
+    // kartankaret i energy.geojson heter GB – normera i namn/attribut så
+    // att tooltips och ankarstämplar stämmer (geometrin aliasas redan).
+    const Z = z => (z === 'EN' ? 'GB' : z);
     const ts = r => (r.MeasureDate ? new Date(r.MeasureDate).toISOString() : now());
     const records = list.map(r => ({
       t: 'm', area: 1, country: 'NO', source: 'statnett',
-      indicator: `Nettoflöde ${r.OutAreaElspotId}→${r.InAreaElspotId}`,
+      indicator: `Nettoflöde ${Z(r.OutAreaElspotId)}→${Z(r.InAreaElspotId)}`,
       value: Number(r.Value), unit: 'MW', ts: ts(r),
     }));
     // M3: flödesgeometri som kartasset – linje mellan schematiska
@@ -35,9 +39,9 @@ export default {
       if (!a || !b) continue;
       records.push({
         t: 'a', area: 1, country: 'NORDIC', source: 'statnett',
-        type: 'flow', name: `${r.OutAreaElspotId}→${r.InAreaElspotId}`,
+        type: 'flow', name: `${Z(r.OutAreaElspotId)}→${Z(r.InAreaElspotId)}`,
         geometry: { type: 'LineString', coordinates: [a, b] },
-        attrs: { mw: Number(r.Value), from: r.OutAreaElspotId, to: r.InAreaElspotId },
+        attrs: { mw: Number(r.Value), from: Z(r.OutAreaElspotId), to: Z(r.InAreaElspotId) },
         updated: ts(r),
       });
     }

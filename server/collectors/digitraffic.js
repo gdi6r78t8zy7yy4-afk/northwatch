@@ -27,7 +27,11 @@ export default {
     const url = process.env.DIGITRAFFIC_MESSAGES_URL || DEFAULT_URL;
     const r = await j(url, {
       headers: {
-        'Digitraffic-User': `northwatch/0.1 (dev@localhost)`,
+        // Tillkrav i deras ToS: unik identifiering –(CONTACT från .env, annars
+        // kontaktlös markerad) i stället för inbakad placeholder.
+        'Digitraffic-User': process.env.CONTACT
+          ? `northwatch/0.1 (${process.env.CONTACT})`
+          : 'northwatch/0.1 (contact: unset)',
         Accept: 'application/json',
         'Accept-Encoding': 'gzip',
       },

@@ -38,6 +38,13 @@ export default {
       Object.keys(rows[0]).filter(k => k.startsWith('Exchange')).reduce((a, f) => a + sum(f), 0),
     );
 
+    // CO2-intensitet (g/kWh) är per-prisområde – summering av DK1+DK2 hade
+    // dubbelräknat. Vägt med förbrukning (GrossCon) per prisområde.
+    const totCons = rows.reduce((a, r) => a + (Number(r.GrossCon) || 0), 0);
+    const co2 = totCons > 0
+      ? round(rows.reduce((a, r) => a + (Number(r.CO2PerkWh) || 0) * (Number(r.GrossCon) || 0), 0) / totCons)
+      : round(sum('CO2PerkWh'));
+
     return [
       { t: 'm', area: 1, country: 'DK', source: 'energidataservice',
         indicator: 'Vindproduktion (DK)', value: wind, unit: 'MW', ts: latestTs },
@@ -50,7 +57,7 @@ export default {
       { t: 'm', area: 1, country: 'DK', source: 'energidataservice',
         indicator: 'Nettoflöde (DK)', value: exch, unit: 'MW', ts: latestTs },
       { t: 'm', area: 1, country: 'DK', source: 'energidataservice',
-        indicator: 'CO2-intensitet (DK)', value: round(sum('CO2PerkWh')), unit: 'g/kWh', ts: latestTs },
+        indicator: 'CO2-intensitet (DK)', value: co2, unit: 'g/kWh', ts: latestTs },
     ];
   },
 };
