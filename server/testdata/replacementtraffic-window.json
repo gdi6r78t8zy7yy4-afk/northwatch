@@ -1,0 +1,255 @@
+{
+ "fetchedAt": "2026-11-03T22:28:32.159Z",
+ "status": 200,
+ "info": null,
+ "rows": [
+  {
+   "Id": "1925673",
+   "ReplacesTrains": {
+    "ReplacesTrain": [
+     {
+      "AdvertisedTrainIdent": "7103",
+      "ScheduledDepartureDate": "2026-11-04"
+     }
+    ]
+   },
+   "VehicleIdentifier": "CGW173",
+   "VehicleMode": "bus",
+   "Status": "confirmed",
+   "Stops": {
+    "Stop": [
+     {
+      "StopDescription": "Luleå Central. Hpl. stationsplanen.",
+      "StopPosition": {
+       "Location": {
+        "Longitude": 22.165184,
+        "Latitude": 65.58412
+       }
+      },
+      "PlannedDepartureTime": "2026-11-04T08:19:00.000+01:00",
+      "Sequence": 1
+     },
+     {
+      "StopDescription": "Notviken Station",
+      "StopPosition": {
+       "Location": {
+        "Longitude": 22.116634,
+        "Latitude": 65.61213
+       }
+      },
+      "PlannedDepartureTime": "2026-11-04T08:31:00.000+01:00",
+      "Sequence": 2
+     },
+     {
+      "StopDescription": "Sunderby sjukhus. Hpl. baksidan sjukhuset.",
+      "StopPosition": {
+       "Location": {
+        "Longitude": 21.93382,
+        "Latitude": 65.67355
+       }
+      },
+      "PlannedDepartureTime": "2026-11-04T08:41:00.000+01:00",
+      "Sequence": 3
+     },
+     {
+      "StopDescription": "Boden Centralstation. Hpl stationsplanen.",
+      "StopPosition": {
+       "Location": {
+        "Longitude": 21.707012,
+        "Latitude": 65.82873
+       }
+      },
+      "PlannedDepartureTime": "2026-11-04T09:01:00.000+01:00",
+      "Sequence": 4
+     }
+    ]
+   }
+  },
+  {
+   "Id": "1925674",
+   "ReplacesTrains": {
+    "ReplacesTrain": [
+     {
+      "AdvertisedTrainIdent": "7183",
+      "ScheduledDepartureDate": "2026-11-04"
+     }
+    ]
+   },
+   "VehicleIdentifier": "ZMJ967",
+   "VehicleMode": "bus",
+   "Status": "confirmed",
+   "Stops": {
+    "Stop": [
+     {
+      "StopDescription": "Luleå Central. Hpl. stationsplanen.",
+      "StopPosition": {
+       "Location": {
+        "Longitude": 22.165184,
+        "Latitude": 65.58412
+       }
+      },
+      "PlannedDepartureTime": "2026-11-04T09:30:00.000+01:00",
+      "Sequence": 4
+     },
+     {
+      "StopDescription": "Boden Centralstation. Hpl stationsplanen.",
+      "StopPosition": {
+       "Location": {
+        "Longitude": 21.707012,
+        "Latitude": 65.82873
+       }
+      },
+      "PlannedDepartureTime": "2026-11-04T08:48:00.000+01:00",
+      "Sequence": 1
+     },
+     {
+      "StopDescription": "Notviken Station",
+      "StopPosition": {
+       "Location": {
+        "Longitude": 22.116634,
+        "Latitude": 65.61213
+       }
+      },
+      "PlannedDepartureTime": "2026-11-04T09:18:00.000+01:00",
+      "Sequence": 3
+     },
+     {
+      "StopDescription": "Sunderby sjukhus. Hpl. baksidan sjukhuset.",
+      "StopPosition": {
+       "Location": {
+        "Longitude": 21.93382,
+        "Latitude": 65.67355
+       }
+      },
+      "PlannedDepartureTime": "2026-11-04T09:08:00.000+01:00",
+      "Sequence": 2
+     }
+    ]
+   }
+  },
+  {
+   "Id": "1925675",
+   "ReplacesTrains": {
+    "ReplacesTrain": [
+     {
+      "AdvertisedTrainIdent": "7151",
+      "ScheduledDepartureDate": "2026-11-04"
+     }
+    ]
+   },
+   "VehicleIdentifier": "CGW173",
+   "VehicleMode": "bus",
+   "Status": "confirmed",
+   "Stops": {
+    "Stop": [
+     {
+      "StopDescription": "Boden Centralstation. Hpl stationsplanen.",
+      "StopPosition": {
+       "Location": {
+        "Longitude": 21.707012,
+        "Latitude": 65.82873
+       }
+      },
+      "PlannedDepartureTime": "2026-11-04T09:16:00.000+01:00",
+      "Sequence": 1
+     },
+     {
+      "StopDescription": "Sunderby sjukhus. Hpl. baksidan sjukhuset.",
+      "StopPosition": {
+       "Location": {
+        "Longitude": 21.93382,
+        "Latitude": 65.67355
+       }
+      },
+      "PlannedDepartureTime": "2026-11-04T09:36:00.000+01:00",
+      "Sequence": 2
+     },
+     {
+      "StopDescription": "Notviken Station",
+      "StopPosition": {
+       "Location": {
+        "Longitude": 22.116634,
+        "Latitude": 65.61213
+       }
+      },
+      "PlannedDepartureTime": "2026-11-04T09:46:00.000+01:00",
+      "Sequence": 3
+     },
+     {
+      "StopDescription": "Luleå Central. Hpl. stationsplanen.",
+      "StopPosition": {
+       "Location": {
+        "Longitude": 22.165184,
+        "Latitude": 65.58412
+       }
+      },
+      "PlannedDepartureTime": "2026-11-04T09:58:00.000+01:00",
+      "Sequence": 4
+     }
+    ]
+   }
+  },
+  {
+   "Id": "9999999",
+   "ReplacesTrains": {
+    "ReplacesTrain": [
+     {
+      "AdvertisedTrainIdent": "7103",
+      "ScheduledDepartureDate": "2026-11-04"
+     }
+    ]
+   },
+   "VehicleIdentifier": "CGW173",
+   "VehicleMode": "bus",
+   "Status": "finished",
+   "Stops": {
+    "Stop": [
+     {
+      "StopDescription": "Luleå Central. Hpl. stationsplanen.",
+      "StopPosition": {
+       "Location": {
+        "Longitude": 22.165184,
+        "Latitude": 65.58412
+       }
+      },
+      "PlannedDepartureTime": "2026-11-04T08:19:00.000+01:00",
+      "Sequence": 1
+     },
+     {
+      "StopDescription": "Notviken Station",
+      "StopPosition": {
+       "Location": {
+        "Longitude": 22.116634,
+        "Latitude": 65.61213
+       }
+      },
+      "PlannedDepartureTime": "2026-11-04T08:31:00.000+01:00",
+      "Sequence": 2
+     },
+     {
+      "StopDescription": "Sunderby sjukhus. Hpl. baksidan sjukhuset.",
+      "StopPosition": {
+       "Location": {
+        "Longitude": 21.93382,
+        "Latitude": 65.67355
+       }
+      },
+      "PlannedDepartureTime": "2026-11-04T08:41:00.000+01:00",
+      "Sequence": 3
+     },
+     {
+      "StopDescription": "Boden Centralstation. Hpl stationsplanen.",
+      "StopPosition": {
+       "Location": {
+        "Longitude": 21.707012,
+        "Latitude": 65.82873
+       }
+      },
+      "PlannedDepartureTime": "2026-11-04T09:01:00.000+01:00",
+      "Sequence": 4
+     }
+    ]
+   }
+  }
+ ]
+}

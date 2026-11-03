@@ -1,0 +1,47 @@
+{
+ "fetchedAt": "2026-11-03T22:28:32.159Z",
+ "status": 200,
+ "info": null,
+ "rows": [
+  {
+   "Id": "1500adde-1c5d-2523-08de-cc5b79d21b80",
+   "MediaType": "Monitor",
+   "LocationCode": "Ljv",
+   "StartDateTime": "2026-08-01T00:01:00.000+02:00",
+   "EndDateTime": "2026-12-31T23:59:00.000+01:00",
+   "FreeText": "På grund av ett problem med högtalarsystemet \nkan vissa utrop utebli. Var därför extra \nuppmärksam på information som visas på \nskyltar och informationsskärmar.",
+   "Status": "Normal",
+   "ModifiedTime": "2026-08-14T13:12:00.584Z"
+  },
+  {
+   "Id": "1500adde-1c5d-2523-08de-cc5b79d21b82",
+   "MediaType": "Monitor",
+   "LocationCode": "Ei",
+   "StartDateTime": "2026-08-01T00:01:00.000+02:00",
+   "EndDateTime": "2026-12-31T23:59:00.000+01:00",
+   "FreeText": "På grund av ett problem med högtalarsystemet \nkan vissa utrop utebli. Var därför extra \nuppmärksam på information som visas på \nskyltar och informationsskärmar.",
+   "Status": "Normal",
+   "ModifiedTime": "2026-08-14T13:12:00.594Z"
+  },
+  {
+   "Id": "1500adde-385d-9cb6-08df-290212355d29",
+   "MediaType": "Monitor",
+   "LocationCode": "Mc",
+   "StartDateTime": "2026-10-28T06:00:00.000+01:00",
+   "EndDateTime": "2026-11-06T05:00:00.000+01:00",
+   "FreeText": "Banarbete Simrishamn.Malmö:\n1/11-6/11 dagligen kl. 22:00-05:00 är \ntågtrafiken mellan Svedala-Skurup ersatt med \nbuss enligt tillfällig tidtabell. Räkna med \nlängre restid än normalt. Orsaken är \nbanarbete. För mer information om din resa \nhänvisas du till ditt tågbolag.",
+   "Status": "Normal",
+   "ModifiedTime": "2026-10-13T08:14:58.358Z"
+  },
+  {
+   "Id": "1500adde-385d-9cb6-08df-290212355d2b",
+   "MediaType": "Monitor",
+   "LocationCode": "Tri",
+   "StartDateTime": "2026-10-28T06:00:00.000+01:00",
+   "EndDateTime": "2026-11-06T05:00:00.000+01:00",
+   "FreeText": "Banarbete Simrishamn.Malmö:\n1/11-6/11 dagligen kl. 22:00-05:00 är \ntågtrafiken mellan Svedala-Skurup ersatt med \nbuss enligt tillfällig tidtabell. Räkna med \nlängre restid än normalt. Orsaken är \nbanarbete. För mer information om din resa \nhänvisas du till ditt tågbolag.",
+   "Status": "Normal",
+   "ModifiedTime": "2026-10-13T08:14:58.376Z"
+  }
+ ]
+}

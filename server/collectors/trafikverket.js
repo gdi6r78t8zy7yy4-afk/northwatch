@@ -25,6 +25,10 @@
 //   WeatherObservation Road.WeatherInfo  2.1  vägväder (vägtemp/is/snö)
 //   TrainStation       rail.infrastructure 1.0 stationer + WGS84-geometri
 //   FerryAnnouncement  Ferry.TrafficInfo 1.2  färjeavgångar påverkade av avvikelser
+//   TrafficSafetyCamera Road.Infrastructure 1.0 kameror (huvudvägar → karta, M7)
+//   RailCrossing       Road.Infrastructure 1.5 järnvägskorsningar i drift (M7)
+//   TrainStationMessage Rail.TrafficInfo  1.0 aktiva stationmeddelanden (M7)
+//   ReplacementTraffic JBS                 1.0 ersättningsbussar för tåg (M7)
 //
 // Strategi: Situation och RoadCondition hålls i ett minneslager (Map per Id).
 // Start + var 30:e min fullast (~3 300 respektive ~800 rader); däremellan
@@ -32,7 +36,12 @@
 // API:ets egen lastmodified/changeid-mekanism ger inga användbara delta
 // (vattenståndet är det äldsta ModifiedTime, changeid avslås 400) – vi
 // förvaltar vattenståndet själva. TrafficFlow/TrainAnnouncement/Weather/Ferry
-// är fönsterfrågor per tick; TrainStation laddas en gång per dygn.
+// är fönsterfrågor per tick; TrainStation laddas en gång per dygn. M7:
+// TrafficSafetyCamera (2 819 rader) och RailCrossing (8 737 "I drift") laddas
+// likaså per dygn; TrainStationMessage (aktiva, ~560) och ReplacementTraffic
+// (fönstret –6 h … +24 h på stopptiderna) är fönsterfrågor per tick.
+// $dateadd-kvick: tidsuttryck utan dagsprefix räknas maximalt 24 h –
+// 1.00:00:00 (med dagsprefix) är 24 h framöver; verifierat live 2026-11-03.
 //
 // SSE (valfritt, TRAFIKVERKET_SSE=1): POST med sseurl='true' ger INFO.SSEURL;
 // GET på den URL:en strömmar text/event-stream (CRLF-ramad: id:/data: per
@@ -52,6 +61,17 @@ const FULL_REFRESH_MS = 30 * 60000;   // fullast situation/väglag
 const SSE_SILENCE_MS = 5 * 60000;     // fall tillbaka på polling efter tystnad
 const STATIONS_D = 24 * 3600 * 1000;  // stationslista per dygn
 const FERRY_D = 5 * 60000;            // färjefönstret (stort) sällan
+const CAMERAS_D = 24 * 3600 * 1000;   // M7: kamerolistan per dygn (~0,6 MB)
+const RAILCROSS_D = 24 * 3600 * 1000; // M7: järnvägskorsningar per dygn (~1,4 MB)
+
+// Huvudvägar (M7, regler verifierade live 2026-11-03): alla E-vägar +
+// riksvägar i listan → 906 av 2 819 kameror (topp: E4=111, E45=110,
+// E14=79, 26=69, 50=61). Endast dessa blir kartpunkter.
+const MAJOR_ROAD_RE = /^E\d+$/i;
+const MAJOR_ROADS = new Set(['1', '3', '4', '5', '6', '7', '9', '13', '15',
+  '17', '18', '20', '21', '22', '23', '25', '26', '28', '31', '34', '40',
+  '50', '56', '220']);
+const isMajorRoad = rn => { const s = String(rn ?? ''); return MAJOR_ROAD_RE.test(s) || MAJOR_ROADS.has(s); };
 
 const stations = () => (process.env.TRAFIKVERKET_STATIONS || 'Cst,G,Mc,U,Lu,Ör,Vå')
   .split(',').map(s => s.trim()).filter(Boolean);
@@ -176,6 +196,10 @@ const S = {
   stations: [],           // alla stationer (prunat), per dygn
   stationNames: new Map(), // LocationSignature -> visningsnamn
   ferry: [],              // avgångar påverkade av avvikelser, -6 h … +12 h
+  cameras: [],            // M7: alla speedkameror (per dygn)
+  railCrossings: [],      // M7: järnvägskorsningar "I drift" (per dygn)
+  stationMsgs: [],        // M7: aktiva stationmeddelanden (per tick)
+  replTraffic: [],        // M7: ersättningsbussar för tåg (per tick)
   initialized: false,
   lastFull: { situation: 0, road: 0 },
   lastFetch: {},
@@ -311,6 +335,70 @@ async function qFerry() {
   S.ferry = rows;
 }
 
+// ---- M7: nya objekttyper ------------------------------------------------
+
+// Speedkameror: full lista per dygn (verifierat 2026-11-03: 2 819 rader,
+// ~0,6 MB). Huvudvägar (E + riksvägar) blir kartpunkter i buildRecords.
+async function qCameras() {
+  const { rows } = await postXml(
+    requestXml({
+      type: 'TrafficSafetyCamera', ns: 'Road.Infrastructure', sv: '1.0', limit: 20000,
+      include: ['Id', 'Name', 'RoadNumber', 'CountyNo', 'Geometry.WGS84',
+        'ModifiedTime', 'Deleted'],
+    }), { tag: 'cameras', timeout: 90000 });
+  S.cameras = rows.filter(r => !r.Deleted);
+}
+
+// Järnvägskorsningar "I drift", per dygn (verifierat: 8 737 rader).
+// TrainFlow är 0 för alla rader – mätning kan inte användas, KPI endast.
+async function qRailCrossings() {
+  const { rows } = await postXml(
+    requestXml({
+      type: 'RailCrossing', ns: 'Road.Infrastructure', sv: '1.5', limit: 20000,
+      include: ['LevelCrossingId', 'RoadName', 'OperatingMode',
+        'NumberOfTracks', 'Geometry.WGS84'],
+      filter: `<FILTER><EQ name='OperatingMode' value='I drift' /></FILTER>`,
+    }), { tag: 'railcrossing', timeout: 90000 });
+  S.railCrossings = rows.filter(r => !r.Deleted);
+}
+
+// Aktiva stationmeddelanden: gällande just nu (Start ≤ nu ≤ End).
+// Verifierat 2026-11-03: ~560 rader / ~0,3 MB; per tick.
+async function qStationMessages() {
+  const { rows } = await postXml(
+    requestXml({
+      type: 'TrainStationMessage', ns: 'Rail.TrafficInfo', sv: '1.0', limit: 1000,
+      orderby: 'ModifiedTime',
+      filter: `<FILTER><AND>`
+        + `<LT name='StartDateTime' value='$now' />`
+        + `<GT name='EndDateTime' value='$now' /></AND></FILTER>`,
+      include: ['Id', 'MediaType', 'LocationCode', 'StartDateTime', 'EndDateTime',
+        'FreeText', 'ModifiedTime', 'Status'],
+    }), { tag: 'stationmsg' });
+  S.stationMsgs = rows.filter(r => !r.Deleted);
+}
+
+// Ersättningsbussar för tåg: fönstret –6 h … +24 h på stopptiderna
+// (dagsprefix i $dateadd – se kommentar i filhuvudet). Verifierat 2026-11-03.
+async function qReplTraffic() {
+  const { rows } = await postXml(
+    requestXml({
+      type: 'ReplacementTraffic', ns: 'JBS', sv: '1.0', limit: 500,
+      filter: `<FILTER><AND>`
+        + `<GT name='Stops.Stop.PlannedDepartureTime' value='$dateadd(-06:00:00)' />`
+        + `<LT name='Stops.Stop.PlannedDepartureTime' value='$dateadd(1.00:00:00)' />`
+        + `</AND></FILTER>`,
+      include: ['Id', 'Status', 'VehicleMode', 'VehicleIdentifier',
+        'ReplacesTrains.ReplacesTrain.AdvertisedTrainIdent',
+        'ReplacesTrains.ReplacesTrain.ScheduledDepartureDate',
+        'Stops.Stop.Sequence', 'Stops.Stop.StopDescription',
+        'Stops.Stop.PlannedDepartureTime', 'Stops.Stop.ExpectedDepartureTime',
+        'Stops.Stop.StopPosition.Location.Latitude',
+        'Stops.Stop.StopPosition.Location.Longitude'],
+    }), { tag: 'repltraffic' });
+  S.replTraffic = rows.filter(r => !r.Deleted);
+}
+
 // ---- SSE (valfritt) ----------------------------------------------------
 
 function stopSse() {
@@ -430,11 +518,16 @@ async function tick() {
   await run('väder', qWeather);
   await run('stationer', qStations, STATIONS_D);
   await run('färja', qFerry, FERRY_D);
+  await run('kameror', qCameras, CAMERAS_D);
+  await run('järnvägskorsningar', qRailCrossings, RAILCROSS_D);
+  await run('stationmeddelanden', qStationMessages);
+  await run('ersättningsbussar', qReplTraffic);
 
   // Källan räknas initierad när minst en datadriven fråga kommit igenom;
   // varje typ hämtar sedan på egen hand (tomt lager ⇒ fullast nästa tick).
   if (!S.initialized && (S.situation.size || S.road.size || S.flowSites.length
-      || S.trains.length || S.weather.length || S.ferry.length)) {
+      || S.trains.length || S.weather.length || S.ferry.length || S.cameras.length
+      || S.railCrossings.length || S.stationMsgs.length || S.replTraffic.length)) {
     S.initialized = true;
   }
   // Frisk = minst en fråga lyckades. Full miss (API nere, dålig nyckel)
@@ -639,6 +732,90 @@ function buildRecords() {
       updated: ts,
     });
   }
+
+  // --- M7: TrafficSafetyCamera – huvudvägar (E + riksvägar) som kartpunkter
+  if (S.cameras.length) {
+    const major = S.cameras.filter(c => isMajorRoad(c.RoadNumber));
+    recs.push(M('Speedkameror (SE)', S.cameras.length, 'st', ts));
+    recs.push(M('Speedkameror på huvudvägar (E + riksvägar, SE)', major.length, 'st', ts));
+    for (const c of major) {
+      const g = wktGeo(c.Geometry?.WGS84);
+      if (!g || g.type !== 'Point') continue;
+      recs.push({
+        t: 'a', area: 3, country: 'SE', source: 'trafikverket',
+        type: 'kamera', name: c.Name ?? `Speedkamera ${c.RoadNumber ?? ''}`.trim(),
+        id: `tv-camera-${c.Id ?? c.Name}`,
+        geometry: g,
+        attrs: {
+          'Väg': c.RoadNumber ? `Väg ${c.RoadNumber}` : null,
+          'Län': Array.isArray(c.CountyNo) && c.CountyNo.some(x => COUNTY[x])
+            ? countyName(c.CountyNo) : null,
+          'Uppdaterad (API)': c.ModifiedTime ?? null,
+        },
+        updated: ts,
+      });
+    }
+  }
+
+  // --- M7: RailCrossing – KPI endast (TrainFlow är 0 för alla rader)
+  if (S.railCrossings.length) {
+    recs.push(M('Järnvägskorsningar i drift (SE)', S.railCrossings.length, 'st', ts));
+  }
+
+  // --- M7: TrainStationMessage – aktiva stationmeddelanden, som sluter
+  //     snart först, upp till 40 poster.
+  const tsmEvs = S.stationMsgs.map(m => {
+    const text = (m.FreeText ?? '').replace(/\s+/g, ' ').trim();
+    return {
+      t: 'e', area: 3, country: 'SE', source: 'trafikverket',
+      kind: 'station', severity: 'info',
+      title: `Stationmeddelande · ${m.LocationCode ?? 'okänd station'}${m.MediaType ? ` (${m.MediaType})` : ''}`,
+      detail: text ? text.slice(0, 220) : null,
+      start: m.StartDateTime ?? ts,
+      end: m.EndDateTime ?? null,
+      geo: null,
+    };
+  }).sort((a, b) => String(a.end).localeCompare(String(b.end)));
+  recs.push(...tsmEvs.slice(0, 40));
+  recs.push(M('Aktiva stationmeddelanden (SE)', S.stationMsgs.length, 'st', ts));
+
+  // --- M7: ReplacementTraffic – ersättningsbussar som händelser med
+  //     ruttlåt (LineString via stoppen, sorterade på Sequence).
+  const replEvs = S.replTraffic
+    .filter(r => !['finished', 'cancelled'].includes(r.Status))
+    .map(r => {
+      const stops = (r.Stops?.Stop ?? [])
+        .filter(s => s.StopPosition?.Location?.Latitude != null
+          && s.StopPosition?.Location?.Longitude != null)
+        .sort((a, b) => Number(a.Sequence ?? 0) - Number(b.Sequence ?? 0));
+      const coords = stops.map(s => [
+        Number(s.StopPosition.Location.Longitude),
+        Number(s.StopPosition.Location.Latitude),
+      ]);
+      const first = stops[0];
+      const last = stops.at(-1);
+      const trains = (r.ReplacesTrains?.ReplacesTrain ?? [])
+        .map(t => t.AdvertisedTrainIdent).filter(Boolean).join(', ');
+      return {
+        t: 'e', area: 3, country: 'SE', source: 'trafikverket',
+        kind: 'ersättning', severity: 'warn',
+        title: trains
+          ? `Ersättningsbuss istället för tåg ${trains}`
+          : `Ersättningsbuss (${r.VehicleIdentifier ?? r.VehicleMode ?? 'okänd resa'})`,
+        detail: [
+          `${stops.length} stopp${r.VehicleMode ? ` (${r.VehicleMode})` : ''}`,
+          first ? `Första stopp ${first.StopDescription ?? '–'} ${first.PlannedDepartureTime ?? ''}`.trim() : null,
+          last && last !== first ? `Mål ${last.StopDescription ?? '–'}` : null,
+        ].filter(Boolean).join(' · '),
+        start: first?.PlannedDepartureTime ?? ts,
+        end: null,
+        geo: coords.length >= 2 ? { type: 'LineString', coordinates: coords }
+          : (coords.length === 1 ? { type: 'Point', coordinates: coords[0] } : null),
+      };
+    })
+    .sort((a, b) => String(a.start).localeCompare(String(b.start)));
+  recs.push(...replEvs.slice(0, 20));
+  recs.push(M('Ersättningsbussar för tåg (–6 h … +24 h)', S.replTraffic.length, 'resor', ts));
 
   return recs;
 }

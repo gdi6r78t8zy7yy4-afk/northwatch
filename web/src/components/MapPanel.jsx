@@ -5,6 +5,7 @@
 //   – zonflöden i realtid (Statnett + Svenska kraftnät, live-mittade MW)
 //   – anläggningspunkter: IX (PeeringDB), OSM (kraft/datacenter/flyg/vatten),
 //     Trafikverket flödesmätare (topp 25) + följda järnvägsstationer (M5)
+//     + speedkameror på huvudvägar (E + riksvägar, M7; ~900 punkter)
 //   – händelser med geografi (t.ex. Digitraffic vägtrafik, FI, Trafikverket)
 // M6: kartvalet styrs av en egen vy-effekt som bara löper vid kontextbyte
 //     (område/land), när landsgränserna laddats klart och via "Återställ vy" –
@@ -40,6 +41,7 @@ const TYPE_COLORS = {
   fartyg: '#0f8b8d',
   flowmatning: '#e0a52e',
   station: '#c2418f',
+  kamera: '#2f9e44',
 };
 
 const TYPE_LABELS = {
@@ -52,6 +54,7 @@ const TYPE_LABELS = {
   flow: 'Zonflöde (Statnett/SVK)',
   flowmatning: 'Flödesmätare (Trafikverket)',
   station: 'Järnvägsstation (Trafikverket)',
+  kamera: 'Speedkamera (Trafikverket)',
 };
 
 const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -160,7 +163,7 @@ export default function MapPanel({ area, country, assets = [], staticGeo = null,
       if (g?.type === 'Point') {
         const [lng, lat] = g.coordinates;
         L.circleMarker([lat, lng], {
-          radius: a.type === 'ix' ? 4.5 : 3.5,
+          radius: a.type === 'ix' ? 4.5 : a.type === 'kamera' ? 2.5 : 3.5,
           color: '#fff', weight: 1,
           fillColor: TYPE_COLORS[a.type] ?? '#888',
           fillOpacity: 0.9,
@@ -217,8 +220,10 @@ export default function MapPanel({ area, country, assets = [], staticGeo = null,
   const hasFartyg = assets.some(a => a.type === 'fartyg');
   const hasFlowmatning = assets.some(a => a.type === 'flowmatning');
   const hasStation = assets.some(a => a.type === 'station');
+  const hasKamera = assets.some(a => a.type === 'kamera');
   const hasEvents = events.length > 0;
-  const empty = !hasIx && !hasOsm && !hasFlow && !hasFartyg && !hasFlowmatning && !hasStation && !hasEvents;
+  const empty = !hasIx && !hasOsm && !hasFlow && !hasFartyg && !hasFlowmatning
+    && !hasStation && !hasKamera && !hasEvents;
 
   return (
     <div className="card">
@@ -252,6 +257,7 @@ export default function MapPanel({ area, country, assets = [], staticGeo = null,
         {hasFartyg && <span><i className="pt" style={{ background: '#0f8b8d' }} />Fartyg (AIS)</span>}
         {hasFlowmatning && <span><i className="pt" style={{ background: '#e0a52e' }} />Flödesmätare (topp 25)</span>}
         {hasStation && <span><i className="pt" style={{ background: '#c2418f' }} />Järnvägsstation</span>}
+        {hasKamera && <span><i className="pt" style={{ background: '#2f9e44' }} />Speedkamera (huvudvägar)</span>}
         {hasEvents && <span><i style={{ background: '#d4574a' }} />Trafikhändelse</span>}
       </div>
       {empty && (

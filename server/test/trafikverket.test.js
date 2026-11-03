@@ -1,10 +1,18 @@
-// Enhetstester för Trafikverket-kollektorn (M5).
+// Enhetstester för Trafikverket-kollektorn (M5; M7: nya objekttyper).
 //
 // Rådata från de live-verifierade frågorna ligger i server/testdata/
-// (2026-11-02, alla HTTP 200) – partiella stickprov (de första raderna)
-// av varje verifierade fråga; rowCount-metaportalen visar den fulla storleken.
-// Testerna kör kollektorns parser och hela tick-vägen mot de fixturen –
-// inget nätverk. Förväntade värden beräknas ur fixturen, inte hårdkodas.
+// (M5: 2026-11-02, M7: 2026-11-03; alla HTTP 200) – partiella stickprov
+// (de första raderna) av varje verifierade fråga; rowCount-metaportalen
+// visar den fulla storleken. Testerna kör kollektorns parser och hela
+// tick-vägen mot de fixturen – inget nätverk. Förväntade värden beräknas
+// ur fixturen, inte hårdkodas.
+//
+// Två dokumenterade modifikationer i M7-fixturen replacementtraffic-window:
+// – rad 1925674 har stoppen omordnade (Sequence 4,1,3,2) för att testa
+//   att kollektorn sorterar på Sequence innan rutten byggs;
+// – en extra rad med Status 'finished' (form verifierad live, 0 finished
+//   rader i fönstret vid kapningstidpunkten) för att testa att avslutade
+//   resor räknas i KPI:n men inte blir händelser.
 //
 // Kör: node --test "server/test/trafikverket.test.js"
 import { test, before, after } from 'node:test';
@@ -27,6 +35,11 @@ const FIXTURE = {
   TrainAnnouncement: 'trainannouncement-6st.json',
   WeatherObservation: 'weatherobs-15min.json',
   FerryAnnouncement: 'ferryannouncements.json',
+  // M7
+  TrafficSafetyCamera: 'trafsafetycameras.json',
+  RailCrossing: 'railcrossings-idrift.json',
+  TrainStationMessage: 'stationmessages-active.json',
+  ReplacementTraffic: 'replacementtraffic-window.json',
 };
 
 // Stationslisten (testdata saknar geometri) bär med geometri + den
@@ -179,6 +192,76 @@ test('tick 1: fullastar och normaliserar alla objekttyper', async () => {
 test('tick 2: deltavägen (ModifiedTime-fönster) utan fullast', async () => {
   const recs = await kollektorn.fetch();
   assert.ok(Array.isArray(recs) && recs.length > 10, `tick 2, fick ${recs.length}`);
+});
+
+// ---- M7: nya objekttyper ---------------------------------------------------
+
+test('M7: kameror, järnvägskorsningar, stationmeddelanden, ersättningsbussar', async () => {
+  const recs = await kollektorn.fetch();
+  const cams = rows('TrafficSafetyCamera').filter(r => !r.Deleted);
+  const MAJOR = new Set(['1', '3', '4', '5', '6', '7', '9', '13', '15', '17', '18',
+    '20', '21', '22', '23', '25', '26', '28', '31', '34', '40', '50', '56', '220']);
+  const isMajor = rn => /^E\d+$/i.test(String(rn ?? '')) || MAJOR.has(String(rn ?? ''));
+  const expectedMajor = cams.filter(c => isMajor(c.RoadNumber)).length;
+
+  const m = p => recs.find(r => r.t === 'm' && r.indicator.includes(p));
+  assert.equal(m('Speedkameror (SE)')?.value, cams.length, 'kamerasamtal (KPI)');
+  assert.equal(m('Speedkameror på huvudvägar')?.value, expectedMajor, 'huvudvägsruletten');
+  assert.equal(m('Järnvägskorsningar i drift')?.value, rows('RailCrossing').length, 'korsnings-KPI');
+  assert.equal(m('Aktiva stationmeddelanden (SE)')?.value, rows('TrainStationMessage').length, 'stationmeddelanden-KPI');
+  // KPI:n räknar hela fönstret (inkl. finished), händelserna inte.
+  const rtRows = rows('ReplacementTraffic');
+  assert.equal(m('Ersättningsbussar för tåg')?.value, rtRows.length, 'ersättnings-KPI (hela fönstret)');
+
+  // Huvudvägskamerorna blir kartpunkter med Id-baserat stabilt namn.
+  const camAssets = recs.filter(r => r.t === 'a' && r.type === 'kamera');
+  assert.equal(camAssets.length, expectedMajor, 'bara huvudvägar som kartpunkter');
+  assert.ok(camAssets.every(a => a.geometry.type === 'Point' && a.id.startsWith('tv-camera-')));
+  const e4 = camAssets.find(a => a.attrs['Väg'] === 'Väg E4');
+  assert.ok(e4, 'E4-kamera finns med vägattribut');
+  const k0 = camAssets.find(a => a.name === 'Kårlanda');
+  assert.ok(k0 && k0.attrs['Län'] == null, 'CountyNo 0 (omappad kod) visas ej som län');
+
+  // Stationmeddelanden: händelser sorterade på avslut, med station + medietyp.
+  const msgEvs = recs.filter(r => r.t === 'e' && r.kind === 'station');
+  assert.equal(msgEvs.length, Math.min(40, rows('TrainStationMessage').length), 'stationmeddelanden som händelser');
+  const ends = msgEvs.map(e => String(e.end));
+  assert.deepEqual(ends, [...ends].sort(), 'sluter-snart-först');
+  assert.match(msgEvs[0].title, /^Stationmeddelande · (Mc|Tri) \(Monitor\)$/, 'tidigast avslutande först');
+  assert.match(msgEvs[0].detail, /Banarbete/, 'FreeText som detalj');
+
+  // Ersättningsbussar: finished utesluts, rutt på Sequence, tågsiffra i rubriken.
+  const replEvs = recs.filter(r => r.t === 'e' && r.kind === 'ersättning');
+  assert.equal(replEvs.length, rtRows.filter(r => !['finished', 'cancelled'].includes(r.Status)).length,
+    'finished-resan blir ingen händelse');
+  const shuffled = replEvs.find(e => e.title.includes('7183'));
+  assert.equal(shuffled.geo.type, 'LineString');
+  // Fixtures rad 1925674 ligger i ordning 4,1,3,2 – kollektorn måste sortera
+  // på Sequence: start Boden (seq 1), mål Luleå (seq 4).
+  assert.deepEqual(shuffled.geo.coordinates[0], [21.707012, 65.82873], 'rutt börjar vid seq 1');
+  assert.deepEqual(shuffled.geo.coordinates.at(-1), [22.165184, 65.58412], 'rutt slutar vid seq 4');
+  assert.match(shuffled.detail, /4 stopp \(bus\)/, 'stoppantal + fordonstyp i detaljen');
+});
+
+test('M7: frågebygge verifierat mot live-API:t 2026-11-03', async () => {
+  await kollektorn.fetch();
+  // Kameran: full lista per dygn (limit 20000, inget tidsfilter).
+  const cam = seenBodies.get('TrafficSafetyCamera');
+  assert.match(cam, /namespace='Road\.Infrastructure' schemaversion='1\.0' limit='20000'/);
+  for (const f of ['Id', 'Name', 'RoadNumber', 'CountyNo', 'Geometry.WGS84', 'ModifiedTime', 'Deleted']) {
+    assert.match(cam, new RegExp(`<INCLUDE>${f.replace(/\./g, '\\.')}</INCLUDE>`), `INCLUDE ${f}`);
+  }
+  // Järnvägskorsningar: bara "I drift".
+  const rc = seenBodies.get('RailCrossing');
+  assert.match(rc, /<FILTER><EQ name='OperatingMode' value='I drift' \/><\/FILTER>/);
+  // Stationmeddelanden: gällande nu ($now, inget $dateadd).
+  const tsm = seenBodies.get('TrainStationMessage');
+  assert.match(tsm, /<LT name='StartDateTime' value='\$now' \/><GT name='EndDateTime' value='\$now' \/>/);
+  assert.doesNotMatch(tsm, /dateadd/);
+  // Ersättningsbussar: dagsprefixerat +24 h (tidskvicken, se filhuvudet).
+  const rt = seenBodies.get('ReplacementTraffic');
+  assert.match(rt, /value='\$dateadd\(-06:00:00\)'/);
+  assert.match(rt, /value='\$dateadd\(1\.00:00:00\)'/, '24 h kräver dagsprefix');
 });
 
 test('tick: totalt misslyckande avkastar fel till hälsan', async () => {

@@ -103,7 +103,7 @@ asset  { t:'a', area, country, source, type, name, id?, geometry, attrs?, update
 | ENTSO-E Transparency Platform | 1 Energi (SE/NO/FI) | struktur verifierad; datalagret tomt 2026-11-01 (kollektorn aktiverar sig automatiskt när data finns) |
 | Statnett driftsdata (gränsflöden) | 1 Energi (NO) | ok – verifierad 2026-11-01 |
 | Energi Data Service | 1 Energi (DK) | ok – verifierad 2026-11-01 |
-| Trafikverket öppna dataplattform (datacache v2) | 3 Transport (SE) | kräver `TRAFIKVERKET_KEY` – omskriven till datacache-API:t 2026-11-02 (M5); väg, väglag, trafikflöden, vägväder, järnväg, färjor |
+| Trafikverket öppna dataplattform (datacache v2) | 3 Transport (SE) | kräver `TRAFIKVERKET_KEY` – omskriven till datacache-API:t 2026-11-02 (M5); väg, väglag, trafikflöden, vägväder, järnväg, färjor + speedkameror på huvudvägar (kartlager), järnvägskorsningar i drift, aktiva stationmeddelanden och ersättningsbussar för inställda tåg (M7) |
 | Digitraffic vägtrafikmeddelanden | 3 Transport (FI) | ok – v1/messages verifierad 2026-11-01 |
 | PeeringDB (IX) | 2 Digital infrastruktur (Nordiskt) | ok – verifierad 2026-11-01 |
 | Eurostat (BNP, SDMX 2.1) | 7 Industri (Nordiskt) | ok – verifierad 2026-11-01 |
@@ -179,6 +179,10 @@ M5 (2026-11-02) omskriver kollektorn till **datacache-API:t v2**
   `RoadCondition` 1.3 (~820), `TrafficFlow` 1.5 (~3 200 i fönster),
   `TrainAnnouncement` 2.0 (tidsfönsterrädd; ofiltrerat svar returnerar föråldrade
   rader), `WeatherObservation` 2.1, `TrainStation` 1.0 (1 757), `FerryAnnouncement` 1.2.
+  M7 (live-verifierat 2026-11-03): `TrafficSafetyCamera` 1.0 (`Road.Infrastructure`,
+  2 819 rader), `RailCrossing` 1.5 (`Road.Infrastructure`, 8 737 `"I drift"`),
+  `TrainStationMessage` 1.0 (aktiva, hundra-tals) och `ReplacementTraffic` 1.0
+  (namespace `JBS`, ersättningsbussar för inställda tåg).
 - **Uppdateringsstrategi (API:s egen delta-markör är odokumenterad och ger 400 – vi
   hanterar vattenmärkena själva):**
   - Situation + RoadCondition: fullast vid start och var 30:e min; däremellan
@@ -200,6 +204,19 @@ M5 (2026-11-02) omskriver kollektorn till **datacache-API:t v2**
     per-kods mätarbbox 2026-11-02.
   - FerryAnnouncement: `DepartureTime −6 h…+12 h`, limit 2 500
     (hela flödet bär `DeviationId` – inget filter behövs).
+  - **M7:** `TrafficSafetyCamera` fulllistas per dygn (limit 20 000) – kameror
+    på huvudvägar (E + riksvägar, ~900) blir kartpunkter `kamera` med stabil
+    id `tv-camera-<Id>` + två KPI:er. OBS: `CountyNo` är *array* i denna typ
+    (kod 0 = okänt, visas ej som län). `RailCrossing` fulllistas per dygn med
+    `OperatingMode = 'I drift'` – KPI endast (`TrainFlow` är 0 för alla rader,
+    inget flödesdatum att visa). `TrainStationMessage` per tick: bara aktiva
+    (`StartDateTime < $now < EndDateTime`), `orderby ModifiedTime`, limit 1 000
+    – topp 40 som händelser (de som sluter snart först) + KPI. `ReplacementTraffic`
+    per tick: fönstret `PlannedDepartureTime −6 h…+24 h`, limit 500 – händelser
+    med ruttlåt (LineString via stoppen, sorterade på `Sequence`);
+    `finished`/`cancelled` räknas i KPI:n men blir inga händelser.
+    **`$dateadd`-kvick (verifierad live):** tidsuttryck utan dagsprefix räknas
+    maximalt 24 h – "24 h framöver" kräver `1.00:00:00` med dagsprefix.
 - **SSE (valfritt, `TRAFIKVERKET_SSE=1`):** `sseurl='true'` ger en
   `…/data.json?ssereqid=…`-ström (`text/event-stream`, CRLF-ramad) som mergas in i
   minneslagret. Strömstarten avser en *full replay* (~12 MB) som ignorerar limit –
@@ -309,6 +326,14 @@ CDS_EMAIL=…          # M4 – kontots e-post (CDS kräver token + e-post per a
   historiska dataseten som SVK frusit per 2026-11-03 ("Discontinued" /
   "Currently not updating") med sista värdet respektive och datasetets egna
   tidstämpel. Enhetstester mot live-fixtures (server/test/svk.test.js).
+- **M7 (klart 2026-11-04):** Trafikverket datacache – fyra nya objekttyper
+  (live-verifierade 2026-11-03 med kollektorns egna frågor): speedkameror på
+  huvudvägar (E + riksvägar) som nytt kartlager `kamera` i MapPanel (egen
+  färg/legend, ~900 punkter) + KPI:er; järnvägskorsningar i drift (KPI);
+  aktiva stationmeddelanden som händelser (topp 40, som sluter snart först) +
+  KPI; ersättningsbussar för inställda tåg som händelser med ruttlåt
+  (LineString via stoppen, sorterade på `Sequence`) + KPI. Enhetstester mot
+  live-fixtures (server/testdata/), MapPanel-test för `kamera`-lagret.
 
 ## Datakällor och villkor
 

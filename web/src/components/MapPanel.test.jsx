@@ -187,6 +187,21 @@ describe('MapPanel – lager', () => {
     expect(byPopup('StockholmIX').popup).toContain('peeringdb');
   });
 
+  test('speedkameror (M7) med egen färg, liten radie, popup och legendpost', () => {
+    renderMap({
+      assets: [
+        point({ id: 'k1', name: 'Marbäck', type: 'kamera', source: 'trafikverket',
+          attrs: { Väg: 'Väg 25', Län: 'Halland' } }),
+      ],
+    });
+    const cam = __leaf.created.find(c => c.kind === 'circleMarker' && c.popup?.includes('Marbäck'));
+    expect(cam.options.fillColor).toBe('#2f9e44'); // kamera
+    expect(cam.options.radius).toBe(2.5);          // ~900 punkter – ryms bättre
+    expect(cam.popup).toContain('Speedkamera (Trafikverket)');
+    expect(cam.popup).toContain('Halland');
+    expect(screen.getByText('Speedkamera (huvudvägar)')).toBeInTheDocument();
+  });
+
   test('flöden gröna i exportriktning, röda i motriktning', () => {
     renderMap({
       assets: [
@@ -252,6 +267,7 @@ describe('MapPanel – lager', () => {
     expect(screen.getByText('Flödesmätare (topp 25)')).toBeInTheDocument();
     expect(screen.queryByText('Fartyg (AIS)')).not.toBeInTheDocument();
     expect(screen.queryByText('Järnvägsstation')).not.toBeInTheDocument();
+    expect(screen.queryByText('Speedkamera (huvudvägar)')).not.toBeInTheDocument();
     expect(screen.queryByText('Trafikhändelse')).not.toBeInTheDocument();
   });
 

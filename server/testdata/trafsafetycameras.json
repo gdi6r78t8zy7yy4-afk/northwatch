@@ -1,0 +1,111 @@
+{
+ "fetchedAt": "2026-11-03T22:28:32.159Z",
+ "status": 200,
+ "info": null,
+ "rows": [
+  {
+   "CountyNo": [
+    25
+   ],
+   "Deleted": false,
+   "Geometry": {
+    "WGS84": "POINT (23.914672086839264 65.81157717989542)"
+   },
+   "Id": "25010020",
+   "Name": "Nikkalakorsning mot Kalix",
+   "RoadNumber": "E4",
+   "ModifiedTime": "2024-08-28T08:03:29.436Z"
+  },
+  {
+   "CountyNo": [
+    13
+   ],
+   "Deleted": false,
+   "Geometry": {
+    "WGS84": "POINT (13.01798223014114 56.701843472006935)"
+   },
+   "Id": "13005020",
+   "Name": "Marbäck",
+   "RoadNumber": "25",
+   "ModifiedTime": "2024-08-28T08:03:24.101Z"
+  },
+  {
+   "CountyNo": [
+    7
+   ],
+   "Deleted": false,
+   "Geometry": {
+    "WGS84": "POINT (14.490742782888484 56.73341201519101)"
+   },
+   "Id": "07002110",
+   "Name": "Gottåsa Västra",
+   "RoadNumber": "23",
+   "ModifiedTime": "2026-10-02T05:33:34.501Z"
+  },
+  {
+   "CountyNo": [
+    7
+   ],
+   "Deleted": false,
+   "Geometry": {
+    "WGS84": "POINT (15.23146090795958 56.78161819032308)"
+   },
+   "Id": "07006030",
+   "Name": "Hyllsjön",
+   "RoadNumber": "25",
+   "ModifiedTime": "2024-08-28T08:03:24.154Z"
+  },
+  {
+   "CountyNo": [
+    0
+   ],
+   "Deleted": false,
+   "Geometry": {
+    "WGS84": "POINT (15.183272228533562 56.78672922296461)"
+   },
+   "Id": "07006010",
+   "Name": "Kårlanda",
+   "RoadNumber": "25",
+   "ModifiedTime": "2024-08-28T08:03:24.156Z"
+  },
+  {
+   "CountyNo": [
+    0
+   ],
+   "Deleted": false,
+   "Geometry": {
+    "WGS84": "POINT (15.204322979975256 56.78098281454339)"
+   },
+   "Id": "07006020",
+   "Name": "Kvarnsjörås",
+   "RoadNumber": "25",
+   "ModifiedTime": "2024-08-28T08:03:24.157Z"
+  },
+  {
+   "CountyNo": [
+    4
+   ],
+   "Deleted": false,
+   "Geometry": {
+    "WGS84": "POINT (17.01189040432469 59.49294225195851)"
+   },
+   "Id": "04001060",
+   "Name": "Säby",
+   "RoadNumber": "55",
+   "ModifiedTime": "2024-08-28T08:03:24.133Z"
+  },
+  {
+   "CountyNo": [
+    18
+   ],
+   "Deleted": false,
+   "Geometry": {
+    "WGS84": "POINT (15.57732909457214 59.14610566207804)"
+   },
+   "Id": "18008060",
+   "Name": "Lännäs",
+   "RoadNumber": "52",
+   "ModifiedTime": "2024-08-28T08:03:30.241Z"
+  }
+ ]
+}

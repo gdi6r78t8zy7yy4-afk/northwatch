@@ -1,0 +1,43 @@
+{
+ "fetchedAt": "2026-11-03T22:28:32.159Z",
+ "status": 200,
+ "info": null,
+ "rows": [
+  {
+   "LevelCrossingId": 10009,
+   "NumberOfTracks": 2,
+   "OperatingMode": "I drift",
+   "RoadName": "Lidnäs N",
+   "Geometry": {
+    "WGS84": "POINT (14.601380968433508 57.0718978387826)"
+   }
+  },
+  {
+   "LevelCrossingId": 10012,
+   "NumberOfTracks": 2,
+   "OperatingMode": "I drift",
+   "RoadName": "Torpsbruk",
+   "Geometry": {
+    "WGS84": "POINT (14.576575240134458 57.0365361372634)"
+   }
+  },
+  {
+   "LevelCrossingId": 10013,
+   "NumberOfTracks": 2,
+   "OperatingMode": "I drift",
+   "RoadName": "Östanåkra",
+   "Geometry": {
+    "WGS84": "POINT (14.576477534235027 57.02568540214448)"
+   }
+  },
+  {
+   "LevelCrossingId": 10020,
+   "NumberOfTracks": 2,
+   "OperatingMode": "I drift",
+   "RoadName": "Lekaryd",
+   "Geometry": {
+    "WGS84": "POINT (14.577264249482537 56.93820612274035)"
+   }
+  }
+ ]
+}
