@@ -1,0 +1,183 @@
+{
+ "fetchedAt": "2026-11-03T18:06:40.552Z",
+ "status": 200,
+ "info": "svk_probe3 2026-11-03; två första leveranstimmarna (SE1–SE4 × up/down). Live: total=190 585 rader.",
+ "rows": [
+  {
+   "start_time_sweden": "2026-11-03T18:00:00",
+   "start_time_utc": "2026-11-03T17:00:00",
+   "bidding_zone": "SE1",
+   "reserve_product": "mFRRCapacityMarket",
+   "reserve_direction": "up",
+   "price": 2.1,
+   "price_unit": "EUR-MW",
+   "volume": 120.5,
+   "volume_unit": "MW"
+  },
+  {
+   "start_time_sweden": "2026-11-03T18:00:00",
+   "start_time_utc": "2026-11-03T17:00:00",
+   "bidding_zone": "SE1",
+   "reserve_product": "mFRRCapacityMarket",
+   "reserve_direction": "down",
+   "price": 2.4,
+   "price_unit": "EUR-MW",
+   "volume": 95,
+   "volume_unit": "MW"
+  },
+  {
+   "start_time_sweden": "2026-11-03T18:00:00",
+   "start_time_utc": "2026-11-03T17:00:00",
+   "bidding_zone": "SE2",
+   "reserve_product": "mFRRCapacityMarket",
+   "reserve_direction": "up",
+   "price": 1.6,
+   "price_unit": "EUR-MW",
+   "volume": 115,
+   "volume_unit": "MW"
+  },
+  {
+   "start_time_sweden": "2026-11-03T18:00:00",
+   "start_time_utc": "2026-11-03T17:00:00",
+   "bidding_zone": "SE2",
+   "reserve_product": "mFRRCapacityMarket",
+   "reserve_direction": "down",
+   "price": 1.9,
+   "price_unit": "EUR-MW",
+   "volume": 88.5,
+   "volume_unit": "MW"
+  },
+  {
+   "start_time_sweden": "2026-11-03T18:00:00",
+   "start_time_utc": "2026-11-03T17:00:00",
+   "bidding_zone": "SE3",
+   "reserve_product": "mFRRCapacityMarket",
+   "reserve_direction": "up",
+   "price": 2.8,
+   "price_unit": "EUR-MW",
+   "volume": 210,
+   "volume_unit": "MW"
+  },
+  {
+   "start_time_sweden": "2026-11-03T18:00:00",
+   "start_time_utc": "2026-11-03T17:00:00",
+   "bidding_zone": "SE3",
+   "reserve_product": "mFRRCapacityMarket",
+   "reserve_direction": "down",
+   "price": 3.1,
+   "price_unit": "EUR-MW",
+   "volume": 150.5,
+   "volume_unit": "MW"
+  },
+  {
+   "start_time_sweden": "2026-11-03T18:00:00",
+   "start_time_utc": "2026-11-03T17:00:00",
+   "bidding_zone": "SE4",
+   "reserve_product": "mFRRCapacityMarket",
+   "reserve_direction": "up",
+   "price": 12.58,
+   "price_unit": "EUR-MW",
+   "volume": 195,
+   "volume_unit": "MW"
+  },
+  {
+   "start_time_sweden": "2026-11-03T18:00:00",
+   "start_time_utc": "2026-11-03T17:00:00",
+   "bidding_zone": "SE4",
+   "reserve_product": "mFRRCapacityMarket",
+   "reserve_direction": "down",
+   "price": 13.2,
+   "price_unit": "EUR-MW",
+   "volume": 140,
+   "volume_unit": "MW"
+  },
+  {
+   "start_time_sweden": "2026-11-03T19:00:00",
+   "start_time_utc": "2026-11-03T18:00:00",
+   "bidding_zone": "SE1",
+   "reserve_product": "mFRRCapacityMarket",
+   "reserve_direction": "up",
+   "price": 2.1,
+   "price_unit": "EUR-MW",
+   "volume": 125,
+   "volume_unit": "MW"
+  },
+  {
+   "start_time_sweden": "2026-11-03T19:00:00",
+   "start_time_utc": "2026-11-03T18:00:00",
+   "bidding_zone": "SE1",
+   "reserve_product": "mFRRCapacityMarket",
+   "reserve_direction": "down",
+   "price": 2.4,
+   "price_unit": "EUR-MW",
+   "volume": 90,
+   "volume_unit": "MW"
+  },
+  {
+   "start_time_sweden": "2026-11-03T19:00:00",
+   "start_time_utc": "2026-11-03T18:00:00",
+   "bidding_zone": "SE2",
+   "reserve_product": "mFRRCapacityMarket",
+   "reserve_direction": "up",
+   "price": 1.6,
+   "price_unit": "EUR-MW",
+   "volume": 110,
+   "volume_unit": "MW"
+  },
+  {
+   "start_time_sweden": "2026-11-03T19:00:00",
+   "start_time_utc": "2026-11-03T18:00:00",
+   "bidding_zone": "SE2",
+   "reserve_product": "mFRRCapacityMarket",
+   "reserve_direction": "down",
+   "price": 1.9,
+   "price_unit": "EUR-MW",
+   "volume": 85,
+   "volume_unit": "MW"
+  },
+  {
+   "start_time_sweden": "2026-11-03T19:00:00",
+   "start_time_utc": "2026-11-03T18:00:00",
+   "bidding_zone": "SE3",
+   "reserve_product": "mFRRCapacityMarket",
+   "reserve_direction": "up",
+   "price": 2.8,
+   "price_unit": "EUR-MW",
+   "volume": 205,
+   "volume_unit": "MW"
+  },
+  {
+   "start_time_sweden": "2026-11-03T19:00:00",
+   "start_time_utc": "2026-11-03T18:00:00",
+   "bidding_zone": "SE3",
+   "reserve_product": "mFRRCapacityMarket",
+   "reserve_direction": "down",
+   "price": 3.1,
+   "price_unit": "EUR-MW",
+   "volume": 155,
+   "volume_unit": "MW"
+  },
+  {
+   "start_time_sweden": "2026-11-03T19:00:00",
+   "start_time_utc": "2026-11-03T18:00:00",
+   "bidding_zone": "SE4",
+   "reserve_product": "mFRRCapacityMarket",
+   "reserve_direction": "up",
+   "price": 12.58,
+   "price_unit": "EUR-MW",
+   "volume": 190,
+   "volume_unit": "MW"
+  },
+  {
+   "start_time_sweden": "2026-11-03T19:00:00",
+   "start_time_utc": "2026-11-03T18:00:00",
+   "bidding_zone": "SE4",
+   "reserve_product": "mFRRCapacityMarket",
+   "reserve_direction": "down",
+   "price": 13.2,
+   "price_unit": "EUR-MW",
+   "volume": 135,
+   "volume_unit": "MW"
+  }
+ ]
+}

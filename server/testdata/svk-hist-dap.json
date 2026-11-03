@@ -1,0 +1,21 @@
+{
+ "fetchedAt": "2026-11-03T18:10:15.264Z",
+ "status": 200,
+ "info": "svk_probe5 2026-11-03; sista raderna. SVK: \"Currently not updating\"; senaste raden 2026-07-01. Live: total=1 196 959 rader.",
+ "rows": [
+  {
+   "start_time_sweden": "2026-07-01T23:00:00",
+   "start_time_utc": "2026-07-01T21:00:00",
+   "bidding_zone": "SE1",
+   "price": 31.32,
+   "price_unit": "EUR-MWh"
+  },
+  {
+   "start_time_sweden": "2026-07-01T23:45:00",
+   "start_time_utc": "2026-07-01T21:45:00",
+   "bidding_zone": "SE3",
+   "price": 89.7,
+   "price_unit": "EUR-MWh"
+  }
+ ]
+}

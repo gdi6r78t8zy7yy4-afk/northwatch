@@ -1,0 +1,34 @@
+{
+ "fetchedAt": "2026-11-03T18:07:33.902Z",
+ "status": 200,
+ "info": "svk_probe5 2026-11-03; tre sista raderna. Datasetet är avstannat av SVK (\"Discontinued\"); senaste raden 2026-04-14. Live: total=295 683 rader.",
+ "rows": [
+  {
+   "start_time_sweden": "2026-04-14T20:00:00",
+   "start_time_utc": "2026-04-14T18:00:00",
+   "auction_round": "fcrAuction1",
+   "reserve_product": "FCRN",
+   "reserve_direction": "up",
+   "volume": 410.2,
+   "volume_unit": "MW"
+  },
+  {
+   "start_time_sweden": "2026-04-14T21:00:00",
+   "start_time_utc": "2026-04-14T19:00:00",
+   "auction_round": "fcrAuction2",
+   "reserve_product": "FCRN",
+   "reserve_direction": "up",
+   "volume": 505,
+   "volume_unit": "MW"
+  },
+  {
+   "start_time_sweden": "2026-04-14T23:00:00",
+   "start_time_utc": "2026-04-14T21:00:00",
+   "auction_round": "fcrAuction2",
+   "reserve_product": "FCRD",
+   "reserve_direction": "down",
+   "volume": 287.8,
+   "volume_unit": "MW"
+  }
+ ]
+}

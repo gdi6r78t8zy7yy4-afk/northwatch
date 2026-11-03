@@ -1,0 +1,73 @@
+{
+ "fetchedAt": "2026-11-03T18:06:02.118Z",
+ "status": 200,
+ "info": "svk_probe3 2026-11-03; leveransblock för de kommande timmarna (publicerade ~5 h framåt). Live: total=111 039 rader.",
+ "rows": [
+  {
+   "start_time_sweden": "2026-11-03T18:00:00",
+   "start_time_utc": "2026-11-03T17:00:00",
+   "bidding_zone": "SE2",
+   "reserve_product": "aFRRCapacityMarket",
+   "reserve_direction": "down",
+   "price": 14.67,
+   "price_unit": "EUR-MW",
+   "volume": 67,
+   "volume_unit": "MW"
+  },
+  {
+   "start_time_sweden": "2026-11-03T19:00:00",
+   "start_time_utc": "2026-11-03T18:00:00",
+   "bidding_zone": "SE2",
+   "reserve_product": "aFRRCapacityMarket",
+   "reserve_direction": "down",
+   "price": 14.67,
+   "price_unit": "EUR-MW",
+   "volume": 67,
+   "volume_unit": "MW"
+  },
+  {
+   "start_time_sweden": "2026-11-03T20:00:00",
+   "start_time_utc": "2026-11-03T19:00:00",
+   "bidding_zone": "SE2",
+   "reserve_product": "aFRRCapacityMarket",
+   "reserve_direction": "down",
+   "price": 14.9,
+   "price_unit": "EUR-MW",
+   "volume": 68,
+   "volume_unit": "MW"
+  },
+  {
+   "start_time_sweden": "2026-11-03T21:00:00",
+   "start_time_utc": "2026-11-03T20:00:00",
+   "bidding_zone": "SE2",
+   "reserve_product": "aFRRCapacityMarket",
+   "reserve_direction": "down",
+   "price": 14.67,
+   "price_unit": "EUR-MW",
+   "volume": 66,
+   "volume_unit": "MW"
+  },
+  {
+   "start_time_sweden": "2026-11-03T22:00:00",
+   "start_time_utc": "2026-11-03T21:00:00",
+   "bidding_zone": "SE2",
+   "reserve_product": "aFRRCapacityMarket",
+   "reserve_direction": "down",
+   "price": 14.67,
+   "price_unit": "EUR-MW",
+   "volume": 69,
+   "volume_unit": "MW"
+  },
+  {
+   "start_time_sweden": "2026-11-03T23:00:00",
+   "start_time_utc": "2026-11-03T22:00:00",
+   "bidding_zone": "SE2",
+   "reserve_product": "aFRRCapacityMarket",
+   "reserve_direction": "down",
+   "price": 14.67,
+   "price_unit": "EUR-MW",
+   "volume": 70,
+   "volume_unit": "MW"
+  }
+ ]
+}

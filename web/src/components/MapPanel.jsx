@@ -2,7 +2,7 @@
 // Lager:
 //   – landsgränser (statisk GeoJSON via backend, Natural Earth)
 //   – energilagret: HVDC-länkar + schematiska zonskilda (område 1)
-//   – zonflöden i realtid (Statnett, live-mittade MW)
+//   – zonflöden i realtid (Statnett + Svenska kraftnät, live-mittade MW)
 //   – anläggningspunkter: IX (PeeringDB), OSM (kraft/datacenter/flyg/vatten),
 //     Trafikverket flödesmätare (topp 25) + följda järnvägsstationer (M5)
 //   – händelser med geografi (t.ex. Digitraffic vägtrafik, FI, Trafikverket)
@@ -49,7 +49,7 @@ const TYPE_LABELS = {
   flygplats: 'Flygplats (OSM)',
   vattenverk: 'Vattenverk (OSM)',
   fartyg: 'Fartyg i rörelse (AIS, Digitraffic Meri)',
-  flow: 'Zonflöde (Statnett)',
+  flow: 'Zonflöde (Statnett/SVK)',
   flowmatning: 'Flödesmätare (Trafikverket)',
   station: 'Järnvägsstation (Trafikverket)',
 };
@@ -154,7 +154,7 @@ export default function MapPanel({ area, country, assets = [], staticGeo = null,
       }
     }
 
-    // Asset: punkter (IX, OSM) och linjer (Statnett-flöden).
+    // Asset: punkter (IX, OSM) och linjer (Statnett/SVK-flöden).
     for (const a of assets) {
       const g = a.geometry;
       if (g?.type === 'Point') {

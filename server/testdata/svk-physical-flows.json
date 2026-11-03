@@ -1,0 +1,95 @@
+{
+ "fetchedAt": "2026-11-03T18:05:12.441Z",
+ "status": 200,
+ "info": "svk_probe2/3 2026-11-03; stickprov: två senaste 15-min-steg (publiceringsfördröjning ~2 h). Live: total=2 249 921 rader, 24h=1 235.",
+ "rows": [
+  {
+   "_id": 2249917,
+   "start_time_sweden": "2026-11-03T17:45:00",
+   "start_time_utc": "2026-11-03T15:45:00",
+   "from_bidding_zone": "SE3",
+   "to_bidding_zone": "DK1",
+   "power": 370.39,
+   "power_unit": "MW",
+   "soda_hashbyte": "1a250ce77e57e2068069077b494568c0",
+   "soda_identity": 1
+  },
+  {
+   "_id": 2249918,
+   "start_time_sweden": "2026-11-03T17:45:00",
+   "start_time_utc": "2026-11-03T15:45:00",
+   "from_bidding_zone": "SE1",
+   "to_bidding_zone": "FI",
+   "power": 1847.35,
+   "power_unit": "MW",
+   "soda_hashbyte": "1a250ce77e57e2068069077b494568c0",
+   "soda_identity": 2
+  },
+  {
+   "_id": 2249919,
+   "start_time_sweden": "2026-11-03T17:45:00",
+   "start_time_utc": "2026-11-03T15:45:00",
+   "from_bidding_zone": "DELU",
+   "to_bidding_zone": "SE4",
+   "power": 203.19,
+   "power_unit": "MW",
+   "soda_hashbyte": "1a250ce77e57e2068069077b494568c0",
+   "soda_identity": 3
+  },
+  {
+   "_id": 2249920,
+   "start_time_sweden": "2026-11-03T17:45:00",
+   "start_time_utc": "2026-11-03T15:45:00",
+   "from_bidding_zone": "SE2",
+   "to_bidding_zone": "SE3",
+   "power": 6283.76,
+   "power_unit": "MW",
+   "soda_hashbyte": "1a250ce77e57e2068069077b494568c0",
+   "soda_identity": 4
+  },
+  {
+   "_id": 2249921,
+   "start_time_sweden": "2026-11-03T18:00:00",
+   "start_time_utc": "2026-11-03T16:00:00",
+   "from_bidding_zone": "SE3",
+   "to_bidding_zone": "DK1",
+   "power": 402.1,
+   "power_unit": "MW",
+   "soda_hashbyte": "f0322bbd800fa09b576e247e2ccb2d8b",
+   "soda_identity": 1
+  },
+  {
+   "_id": 2249922,
+   "start_time_sweden": "2026-11-03T18:00:00",
+   "start_time_utc": "2026-11-03T16:00:00",
+   "from_bidding_zone": "SE1",
+   "to_bidding_zone": "FI",
+   "power": 1799.9,
+   "power_unit": "MW",
+   "soda_hashbyte": "f0322bbd800fa09b576e247e2ccb2d8b",
+   "soda_identity": 2
+  },
+  {
+   "_id": 2249923,
+   "start_time_sweden": "2026-11-03T18:00:00",
+   "start_time_utc": "2026-11-03T16:00:00",
+   "from_bidding_zone": "DELU",
+   "to_bidding_zone": "SE4",
+   "power": 210,
+   "power_unit": "MW",
+   "soda_hashbyte": "f0322bbd800fa09b576e247e2ccb2d8b",
+   "soda_identity": 3
+  },
+  {
+   "_id": 2249924,
+   "start_time_sweden": "2026-11-03T18:00:00",
+   "start_time_utc": "2026-11-03T16:00:00",
+   "from_bidding_zone": "SE2",
+   "to_bidding_zone": "SE3",
+   "power": 6150,
+   "power_unit": "MW",
+   "soda_hashbyte": "f0322bbd800fa09b576e247e2ccb2d8b",
+   "soda_identity": 4
+  }
+ ]
+}

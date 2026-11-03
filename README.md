@@ -85,7 +85,7 @@ asset  { t:'a', area, country, source, type, name, id?, geometry, attrs?, update
 - `GET /api/geo/static` – statiska kartlager (landsgränser + energilager), ändras sällan
 - `GET /api/health` – källhälsa
 
-## Källor (M1–M4, 32 st)
+## Källor (33 st)
 
 | Källa | Område | Status |
 |-------|--------|--------|
@@ -97,7 +97,8 @@ asset  { t:'a', area, country, source, type, name, id?, geometry, attrs?, update
 | NIST NVD CVE API 2.0 | 5 Cyber (Nordiskt) | ok |
 | FIRST EPSS | 5 Cyber (Nordiskt) | ok – nyckelfri, daglig |
 | MITRE ATT&CK (Enterprise) | 5 Cyber (Nordiskt) | ok – veckovis, ETag-cache |
-| Svenska kraftnät Data Service (CKAN) | 1 Energi (SE) | kräver `SVK_RESOURCE_ID` |
+| Svenska kraftnät Data Service (data.svk.se, CKAN datastore) | 1 Energi (SE) | ok – nyckelfri (resurs-id är publika); fysiska gränsflöden 15 min (senaste steget → mätvärde per zonpar + "Svensk nettoexport"-KPI + kartlinjer mellan elspotzoner, DELU ritas ej), aFRR/mFRR-leveransblock, sista FCR-bidmätningen; verifierat live 2026-11-03 |
+| Svenska kraftnät – historiska dataset (data.svk.se) | 1 Energi (SE) | ok – nyckelfri; fyra frusna dataset (FCR-aktiverad energi, FCR-kapacitet, FCR aggregerade volymer, dagstima-priser) med sista värdet var 6:e timme; varje post bär dataens egen tidstämpel så åldern syns i tabellen; verifierat 2026-11-03 |
 | Fingrid Open Data | 1 Energi (FI) | kräver `FINGRID_KEY` + `FINGRID_DATASETS` |
 | ENTSO-E Transparency Platform | 1 Energi (SE/NO/FI) | struktur verifierad; datalagret tomt 2026-11-01 (kollektorn aktiverar sig automatiskt när data finns) |
 | Statnett driftsdata (gränsflöden) | 1 Energi (NO) | ok – verifierad 2026-11-01 |
@@ -239,7 +240,17 @@ CONTACT=…            # User-Agent-identifiering (krävs av bl.a. MET Norway; a
                      #   även som Digitraffic-User-headern för FI:s trafik-API:er)
 FINGRID_KEY=…        # https://data.fingrid.fi/en/instructions
 FINGRID_DATASETS=    # "datasetId:Indikator,..."
-SVK_RESOURCE_ID=…    # resource_id per dataset på data.svk.se
+SVK_API_BASE_URL=…   # standard https://data.svk.se – CKAN datastore API, helt öppet
+                     #   (ingen API-nyckel enligt SVK:s API Guide). Resurs-id:n (UUID)
+                     #   är publika datasetidentiteter på portalen.
+SVK_PHYSICAL_FLOWS_RESOURCE_ID=…    # aktiva (svk.js, 15 min): gränsflöden
+SVK_AFRR_CAPACITY_RESOURCE_ID=…     # aktiva (svk.js, 15 min): aFRR-leveransblock
+SVK_MFRR_CAPACITY_RESOURCE_ID=…     # aktiva (svk.js, 15 min): mFRR-leveransblock
+SVK_FCR_BID_VOLUMES_RESOURCE_ID=…   # aktiva (svk.js, 15 min): FCR-erbjudandevolymer
+SVK_FCR_ACTIVATED_ENERGY_RESOURCE_ID=…   # historiska (svk-hist.js, 6 h), frusna:
+SVK_FCR_CAPACITY_RESOURCE_ID=…           #   FCR-aktiverad energi, FCR-kapacitet,
+SVK_FCR_AGGREGATED_VOLUMES_RESOURCE_ID=… #   FCR aggregerade volymer,
+SVK_DAY_AHEAD_PRICES_RESOURCE_ID=…       #   dagstima-priser
 TRAFIKVERKET_KEY=…   # M5 – datacache v2; autentisering sker i XML-bodyn (<LOGIN>), ej header
 TRAFIKVERKET_STATIONS=  # M5 – valfria följda järnvägsstationer (LocationSignature);
                         #   standard Cst,G,Mc,U,Lu,Ör,Vå (OBS: 'Stl' = Ställdalen)
@@ -288,6 +299,16 @@ CDS_EMAIL=…          # M4 – kontots e-post (CDS kräver token + e-post per a
   (dataeffekt/vyeffekt separerade, "Återställ vy"-knapp), full frontendtesttäckning
   (Vitest + Testing Library, deterministisk Leaflet-mock, 77 tester).
   Se "Kartwidget (M6)".
+- **SvK-omskrivning (klart 2026-11-03):** Svenska kraftnät-kollektorn byggd om mot
+  data.svk.se:s öppna CKAN datastore-API (`datastore_search`, ingen API-nyckel –
+  resurs-id:n är publika och ligger ifyllda i `.env.example`). Två kollektorer:
+  `svk` (15 min) hämtar fysiska gränsflöden (senaste 15-min-steget → mätvärde per
+  zonpar, "Svensk nettoexport"-KPI och kartlinjer mellan elspotzonernas
+  zonskilda – DELU saknar skilda och ritas ej), aFRR-/mFRR-leveransblock för den
+  igångvarande timmen samt sista FCR-bidmätningen; `svk-hist` (6 h) visar de fyra
+  historiska dataseten som SVK frusit per 2026-11-03 ("Discontinued" /
+  "Currently not updating") med sista värdet respektive och datasetets egna
+  tidstämpel. Enhetstester mot live-fixtures (server/test/svk.test.js).
 
 ## Datakällor och villkor
 

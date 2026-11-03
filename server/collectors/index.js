@@ -1,4 +1,9 @@
-// Källregistret – 32 källor: M1 (9) + M2 (9) + M3 (4 OSM/Overpass) + M4 (10).
+// Källregistret – 33 källor: M1 (9) + M2 (9) + M3 (4 OSM/Overpass) + M4 (10)
+// + svk-hist. SVK-omskrivning (2026-11-03): svk.js är ombyggd mot de nya
+// data.svk.se-UUID-resurserna (ingen API-nyckel, CKAN datastore_search) med
+// flöden + aFRR/mFRR-leveranser + sista FCR-bidmätningen; svk-hist.js pollar
+// de fyra frusna historiska dataseten (FCR-energi/kapacitet/aggregerade
+// volymer + dagstima-priser) var 6:e timme. Se README "Källor".
 // M2 (2026-11-01): entsoe, statnett, energidataservice, peeringdb, eurostat,
 // noaa, epss, attack, dmi. Digitraffic verifierad mot v1/messages;
 // M5 (2026-11-02): Trafikverket-omskrivning till datacache-API:t (v2) med
@@ -16,6 +21,7 @@ import metno from './metno.js';
 import kev from './kev.js';
 import nvd from './nvd.js';
 import svk from './svk.js';
+import svkHist from './svk-hist.js';
 import fingrid from './fingrid.js';
 import trafikverket from './trafikverket.js';
 import digitraffic from './digitraffic.js';
@@ -50,6 +56,7 @@ export const COLLECTORS = [
   epss,
   attack,
   svk,
+  svkHist,
   fingrid,
   entsoe,
   statnett,

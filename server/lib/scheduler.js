@@ -5,7 +5,12 @@ import { setResult, setError, setNoKey, state } from './store.js';
 
 async function run(c) {
   const s = state.sources.get(c.id);
-  if (c.need && !process.env[c.need]) { setNoKey(c.id, c.need); return; }
+  // need kan vara ett env-namn eller en lista (svk.js/svk-hist.js har varsin
+  // lista med resource-id:n); saknas något visas källan "Saknar …".
+  const missing = (Array.isArray(c.need) ? c.need : [c.need])
+    .filter(Boolean)
+    .filter(n => !process.env[n]);
+  if (missing.length) { setNoKey(c.id, missing.join(', ')); return; }
   const t = Date.now();
   try {
     const records = await c.fetch();

@@ -1,0 +1,29 @@
+{
+ "fetchedAt": "2026-11-03T18:09:41.777Z",
+ "status": 200,
+ "info": "svk_probe5 2026-11-03; sista raderna. Fruset dataset; senaste raden 2026-04-14. Live: total=439 314 rader.",
+ "rows": [
+  {
+   "start_time_sweden": "2026-04-14T23:00:00",
+   "start_time_utc": "2026-04-14T21:00:00",
+   "reserve_product": "FCRN",
+   "reserve_direction": "symmetric",
+   "auction_round": "fcrAuction2",
+   "price": 6.4,
+   "price_unit": "EUR-MW",
+   "volume": 39.1,
+   "volume_unit": "MW"
+  },
+  {
+   "start_time_sweden": "2026-04-14T23:30:00",
+   "start_time_utc": "2026-04-14T21:30:00",
+   "reserve_product": "FCRD",
+   "reserve_direction": "down",
+   "auction_round": "fcrAuction2",
+   "price": 1.04,
+   "price_unit": "EUR-MW",
+   "volume": 154.5,
+   "volume_unit": "MW"
+  }
+ ]
+}
