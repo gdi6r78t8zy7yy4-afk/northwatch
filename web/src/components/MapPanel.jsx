@@ -6,13 +6,30 @@
 //   – anläggningspunkter: IX (PeeringDB), OSM (kraft/datacenter/flyg/vatten),
 //     Trafikverket flödesmätare (topp 25) + följda järnvägsstationer (M5)
 //   – händelser med geografi (t.ex. Digitraffic vägtrafik, FI, Trafikverket)
+// M6: kartvalet styrs av en egen vy-effekt som bara löper vid kontextbyte
+//     (område/land), när landsgränserna laddats klart och via "Återställ vy" –
+//     30 s-uppdateringen ritar om datalagren men flyttar ALDRIG kartan.
+//     Störlek S/M/L väljs av användaren och minns i webbläsaren (nw-mapsize).
 // Allt servas av backend – frontend pratar aldrig med externa källor.
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
 const NORDIC_CENTER = [64.5, 8];
 const NORDIC_ZOOM = 4;
+
+// M6: kartstorlek (px). M = tidigare CSS-standard (420 px).
+export const MAP_SIZES = { S: 260, M: 420, L: 580 };
+const MAP_SIZE_KEY = 'nw-mapsize';
+
+const readMapSize = () => {
+  try {
+    const v = localStorage.getItem(MAP_SIZE_KEY);
+    return Object.prototype.hasOwnProperty.call(MAP_SIZES, v) ? v : 'M';
+  } catch {
+    return 'M';
+  }
+};
 
 const TYPE_COLORS = {
   ix: '#7c5cd6',
@@ -52,6 +69,13 @@ export default function MapPanel({ area, country, assets = [], staticGeo = null,
   const divRef = useRef(null);
   const mapRef = useRef(null);
   const layerRef = useRef(null);
+  const [size, setSize] = useState(readMapSize);
+  const [resetNonce, setResetNonce] = useState(0);
+
+  const chooseSize = s => {
+    setSize(s);
+    try { localStorage.setItem(MAP_SIZE_KEY, s); } catch { /* privat läge m.m. */ }
+  };
 
   // Bygg kartan en gång, riva vid unmount.
   useEffect(() => {
@@ -73,7 +97,15 @@ export default function MapPanel({ area, country, assets = [], staticGeo = null,
     };
   }, []);
 
-  // Uppdatera datalagren vid förändring.
+  // M6: storleksändring – Leaflet behöver veta den nya behållarhöjden.
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map) return undefined;
+    const t = setTimeout(() => map.invalidateSize(), 0);
+    return () => clearTimeout(t);
+  }, [size]);
+
+  // Datalagren uppdateras vid förändring – rör aldrig kartvalet (M6).
   useEffect(() => {
     const map = mapRef.current;
     const layer = layerRef.current;
@@ -134,7 +166,7 @@ export default function MapPanel({ area, country, assets = [], staticGeo = null,
           fillOpacity: 0.9,
         }).bindPopup(popupHtml(a), { maxWidth: 280 }).addTo(layer);
       } else if (g?.type === 'LineString') {
-        const coords = g.coordinates.map(([lng, lat]) => [lat, lng]);
+        const coords = a.geometry.coordinates.map(([lng, lat]) => [lat, lng]);
         const mw = a.attrs?.mw;
         const color = a.type === 'flow' ? (mw >= 0 ? '#2e9e5b' : '#d4574a') : '#e08a2e';
         L.polyline(coords, {
@@ -155,18 +187,28 @@ export default function MapPanel({ area, country, assets = [], staticGeo = null,
         onEachFeature: (f, l) => l.bindTooltip(f.properties.title),
       }).addTo(layer);
     }
-
-    // Utsikt: valt land, annars hela Norden.
-    if (sel) {
-      const feat = staticGeo?.countries?.features?.find(f => f.properties.code === sel);
-      if (feat) {
-        const b = L.geoJSON(feat).getBounds();
-        if (b.isValid()) map.fitBounds(b.pad(0.08), { maxZoom: 7 });
-        return;
-      }
-    }
-    map.setView(NORDIC_CENTER, NORDIC_ZOOM);
   }, [area.id, country, assets, staticGeo, events]);
+
+  // Kartvalet (M6): bara vid kontextbyte (område/land), när landsgränserna
+  // har laddats, eller vid manuell "Återställ vy". 30 s-uppdateringen byter
+  // aldrig referens på någon av dessa avbildningar – kartan står stilla.
+  const geoReady = !!staticGeo?.countries?.features?.length;
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map) return;
+    if (country === 'ALL') {
+      map.setView(NORDIC_CENTER, NORDIC_ZOOM);
+      return;
+    }
+    if (!geoReady) return; // väntar på landsgränserna – ingen fallback-vy
+    const feat = staticGeo.countries.features.find(f => f.properties.code === country);
+    if (feat) {
+      const b = L.geoJSON(feat).getBounds();
+      if (b.isValid()) map.fitBounds(b.pad(0.08), { maxZoom: 7 });
+    } else {
+      map.setView(NORDIC_CENTER, NORDIC_ZOOM);
+    }
+  }, [area.id, country, geoReady, resetNonce]);
 
   const hasEnergy = area.id === 1;
   const hasIx = assets.some(a => a.type === 'ix');
@@ -180,8 +222,25 @@ export default function MapPanel({ area, country, assets = [], staticGeo = null,
 
   return (
     <div className="card">
-      <h2>Karta</h2>
-      <div ref={divRef} className="mapbox" />
+      <h2>
+        Karta
+        <span className="maptools">
+          <span className="seg" role="group" aria-label="Kartstorlek">
+            {Object.keys(MAP_SIZES).map(s => (
+              <button key={s} type="button" className={s === size ? 'on' : ''}
+                aria-pressed={s === size}
+                title={`Storlek ${s} (${MAP_SIZES[s]} px)`}
+                onClick={() => chooseSize(s)}>
+                {s}
+              </button>
+            ))}
+          </span>
+          <button type="button" className="tbtn" onClick={() => setResetNonce(n => n + 1)}>
+            Återställ vy
+          </button>
+        </span>
+      </h2>
+      <div ref={divRef} className="mapbox" style={{ height: MAP_SIZES[size] }} />
       <div className="maplegend mut">
         <span><i style={{ background: '#4a7fd4' }} />Landsgränser</span>
         {hasEnergy && <span><i style={{ background: '#e08a2e' }} />HVDC-länk</span>}

@@ -97,11 +97,26 @@ tr.area-row:hover td { background: var(--mut-bg); }
 .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; }
 .row { display: flex; justify-content: space-between; gap: 8px; padding: 2px 0; }
 .gapcard { border-left: 3px solid var(--warn); }
-/* M3: Leaflet-karta */
+/* M3: Leaflet-karta (höjd styrs inline av M6-storleken S/M/L) */
 .mapbox {
   width: 100%; height: 420px; border: 1px solid var(--bd);
   border-radius: 8px; background: var(--mut-bg);
 }
+/* M6: kartverktyg – storlek S/M/L + vyåterställning i kortrubriken */
+.maptools { display: inline-flex; align-items: center; gap: 8px; }
+.seg { display: inline-flex; border: 1px solid var(--bd); border-radius: 6px; overflow: hidden; }
+.seg button {
+  border: none; background: var(--card); color: var(--mut);
+  font: inherit; font-size: 12px; line-height: 1.7; padding: 1px 9px; cursor: pointer;
+}
+.seg button + button { border-left: 1px solid var(--bd); }
+.seg button.on { background: var(--accent); color: #fff; font-weight: 600; }
+.tbtn {
+  border: 1px solid var(--bd); background: var(--card); color: var(--tx);
+  font: inherit; font-size: 12px; line-height: 1.7; padding: 1px 8px;
+  border-radius: 6px; cursor: pointer;
+}
+.tbtn:hover { border-color: var(--accent); color: var(--accent); }
 .leaflet-container { border-radius: 8px; font: inherit; }
 .maplegend {
   display: flex; gap: 14px; flex-wrap: wrap; margin-top: 8px; font-size: 12px;

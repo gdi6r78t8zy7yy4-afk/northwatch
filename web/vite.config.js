@@ -9,4 +9,11 @@ export default defineConfig({
       '/api': 'http://localhost:3000',
     },
   },
+  // M6: frontendtest (Vitest + Testing Library, jsdom, Leaflet mockas).
+  test: {
+    environment: 'jsdom',
+    globals: true,
+    setupFiles: './src/test/setup.js',
+    include: ['src/**/*.test.{js,jsx}'],
+  },
 });
