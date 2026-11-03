@@ -23,6 +23,13 @@ npm run build
 npm start              # http://localhost:3000
 ```
 
+Frontendtester (offline – allt nätverk mockas):
+
+```bash
+npm --prefix web test          # vitest run: 10 filer, 77 tester
+npm --prefix web run test:watch
+```
+
 ## Områden (enligt API-katalogen)
 
 | # | Område | # | Område |
@@ -201,6 +208,30 @@ M5 (2026-11-02) omskriver kollektorn till **datacache-API:t v2**
   (`node --test "server/test/trafikverket.test.js"`) körs mot live-verifierade
   fixtures i `server/testdata/` – inget nätverk.
 
+## Kartwidget (M6)
+
+M6 (2026-11-03) ändrar kartpanelen på de geo-markerade dashboarden (områdena
+1, 2, 3, 4, 10, 11) på tre sätt:
+
+- **Kartstorlek S/M/L:** användaren väljer höjd (S=260, M=420, L=580 px, default
+  M) i en segmenterad kontroll i kortets rubrik. Valet minns i webbläsaren
+  (`localStorage`-nyckeln `nw-mapsize`; ogiltig sparad värde → M) och varje
+  storleksbyte kallar `map.invalidateSize()` så Leaflet mäter om kartytan.
+- **Vy bevaras vid 30 s-uppdateringen:** `MapPanel` är uppdelad i en *dataeffekt*
+  (ritar lagren, körs när assets/events-referenserna byts vid polling) och en
+  *vyeffekt* (körs bara vid områdes-/landsbyte, när landsgränserna laddats klart,
+  eller manuellt via "Återställ vy" i kortets rubrik). 30 s-polling ritar alltså
+  om datalagren men flyttar aldrig kartan. Ett land valt innan gränsdatan är
+  hämtad väntar på den – ingen fallback-vy till Norden.
+- **Frontendtestning:** Vitest + Testing Library + jsdom i `web/` (devDependencies
+  bara, körs mot `vite.config.js` med `test`-block + `src/test/setup.js`).
+  `src/test/leafletMock.js` är en deterministisk Leaflet-mock som loggar
+  `setView`/`fitBounds`/`invalidateSize`, lagerkapning och –skapande, så testerna
+  kan verifiera *när* kartan får nya måtten/vyer. Täckning: MapPanel (vy vs data,
+  S/M/L, alla lager), DashboardPage (30 s-polling, källstatus), SummaryPage
+  (matris, KPI, navigering), App, TopBar, HealthTable, RecordsTables, StatusPill
+  samt `status.js` och `api.js`.
+
 ## Nycklar och kredensials (`.env`)
 
 ```
@@ -252,6 +283,11 @@ CDS_EMAIL=…          # M4 – kontots e-post (CDS kräver token + e-post per a
   kartpunkter, tåganmälningar för valda stationer (LocationSignature), vägväder-KPI:er,
   påverkade färjeavgångar, valfri SSE-ström; enhetstester mot live-fixtures
   (server/testdata/), felfelhantering per typ. Se "Trafikverket (M5)".
+- **M6 (klart 2026-11-03):** kartwidget – användarvald storlek S/M/L (persisteras i
+  webbläsaren), kartan återställer inte längre vyn vid 30 s-uppdateringen
+  (dataeffekt/vyeffekt separerade, "Återställ vy"-knapp), full frontendtesttäckning
+  (Vitest + Testing Library, deterministisk Leaflet-mock, 77 tester).
+  Se "Kartwidget (M6)".
 
 ## Datakällor och villkor
 
