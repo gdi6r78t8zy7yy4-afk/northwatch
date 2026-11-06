@@ -202,6 +202,6 @@ http.createServer((q, res) => {
   }
   if (q.method === 'GET' && u.pathname.startsWith('/api/')) { res.writeHead(404); return res.end('Not found'); }
   serveStatic(q, res);
-}).listen(process.env.PORT || 3000, () => {
-  console.log(`northwatch: http://localhost:${process.env.PORT || 3000} (${COLLECTORS.length} källor)`);
+}).listen(3000, '0.0.0.0', () => {
+  console.log(`northwatch: http://0.0.0.0:3000 (${COLLECTORS.length} källor)`);
 });

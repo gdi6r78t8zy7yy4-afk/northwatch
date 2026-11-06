@@ -3,16 +3,17 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
+  "workspaces": [
+    "web"
+  ],
   "scripts": {
-    "dev": "concurrently -n server,web -c blue,green \"node server/app.js\" \"npm --prefix web run dev\"",
+    "dev": "npm run build && node server/app.js",
     "build": "npm --prefix web run build",
-    "start": "node server/app.js"
+    "start": "node server/app.js",
+    "lint": "node --check server/app.js"
   },
   "engines": {
     "node": ">=20.6"
-  },
-  "devDependencies": {
-    "concurrently": "^9.1.0"
   },
   "dependencies": {
     "fast-xml-parser": "^5.11.2"
