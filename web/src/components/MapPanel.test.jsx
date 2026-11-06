@@ -4,11 +4,18 @@
 //  – vy sätts vid områdes/landsbyte, när gränsdata blir klart, manuellt
 //  – storlek S/M/L: höjd, persistens, återställning, invalidateSize
 //  – lager: punkter, flöden, energi, händelser, gränser, legend, tomt läge
+//  – M8: prognosrutnät (SMHI snow1g) som imageOverlay + klick → onMapClick
 // Leaflet är deterministiskt mockat (src/test/leafletMock.js).
-import { test, expect, describe, vi } from 'vitest';
-import { render, screen, fireEvent, act } from '@testing-library/react';
+import { test, expect, describe, beforeEach, vi } from 'vitest';
+import { render, screen, fireEvent, act, waitFor } from '@testing-library/react';
 import MapPanel from './MapPanel.jsx';
-import { __leaf, __resetLeaflet } from '../test/leafletMock.js';
+import { __leaf, __resetLeaflet, __fireLeaf } from '../test/leafletMock.js';
+
+// M8: prognosrutnätet hämtas via backend – mockat som alla övriga anrop.
+vi.mock('../api.js');
+import { fetchForecastGrid, fetchForecastGridCoords } from '../api.js';
+import { nowIndex } from '../lib/wxGrid.js';
+import { fmtTime } from '../status.js';
 
 const GEO = {
   countries: {
@@ -286,5 +293,163 @@ describe('MapPanel – lager', () => {
     expect(__leaf.removed).toBe(0);
     unmount();
     expect(__leaf.removed).toBe(1);
+  });
+});
+
+// M8: prognosrutnät (SMHI snow1g, område 11). Rutnätets värden + koordinater
+// hämtas via backend (mockat). Fixturens tider ligger i det förflutna →
+// nowIndex = sista steget i cykeln, så förväntat tidstämpel är deterministiskt.
+describe('MapPanel – prognosrutnät (M8)', () => {
+  const WX_TIMES = ['2026-11-05T10:00:00Z', '2026-11-05T11:00:00Z', '2026-11-05T12:00:00Z'];
+  const NOW_TIME = WX_TIMES[nowIndex(WX_TIMES)]; // = WX_TIMES[2] (allt förflutet)
+  const WX_META = {
+    ready: true,
+    createdTime: '2026-11-05T10:15:00Z',
+    referenceTime: WX_TIMES[0],
+    times: WX_TIMES,
+    points: [],
+    grid: { downsample: 20, parameters: ['air_temperature', 'wind_speed_of_gust'] },
+  };
+  const WX_COORDS = [[10, 58], [12, 58], [10, 60], [12, 60]];
+  const WX_VALUES = [2, 8, -5, 9999];
+
+  const gridOk = (parameter, values) => ({
+    ok: true, status: 200,
+    body: {
+      parameter, time: NOW_TIME, createdTime: WX_META.createdTime,
+      downsample: 20, count: values.length, values,
+    },
+  });
+  const coordsOk = () => ({
+    ok: true, status: 200,
+    body: { downsample: 20, count: 4, coordinates: WX_COORDS },
+  });
+
+  const renderWx = (props = {}) =>
+    renderMap({ area: { id: 11 }, forecastMeta: WX_META, ...props });
+
+  const overlays = () => __leaf.created.filter(c => c.kind === 'imageOverlay');
+
+  beforeEach(() => {
+    // Svaret speglar den efterfrågade parametern (som servern gör).
+    vi.mocked(fetchForecastGrid)
+      .mockReset()
+      .mockImplementation((param, _time, _ds) =>
+        Promise.resolve(gridOk(param, WX_VALUES)));
+    vi.mocked(fetchForecastGridCoords).mockReset().mockResolvedValue(coordsOk());
+  });
+
+  test('redo cykel → imageOverlay under gränslaget med bbox, opacitet och ramplegend', async () => {
+    const { container } = renderWx();
+    await waitFor(() => expect(overlays()).toHaveLength(1));
+
+    // I sista renderpassen (efter att wx-läget kommit) är de två
+    // nysskapade lagen overlay + gränser – i den ordningen, så att
+    // punkter/linjer ritas ovanpå prognosrutnätet.
+    const [ov, border] = __leaf.created.slice(-2);
+    expect(ov.kind).toBe('imageOverlay');
+    expect(border.kind).toBe('geoJSON');
+    expect(border.options.style).toBeTypeOf('function');
+    expect(ov.arg.bounds).toEqual([[58, 10], [60, 12]]); // Leaflet [[s,v],[n,o]]
+    expect(ov.arg.url).toMatch(/^data:image\/png/); // jsdom: fallback-dataURL
+    expect(ov.options).toEqual({ opacity: 0.55, className: 'wxgrid', interactive: false });
+
+    // Hämtas vid cykelns nu-steg med den första parametern.
+    expect(fetchForecastGrid).toHaveBeenCalledWith('air_temperature', NOW_TIME, 20);
+    expect(fetchForecastGridCoords).toHaveBeenCalledWith(20);
+
+    // Legenden: parameterns etikett + tider i standardformatet.
+    // (queryByText-varianten matchar även <option>-texten – skopa till .wxlegend.)
+    const legend = container.querySelector('.wxlegend');
+    expect(legend).not.toBeNull();
+    expect(legend.textContent).toContain('Temperatur (°C)');
+    expect(legend.textContent).toContain(`nu-steg ${fmtTime(NOW_TIME)}`);
+    expect(legend.textContent).toContain(`cykel ${fmtTime(WX_META.createdTime)}`);
+    expect(legend.textContent).toContain('klicka för punktprognos');
+  });
+
+  test('utan forecastMeta → ingen hämtning, ingen overlay, ingen parameterväljare', async () => {
+    renderMap(); // område 3 utan forecastMeta
+    await act(async () => {}); // låt microtask-löpan köra klart
+    expect(overlays()).toHaveLength(0);
+    expect(screen.queryByRole('combobox', { name: 'Prognosparameter' })).toBeNull();
+    expect(fetchForecastGrid).not.toHaveBeenCalled();
+    expect(fetchForecastGridCoords).not.toHaveBeenCalled();
+    expect(screen.queryByText(/Prognosrutnät/)).not.toBeInTheDocument();
+  });
+
+  test('parameterväxling → ny fetch vid nu-steget; legenden följer med', async () => {
+    const { container } = renderWx();
+    await waitFor(() => expect(overlays()).toHaveLength(1));
+    expect(fetchForecastGrid).toHaveBeenCalledTimes(1);
+
+    fireEvent.change(
+      screen.getByRole('combobox', { name: 'Prognosparameter' }),
+      { target: { value: 'wind_speed_of_gust' } },
+    );
+    await waitFor(() =>
+      expect(fetchForecastGrid)
+        .toHaveBeenLastCalledWith('wind_speed_of_gust', NOW_TIME, 20));
+    // Legenden byter etikett när det nya svaret kommit (option-texten
+    // matchar också en textquery – skopa till .wxlegend).
+    await waitFor(() =>
+      expect(container.querySelector('.wxlegend').textContent)
+        .toContain('Vindbyar (m/s)'));
+  });
+
+  test('grid 502 → förklarande felrad, ingen overlay', async () => {
+    vi.mocked(fetchForecastGrid).mockResolvedValue({
+      ok: false, status: 502, body: { error: 'Kunde inte hämta rutnätet: timeout' },
+    });
+    renderWx();
+    expect(await screen
+      .findByText('Prognosrutnät: Kunde inte hämta rutnätet: timeout')).toBeInTheDocument();
+    expect(overlays()).toHaveLength(0);
+  });
+
+  test('klick på kartan → onMapClick({lat, lon}) – lon, inte lng', () => {
+    const onMapClick = vi.fn();
+    renderMap({ onMapClick });
+    __fireLeaf('click', { latlng: { lat: 59.33, lng: 18.07 } });
+    expect(onMapClick).toHaveBeenCalledTimes(1);
+    expect(onMapClick).toHaveBeenCalledWith({ lat: 59.33, lon: 18.07 });
+  });
+
+  test('clickRef: efter rerender kallas bara senaste onMapClick', () => {
+    const oldCb = vi.fn();
+    const { rerender } = renderMap({ onMapClick: oldCb });
+    __fireLeaf('click', { latlng: { lat: 59, lng: 18 } });
+    expect(oldCb).toHaveBeenCalledTimes(1);
+
+    const newCb = vi.fn();
+    rerender(
+      <MapPanel area={{ id: 11 }} country="ALL" assets={[]} staticGeo={GEO} events={[]}
+        onMapClick={newCb} />,
+    );
+    __fireLeaf('click', { latlng: { lat: 60, lng: 17 } });
+    expect(oldCb).toHaveBeenCalledTimes(1); // Leaflet-händlern byts inte ut
+    expect(newCb).toHaveBeenCalledTimes(1);
+    expect(newCb).toHaveBeenCalledWith({ lat: 60, lon: 17 });
+  });
+
+  test('forecastMeta → null efter redo: rutnätet rensas, ingen ny overlay', async () => {
+    const { rerender } = renderWx();
+    await waitFor(() => expect(overlays()).toHaveLength(1));
+    const clearsBefore = __leaf.clearLayers;
+
+    rerender(
+      <MapPanel area={{ id: 11 }} country="ALL" assets={[]} staticGeo={GEO} events={[]}
+        forecastMeta={null} />,
+    );
+    await act(async () => {});
+    expect(__leaf.clearLayers).toBeGreaterThan(clearsBefore); // lagren ritades om
+    // Slutläget: sista renderpasset har bara gränslaget kvar (mockens logg
+    // är tilläggande – ritade-och-rensade lager syns bara som ordning).
+    const last = __leaf.created.at(-1);
+    expect(last.kind).toBe('geoJSON');
+    expect(last.options.style).toBeTypeOf('function');
+    expect(screen.queryByRole('combobox', { name: 'Prognosparameter' })).toBeNull();
+    expect(screen.queryByText(t => t.includes('klicka för punktprognos')))
+      .not.toBeInTheDocument();
   });
 });

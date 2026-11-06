@@ -135,3 +135,37 @@ tr.area-row:hover td { background: var(--mut-bg); }
 .leaflet-popup-content .poprow {
   display: flex; justify-content: space-between; gap: 14px; margin-top: 2px;
 }
+
+/* M8: SMHI-prognospanel (område 11) + prognosrutnät på kartan */
+.fchart { margin: 12px 0 2px; }
+.fchart svg { width: 100%; height: auto; display: block; }
+.fctitle { font-size: 12.5px; font-weight: 600; margin-bottom: 2px; }
+.flegend { margin-left: 10px; font-weight: 400; color: var(--mut); font-size: 11.5px; }
+.flg { margin-right: 10px; white-space: nowrap; }
+.flg i {
+  display: inline-block; width: 10px; height: 3px; border-radius: 2px;
+  vertical-align: middle; margin-right: 4px;
+}
+.fchart .fcgrid { stroke: var(--bd); stroke-width: 1; opacity: .55; }
+.fchart .fzero { stroke: var(--mut); stroke-width: 1; opacity: .5; }
+.fchart .fclbl { font-size: 10.5px; fill: var(--mut); }
+.fchart .fnow { stroke: var(--accent); stroke-width: 1; stroke-dasharray: 3 3; opacity: .8; }
+.fchart .fnowlbl { fill: var(--accent); font-weight: 600; }
+.fchart .fhover { stroke: var(--tx); stroke-width: 1; opacity: .5; }
+.fscrub { display: flex; align-items: center; gap: 10px; margin: 12px 0 2px; }
+.fscrub input[type='range'] { flex: 1; accent-color: var(--accent); }
+.fcond {
+  display: flex; flex-wrap: wrap; gap: 4px 14px; padding: 8px 0; margin: 8px 0;
+  border-top: 1px solid var(--bd); border-bottom: 1px solid var(--bd);
+  font-size: 12.5px;
+}
+.fchart2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+@media (max-width: 760px) { .fchart2 { grid-template-columns: 1fr; } }
+.wxsel { font-size: 12px; padding: 2px 6px; }
+.wxlegend {
+  display: flex; align-items: center; gap: 8px; margin-top: 8px; font-size: 11.5px;
+}
+.wxlegend .ramp {
+  width: 110px; height: 8px; border-radius: 4px; border: 1px solid var(--bd);
+  flex-shrink: 0;
+}

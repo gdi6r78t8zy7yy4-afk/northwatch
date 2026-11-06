@@ -7,7 +7,7 @@
 //   toppfält dataUpdatedTime. v2-endpointen (DATEX-II) finns i dokumentationen
 //   men levererar i nuläget tomma payload.
 // 871 KB per anrop + ToS (max 1 anrop/s) → pollar var 5:e minut.
-import { j, now } from '../lib/http.js';
+import { j, now, safeContact } from '../lib/http.js';
 
 const DEFAULT_URL = 'https://tie.digitraffic.fi/api/traffic-message/v1/messages?inactiveHours=0&includeAreaGeometry=false';
 
@@ -30,7 +30,7 @@ export default {
         // Tillkrav i deras ToS: unik identifiering –(CONTACT från .env, annars
         // kontaktlös markerad) i stället för inbakad placeholder.
         'Digitraffic-User': process.env.CONTACT
-          ? `northwatch/0.1 (${process.env.CONTACT})`
+          ? `northwatch/0.1 (${safeContact(process.env.CONTACT)})`
           : 'northwatch/0.1 (contact: unset)',
         Accept: 'application/json',
         'Accept-Encoding': 'gzip',

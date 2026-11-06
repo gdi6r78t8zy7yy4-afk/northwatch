@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink, Link } from 'react-router-dom';
-import { COUNTRY_NAMES } from '../status.js';
+import { COUNTRY_NAMES, fmtTime } from '../status.js';
 
 export default function TopBar({ areas, gen, backendDown, country, setCountry }) {
   return (
@@ -16,7 +16,7 @@ export default function TopBar({ areas, gen, backendDown, country, setCountry })
       </nav>
       <div className="topright">
         {backendDown && <span className="pill st-err">Backend ej nåbar</span>}
-        {gen && <span>uppdaterad {new Date(gen).toLocaleTimeString('sv-SE')}</span>}
+        {gen && <span>uppdaterad {fmtTime(gen)}</span>}
         <label>
           Område:{' '}
           <select value={country} onChange={e => setCountry(e.target.value)}>

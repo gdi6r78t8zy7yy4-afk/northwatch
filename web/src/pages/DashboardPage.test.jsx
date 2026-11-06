@@ -1,13 +1,17 @@
 // DashboardPage (M6) – den gemensamma sidan bakom alla 12 dashboard:
 // hämtar-/fel-/okänt-område-lägen, karta bara när area.geo, statusaggregering,
-// källor, luckor och 30 s-hämtning.
+// källor, luckor och 30 s-hämtning. M8: väderprognos (SMHI snow1g) i område 11.
 import { test, expect, describe, beforeEach, vi } from 'vitest';
-import { render, screen, act } from '@testing-library/react';
+import { render, screen, act, waitFor } from '@testing-library/react';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import DashboardPage from './DashboardPage.jsx';
+import { __fireLeaf } from '../test/leafletMock.js';
 
 vi.mock('../api.js');
-import { fetchDashboard, fetchAssets, fetchStaticGeo } from '../api.js';
+import {
+  fetchDashboard, fetchAssets, fetchStaticGeo,
+  fetchForecastMeta, fetchForecastPoint, fetchForecastGrid, fetchForecastGridCoords,
+} from '../api.js';
 
 const now = Date.now();
 
@@ -44,6 +48,10 @@ beforeEach(() => {
   vi.mocked(fetchDashboard).mockReset();
   vi.mocked(fetchAssets).mockReset();
   vi.mocked(fetchStaticGeo).mockReset();
+  vi.mocked(fetchForecastMeta).mockReset();
+  vi.mocked(fetchForecastPoint).mockReset();
+  vi.mocked(fetchForecastGrid).mockReset();
+  vi.mocked(fetchForecastGridCoords).mockReset();
 });
 
 describe('DashboardPage', () => {
@@ -142,5 +150,106 @@ describe('DashboardPage', () => {
     } finally {
       vi.useRealTimers();
     }
+  });
+});
+
+// M8: område 11 (geo: true) kopplar in SMHI snow1g-prognosen: meta delas
+// mellan karta (prognosrutnät) och panel (punktprognoser), klick på kartan
+// ger anpassad plats, övriga områden har ingen prognoslogik alls.
+describe('DashboardPage – väderprognos (M8, område 11)', () => {
+  // Fixturens tider ligger i det förflutna → nu-steget = sista (TIMES[2]),
+  // deterministiskt oavsett när testerna körs.
+  const TIMES = ['2026-11-05T10:00:00Z', '2026-11-05T11:00:00Z', '2026-11-05T12:00:00Z'];
+  const AREA_WX = {
+    id: 11, slug: 'miljo', name: 'Miljö, naturhändelser och klimatpåverkan',
+    short: 'Miljö/Väder', geo: true,
+    scope: 'Nordiskt väder, snö, kraft och naturhändelser.',
+    gaps: 'SMHI-prognosen täcker inte Island.',
+  };
+  const WX_META = {
+    ready: true,
+    createdTime: '2026-11-05T10:15:00Z',
+    referenceTime: TIMES[0],
+    times: TIMES,
+    points: [
+      { name: 'Stockholm', lon: 18.07, lat: 59.33, country: 'SE', outsideDomain: false },
+      { name: 'Reykjavik', lon: -21.94, lat: 64.15, country: 'IS', outsideDomain: true },
+    ],
+    grid: { downsample: 20, parameters: ['air_temperature'] },
+  };
+  const gridOk = {
+    ok: true, status: 200,
+    body: {
+      parameter: 'air_temperature', time: TIMES[2], createdTime: WX_META.createdTime,
+      downsample: 20, count: 4, values: [2, 8, -5, 9999],
+    },
+  };
+  const coordsOk = {
+    ok: true, status: 200,
+    body: { downsample: 20, count: 4, coordinates: [[10, 58], [12, 58], [10, 60], [12, 60]] },
+  };
+  const pointOk = {
+    ok: true, status: 200,
+    body: {
+      point: { name: 'Stockholm', lon: 18.07, lat: 59.33, country: 'SE' },
+      createdTime: WX_META.createdTime,
+      referenceTime: TIMES[0],
+      times: TIMES,
+      timeSeries: TIMES.map((t, i) => ({
+        time: t,
+        data: {
+          air_temperature: 2 + i, wind_speed: 5, wind_speed_of_gust: 10,
+          wind_from_direction: 90, precipitation_amount_mean: 0,
+          symbol_code: 1, predominant_precipitation_type_at_surface: 0,
+        },
+      })),
+    },
+  };
+
+  const renderWxPage = async () => {
+    vi.mocked(fetchDashboard).mockResolvedValue(PAYLOAD(AREA_WX));
+    vi.mocked(fetchAssets).mockResolvedValue({ assets: [] });
+    vi.mocked(fetchStaticGeo).mockResolvedValue(null);
+    vi.mocked(fetchForecastMeta).mockResolvedValue({ ok: true, status: 200, body: WX_META });
+    vi.mocked(fetchForecastPoint).mockResolvedValue(pointOk);
+    vi.mocked(fetchForecastGrid).mockResolvedValue(gridOk);
+    vi.mocked(fetchForecastGridCoords).mockResolvedValue(coordsOk);
+    const view = renderPage(11);
+    await screen.findByText('11. Miljö, naturhändelser och klimatpåverkan');
+    return view;
+  };
+
+  test('område 11: panel + kartrutnät kopplas in; autoval ger 6 grafer', async () => {
+    const { container } = await renderWxPage();
+
+    expect(fetchForecastMeta).toHaveBeenCalledTimes(1);
+    expect(screen.getByText('Väderprognos (SMHI snow1g)')).toBeInTheDocument();
+    // Kartan hämtar rutnätet vid cykelns nu-steg (sista – allt är förflutet).
+    expect(fetchForecastGrid).toHaveBeenCalledWith('air_temperature', TIMES[2], 20);
+    expect(fetchForecastGridCoords).toHaveBeenCalledWith(20);
+    // Panelen autovaljerar första inomdomän-staden → punktprognos → 6 grafer.
+    await waitFor(() => expect(container.querySelectorAll('.fchart').length).toBe(6));
+    expect(fetchForecastPoint).toHaveBeenCalledWith({ name: 'Stockholm' });
+  });
+
+  test('klick på kartan → anpassad plats (2 decimaler) + punktprognos per lat/lon', async () => {
+    await renderWxPage();
+
+    __fireLeaf('click', { latlng: { lat: 59.325, lng: 18.065 } });
+    expect(await screen.findByText('📍 Anpassad plats (59.33, 18.07)')).toBeInTheDocument();
+    expect(fetchForecastPoint).toHaveBeenCalledWith({ lat: 59.33, lon: 18.07 });
+  });
+
+  test('annat område: ingen prognospanel, inga prognosfrågor', async () => {
+    vi.mocked(fetchDashboard).mockResolvedValue(PAYLOAD(AREA_GEO));
+    vi.mocked(fetchAssets).mockResolvedValue({ assets: [] });
+    vi.mocked(fetchStaticGeo).mockResolvedValue(null);
+    renderPage(3);
+    expect(await screen.findByText('3. Transport och logistik')).toBeInTheDocument();
+    expect(screen.queryByText('Väderprognos (SMHI snow1g)')).not.toBeInTheDocument();
+    expect(fetchForecastMeta).not.toHaveBeenCalled();
+    expect(fetchForecastPoint).not.toHaveBeenCalled();
+    expect(fetchForecastGrid).not.toHaveBeenCalled();
+    expect(fetchForecastGridCoords).not.toHaveBeenCalled();
   });
 });

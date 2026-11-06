@@ -9,13 +9,13 @@
 //              timeTableRows:[{differenceInMinutes, scheduledTime, actualTime,
 //              stationShortCode, ...}]} – INGEN position → metriska poster.
 // ToS max 1 anrop/s → anropen iaktskänbar; pollar var 10:e minut.
-import { jjson, now, sleep } from '../lib/http.js';
+import { jjson, now, sleep, safeContact } from '../lib/http.js';
 
 const BASE = 'https://rata.digitraffic.fi/api/v1';
 const H = () => ({
   // Unik identifiering enligt Digitraffics villkor (CONTACT från .env).
   'Digitraffic-User': process.env.CONTACT
-    ? `northwatch/0.1 (${process.env.CONTACT})`
+    ? `northwatch/0.1 (${safeContact(process.env.CONTACT)})`
     : 'northwatch/0.1 (contact: unset)',
   Accept: 'application/json',
   'Accept-Encoding': 'gzip',

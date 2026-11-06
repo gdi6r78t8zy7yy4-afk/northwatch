@@ -25,11 +25,14 @@ export const COUNTRY_NAMES = {
   NORDIC: 'Nordiskt gemensamt', ALL: 'Alla länder',
 };
 
+// Standard tidsstämpelformat för alla dashboard: yyyy-mm-dd hh:mm UTC.
 export function fmtTime(ts) {
   if (!ts) return '–';
   const d = new Date(ts);
   if (Number.isNaN(d.getTime())) return String(ts);
-  return d.toLocaleString('sv-SE', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
+  const p = n => String(n).padStart(2, '0');
+  return `${d.getUTCFullYear()}-${p(d.getUTCMonth() + 1)}-${p(d.getUTCDate())} `
+    + `${p(d.getUTCHours())}:${p(d.getUTCMinutes())} UTC`;
 }
 
 export function fmtAge(ts) {

@@ -26,8 +26,14 @@ npm start              # http://localhost:3000
 Frontendtester (offline – allt nätverk mockas):
 
 ```bash
-npm --prefix web test          # vitest run: 10 filer, 77 tester
+npm --prefix web test          # vitest run: 14 filer, 138 tester
 npm --prefix web run test:watch
+```
+
+Backendtester (offline – live-verifierade fixtures i `server/testdata/`):
+
+```bash
+node --test "server/test/*.test.js"   # 38 tester
 ```
 
 ## Områden (enligt API-katalogen)
@@ -42,8 +48,9 @@ npm --prefix web run test:watch
 | 6 | Hälso- och sjukvård | 12 | Offentlig förvaltning och samhällsberedskap |
 
 Översiktssidan (`#/`) visar status för alla områden per land; varje område har sin sida
-(`#/d/1` … `#/d/12`) med gemensam mall: karta (där tillämpbart), indikatorer, händelser,
-källhälsa och kända luckor. Landsskick väljs i toppraden (sparas i webbläsaren).
+(`#/d/1` … `#/d/12`) med gemensam mall: karta (där tillämpbart), väderprognos (område 11),
+indikatorer, händelser, källhälsa och kända luckor. Landsskick väljs i toppraden
+(sparas i webbläsaren).
 
 ## Arkitektur
 
@@ -56,10 +63,12 @@ server/                 backend – ett enda JS-beroende: fast-xml-parser (ENTSO
   lib/store.js          minneslager: normaliserade poster + källhälsa
   lib/scheduler.js      pollar varje källa med sitt intervall (staggerad uppstart)
   lib/jsonstat.js       json-stat 2.0-parser (SCB v2 + SSB v2, M4)
+  lib/forecast.js       SMHI snow1g-prognos: cykelretention (12) + /api/forecast (M8)
   lib/geolayers.js      statiska kartlager, zonmittpunkter, OSM/Overpass-utdrag (veckocache)
   assets/*.geojson      landsgränser (Natural Earth) + energilager (HVDC, zonankar)
-  cache/                OSM-veckocache på disk (gitignorerad)
+  cache/                OSM-veckocache + SMHI-prognoscyklar på disk (gitignorerad)
   collectors/*.js       en modul per källa → normaliserade poster
+  collectors/smhi-forecast.js  prognoscyklar: 11 stadspunkter + härledda väderhändelser (M8)
 web/                    Vite + React SPA (svenskt gränssnitt)
   src/App.jsx           routing (HashRouter), globalt landsskick, 30 s-refresh
   src/pages/            SummaryPage (statusmatris), DashboardPage (gemensam mall)
@@ -84,13 +93,20 @@ asset  { t:'a', area, country, source, type, name, id?, geometry, attrs?, update
   flygplatser, vattenverk, IX-positioner, zonflöden, AIS-fartyg); `NORDIC` ingår alltid i country-filtret
 - `GET /api/geo/static` – statiska kartlager (landsgränser + energilager), ändras sällan
 - `GET /api/health` – källhälsa
+- `GET /api/forecast/meta` – aktuell prognoscykel: tider, katalogpunkter, rutnätsparametrar
+  (M8, område 11)
+- `GET /api/forecast/point?point=<namn>` eller `?lat=&lon=` – full tidsserie för en punkt
+  (404 utanför domänen, 503 innan första cykeln)
+- `GET /api/forecast/grid?parameter=&time=&downsample=` – rutnätsvärden för kartan
+- `GET /api/forecast/grid-coords?downsample=` – koordinatindex för rutnätet
 
-## Källor (33 st)
+## Källor (34 st)
 
 | Källa | Område | Status |
 |-------|--------|--------|
 | SMHI observationsdata (metobs) | 11 Miljö/Väder (SE) | ok |
 | SMHI vädervarningar (ibww) | 11 Miljö/Väder (SE) | endpoint-verifiering (503 – värdnamnet ej reserbart från testnätet) |
+| SMHI väderprognos (snow1g) | 11 Miljö/Väder (Nordiskt) | ok – nyckelfri; timvisa cyklar (~15 min efter timslaget), de 12 senaste speglade på disk; 11 katalogstäder (5 SE, 3 NO, 1 FI, 1 DK, 1 IS utanför domänen) + valfri plats (klick) + rutnät i ~50 km-avstånd (ds20); härledda väderhändelser; verifierat live 2026-11-05 |
 | MET Norway Weather API | 11 Miljö/Väder (NO) | ok – kräver `CONTACT` i .env |
 | DMI climate data (station 06180) | 11 Miljö/Väder (DK) | ok – verifierad 2026-11-01 |
 | CISA KEV | 5 Cyber (Nordiskt) | ok |
@@ -246,9 +262,60 @@ M6 (2026-11-03) ändrar kartpanelen på de geo-markerade dashboarden (områdena
   `src/test/leafletMock.js` är en deterministisk Leaflet-mock som loggar
   `setView`/`fitBounds`/`invalidateSize`, lagerkapning och –skapande, så testerna
   kan verifiera *när* kartan får nya måtten/vyer. Täckning: MapPanel (vy vs data,
-  S/M/L, alla lager), DashboardPage (30 s-polling, källstatus), SummaryPage
+  S/M/L, alla lager, M8: prognosrutnäts-overlay + klick), DashboardPage (30 s-polling, källstatus, M8: väderprognos i område 11), SummaryPage
   (matris, KPI, navigering), App, TopBar, HealthTable, RecordsTables, StatusPill
-  samt `status.js` och `api.js`.
+  samt `status.js` och `api.js`. M8 lade till `symbolCodes.test.js` (SMHIs
+  vädersymbol-/nederbördstyp-koder + kompassriktning), `wxGrid.test.js`
+  (rutnät → pixelmatris, ren och canvasfri), `ForecastChart.test.jsx`
+  (SVG-graf: gap-split, tröskellinjer, pointer-urval) och
+  `WeatherForecastPanel.test.jsx` (punktval, skrubbar, felstater).
+
+## Väderprognos (M8, område 11)
+
+SMHIs öppna prognos-API (snow1g, 2,5 km-grundrutnät) är nyckelfritt –
+kontaktuppgiften i `CONTACT` räcker. Cyklar släpps ~varje timme (ca 15 min
+efter timslaget, UTC) med ~81 timsteg (max 10 dygn). Kollektorn
+(`collectors/smhi-forecast.js`) pollar `createdtime.json` var 5:e minut; vid
+cykelbyte hämtas `times.json` + tidsserier (15 parametrar) för de 11
+katalogstäderna (5 SE, 3 NO, 1 FI, 1 DK + Reykjavik IS, som ligger utanför
+domänen → `outsideDomain` och markeras i stadsvälgaren).
+
+- **Retention:** de 12 senaste cyklarna speglas på disk
+  (`server/cache/smhi-forecast/<cykel>.json`) – tidsserier och
+  griddatavärden (`smhi-grid-<param>-<time>-ds<N>-<cykel>.json`) överlever
+  omstart; vid tommt minne laddas senaste diskcykeln in av API:et
+  (`loadLatestFromDisk`). Fritvalda platser (klick) cachas i minnet bara,
+  giltiga under aktuell cykel.
+- **Ny API-yta** (se "API-yta"): `/api/forecast/meta` (cykel, tider,
+  punkter, rutnätsparametrar), `/api/forecast/point?point=<namn>` eller
+  `?lat=&lon=` (404 utanför domänen, 503 innan första cykeln),
+  `/api/forecast/grid?parameter=&time=&downsample=` och
+  `/api/forecast/grid-coords?downsample=`. Griddatavärden frågas med
+  kompakt tidsformat (`YYYYMMDDThhmmssZ`) + gzip – ISO-tid ger 404
+  (verifierat live 2026-11-05).
+- **Härledda väderhändelser:** tröskelbrott i kommande dygn → händelser
+  med `kind: väderprognos` ("beräknad utifrån prognos"): byar ≥ 22,5 m/s
+  (röd) / ≥ 17 m/s (orange), temperatur ≤ −15 °C (orange), åskrisk
+  ≥ 60 % (gul), frusn nederbörd ≥ 50 % (gul), nederbörd (max per intervall)
+  ≥ 20 mm (gul). Ibww-varningstjänsten (SMHI vädervarningar) har varit 503
+  sedan 2026-11-01 – dessa händelser kompenserar delvis luckan i område 11.
+- **Frontend (bara område 11):** handgjorda SVG-grafer – sex serier
+  (temperatur, vind/byar, nederbörd, åska/isrisk, tryck/fuktighet) med
+  gemensam tidsskrov och tröskelmarkörer; kartans prognosrutnät
+  (Leaflet imageOverlay, 4 parametrar, nedjustering 1–20, default 20 →
+  48×54-raster i ~50 km-avstånd) ritas under datalagren. Klick på kartan
+  sätter en "Anpassad plats" (2 decimaler) som punktprognos; legendens
+  tider följer standardformatet `yyyy-mm-dd hh:mm UTC`.
+- **API:s egenvilja (verifierat live 2026-11-05):** `times.json` har
+  nyckeln `time`; nederbördsparametrar är växande intervallsummor
+  (1→3→6→12 h) – `intervalParametersStartTime` markerar intervallstarten;
+  `missingValue` = 9999 (och `precipitation_frozen_part` = −9 vid ingen
+  nederbörd); grundrutnätet är roterat ~20° så radordning kan inte
+  antas – frontenden rasteriserar varje punkt uttryckligen mot bgränsen
+  (`src/lib/wxGrid.js`, ren och canvasfri i jsdom).
+- **Tester:** `server/test/smhi-forecast.test.js` (18 tester, offline
+  mot fixtures ur en live-cykel 2026-11-05) + M8-webbtest – se
+  "Kartwidget (M6)" → Frontendtestning.
 
 ## Nycklar och kredensials (`.env`)
 
@@ -279,6 +346,11 @@ NVE_STATIONS=…       # M4 – valfri fast stationslista "6.10.0,..." (annars h
                      #   NVE_STATION_LIMIT första aktiva stationerna, standard 5)
 CDS_TOKEN=…          # M4 – Copernicus CDS, gratis: https://cds.climate.copernicus.eu/profile
 CDS_EMAIL=…          # M4 – kontots e-post (CDS kräver token + e-post per anrop)
+SMHI_FCST_API_BASE=… # M8 – SMHI snow1g-basURL (standard: officiell, nyckelfri)
+SMHI_FCST_POINTS=…   # M8 – "Namn=lon,lat,..." (längd först); standard 11 katalogstäder
+SMHI_FCST_PARAMS=…   # M8 – koma-separerade punktparametrar (15 standard)
+SMHI_GRID_DOWNSAMPLE=…  # M8 – 1–20 (standard 20 → 48×54-raster, ~50 km-avstånd)
+SMHI_FCST_CACHE_DIR=…   # M8 – diskcache (standard server/cache/smhi-forecast)
 ```
 
 `.env` är gitignorerad; `.env.example` dokumenterar fälten.
@@ -334,6 +406,15 @@ CDS_EMAIL=…          # M4 – kontots e-post (CDS kräver token + e-post per a
   KPI; ersättningsbussar för inställda tåg som händelser med ruttlåt
   (LineString via stoppen, sorterade på `Sequence`) + KPI. Enhetstester mot
   live-fixtures (server/testdata/), MapPanel-test för `kamera`-lagret.
+- **M8 (klart 2026-11-05):** väderprognos (SMHI snow1g, område 11) –
+  kollektorn pollar `createdtime.json` var 5:e minut, 15 parametrars
+  tidsserier för 11 katalogstäder, retention av de 12 senaste cyklarna på
+  disk, fyra nya `/api/forecast`-endpointar, härledda väderhändelser
+  (kompenserar ibww:s 503 sedan 2026-11-01), handgjorda SVG-grafer
+  (sex serier + gemensam tidsskrov), prognosrutnät som imageOverlay
+  (ds20 ≈ 50 km-avstånd) och klick-överallt-punktprognos. Enhetstester mot
+  live-fixtures + webbtest för alla nya moduler (totalt 14 filer, 138 webb-
+  tester). Se "Väderprognos (M8, område 11)".
 
 ## Datakällor och villkor
 

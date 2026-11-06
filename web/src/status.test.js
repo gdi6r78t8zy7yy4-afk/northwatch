@@ -27,13 +27,14 @@ test('COUNTRY_NAMES täcker alla dashboardländer + gemensamma', () => {
   }
 });
 
-test('fmtTime: tomt värde → –, ogiltigt datum som-is, giltigt → sv-format', () => {
+test('fmtTime: tomt värde → –, ogiltigt datum som-is, giltigt → yyyy-mm-dd hh:mm UTC', () => {
   expect(fmtTime(null)).toBe('–');
   expect(fmtTime(0)).toBe('–');
   expect(fmtTime('helt-ogiltigt')).toBe('helt-ogiltigt');
+  expect(fmtTime('2026-11-05T21:03:13Z')).toBe('2026-11-05 21:03 UTC');
   const out = fmtTime(Date.now());
   expect(out).not.toBe('–');
-  expect(out).toMatch(/\d{2}\/\d{2} \d{2}:\d{2}/); // dd/mm HH:MM (sv-SE)
+  expect(out).toMatch(/^\d{4}-\d{2}-\d{2} \d{2}:\d{2} UTC$/);
 });
 
 test('fmtAge: nyss / min / h / d-bunkar', () => {

@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { fetchDashboard, fetchAssets, fetchStaticGeo } from '../api.js';
-import { COUNTRY_NAMES } from '../status.js';
+import { fetchDashboard, fetchAssets, fetchStaticGeo, fetchForecastMeta } from '../api.js';
+import { COUNTRY_NAMES, fmtTime } from '../status.js';
 import StatusPill from '../components/StatusPill.jsx';
 import MapPanel from '../components/MapPanel.jsx';
+import WeatherForecastPanel from '../components/WeatherForecastPanel.jsx';
 import { MetricsTable, EventsTable } from '../components/RecordsTables.jsx';
 
 export default function DashboardPage({ country }) {
@@ -13,6 +14,8 @@ export default function DashboardPage({ country }) {
   const [err, setErr] = useState(null);
   const [assets, setAssets] = useState([]);
   const [staticGeo, setStaticGeo] = useState(null);
+  const [fcstMeta, setFcstMeta] = useState(null);
+  const [customPoint, setCustomPoint] = useState(null);
 
   useEffect(() => {
     let stop = false;
@@ -54,6 +57,33 @@ export default function DashboardPage({ country }) {
     return () => { stop = true; };
   }, []);
 
+  // M8: väderprognos (område 11): meta pollas var 30:e sekund och delas av
+  // panelen (punktprognoser) och kartan (prognosrutnät). Meta är
+  // kompletterande – ett misslyckande fäller inte dashboarden.
+  const wxArea = areaId === 11;
+  useEffect(() => {
+    if (!wxArea) return undefined;
+    let stop = false;
+    const load = async () => {
+      try {
+        const r = await fetchForecastMeta();
+        if (!stop && r.ok && r.body) setFcstMeta(r.body);
+      } catch { /* tyst – se kommentar */ }
+    };
+    load();
+    const t = setInterval(load, 30000);
+    return () => { stop = true; clearInterval(t); };
+  }, [wxArea]);
+
+  // M8: klick på kartan → prognos för valfri plats (2 decimaler räcker –
+  // backend cachar anpassade platser per 3 decimaler).
+  const handleMapClick = ({ lat, lon }) => {
+    if (!Number.isFinite(lat) || !Number.isFinite(lon)) return;
+    const rlat = Math.round(lat * 100) / 100;
+    const rlon = Math.round(lon * 100) / 100;
+    setCustomPoint({ name: `Anpassad plats (${rlat}, ${rlon})`, lat: rlat, lon: rlon });
+  };
+
   if (Number.isNaN(areaId)) {
     return <div className="card"><span className="pill st-err">Okänt område</span></div>;
   }
@@ -88,6 +118,16 @@ export default function DashboardPage({ country }) {
           assets={assets}
           staticGeo={staticGeo}
           events={records.filter(r => r.t === 'e' && r.geo)}
+          forecastMeta={wxArea ? fcstMeta : null}
+          onMapClick={wxArea ? handleMapClick : undefined}
+        />
+      )}
+
+      {wxArea && (
+        <WeatherForecastPanel
+          meta={fcstMeta}
+          customPoint={customPoint}
+          onClearCustom={() => setCustomPoint(null)}
         />
       )}
 
@@ -115,7 +155,7 @@ export default function DashboardPage({ country }) {
                   <td className="mono">{s.name} <span className="mut">({s.id})</span></td>
                   <td>{s.country === 'NORDIC' ? 'Nordiskt' : s.country}</td>
                   <td><StatusPill status={s.status} /></td>
-                  <td>{s.lastOk ? new Date(s.lastOk).toLocaleTimeString('sv-SE') : '–'}</td>
+                  <td>{s.lastOk ? fmtTime(s.lastOk) : '–'}</td>
                   <td className="mut">{s.error ?? '–'}</td>
                 </tr>
               ))}

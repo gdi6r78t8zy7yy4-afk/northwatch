@@ -21,3 +21,25 @@ export const fetchStaticGeo = () =>
     staticGeoPromise = null; // tillåt retry
     throw e;
   }));
+
+// M8: SMHI väderprognos (snow1g). getRaw behåller statuskod – punkt-frågan
+// kan svara 404 (utanför domänen) eller 503 (cykeln ej klar). Panelen
+// ska visa det som ett tillstånd, inte ett stacktrace.
+async function getRaw(p) {
+  const r = await fetch(p, { headers: { Accept: 'application/json' } });
+  let body = null;
+  try { body = await r.json(); } catch { /* icke-JSON */ }
+  return { status: r.status, ok: r.ok, body };
+}
+
+export const fetchForecastMeta = () => getRaw('/api/forecast/meta');
+export const fetchForecastPoint = ({ name, lat, lon } = {}) => {
+  const q = name
+    ? `point=${encodeURIComponent(name)}`
+    : `lat=${encodeURIComponent(lat)}&lon=${encodeURIComponent(lon)}`;
+  return getRaw(`/api/forecast/point?${q}`);
+};
+export const fetchForecastGrid = (parameter, time, downsample) =>
+  getRaw(`/api/forecast/grid?parameter=${parameter}&time=${encodeURIComponent(time)}&downsample=${downsample ?? ''}`);
+export const fetchForecastGridCoords = downsample =>
+  getRaw(`/api/forecast/grid-coords?downsample=${downsample ?? ''}`);

@@ -13,6 +13,7 @@ import { state, healthList, areaSources, areaStatus, cellStatus, sourceStatus } 
 import { AREAS, COUNTRIES } from './areas.js';
 import { now } from './lib/http.js';
 import { staticGeo } from './lib/geolayers.js';
+import { apiForecastMeta, apiForecastPoint, apiForecastGrid, apiForecastGridCoords } from './lib/forecast.js';
 
 for (const c of COLLECTORS) registerSource(c);
 startScheduler(COLLECTORS);
@@ -117,6 +118,15 @@ const routes = {
   '/api/geo/static': () => ({ generatedAt: now(), ...staticGeo() }),
 };
 
+// M8: SMHI-prognosapi:t – asynkront (påfrågan kan utlösa SMHI-hämtning
+// på plats, t.ex. griddatavärden eller anpassade platser).
+const asyncRoutes = {
+  '/api/forecast/meta': u => apiForecastMeta(u),
+  '/api/forecast/point': u => apiForecastPoint(u),
+  '/api/forecast/grid': u => apiForecastGrid(u),
+  '/api/forecast/grid-coords': u => apiForecastGridCoords(u),
+};
+
 function sendJson(res, obj) {
   res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store' });
   res.end(JSON.stringify(obj));
@@ -154,9 +164,22 @@ function serveStatic(q, res) {
   });
 }
 
+function sendStatus(res, status, body) {
+  res.writeHead(status, { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store' });
+  res.end(JSON.stringify(body));
+}
+
 http.createServer((q, res) => {
   const u = new URL(q.url, 'http://localhost');
   if (q.method === 'GET' && routes[u.pathname]) return sendJson(res, routes[u.pathname](u));
+  // Asynkna vägar (kan vänta på extern hämtning).
+  const ar = q.method === 'GET' && asyncRoutes[u.pathname];
+  if (ar) {
+    return Promise.resolve(ar(u)).then(
+      ({ status, body }) => sendStatus(res, status ?? 200, body),
+      e => sendStatus(res, 500, { error: String(e?.message ?? e) }),
+    );
+  }
   const m = q.method === 'GET' && u.pathname.match(/^\/api\/dashboard\/(\d+)$/);
   if (m) {
     const id = Number(m[1]);

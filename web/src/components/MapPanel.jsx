@@ -11,10 +11,16 @@
 //     (område/land), när landsgränserna laddats klart och via "Återställ vy" –
 //     30 s-uppdateringen ritar om datalagren men flyttar ALDRIG kartan.
 //     Störlek S/M/L väljs av användaren och minns i webbläsaren (nw-mapsize).
+// M8: prognosrutnät (SMHI snow1g, område 11) som imageOverlay under alla
+//     datalager – nu-steg i aktuell cykel, parameterväljare i verktygsraden.
+//     onMapClick(latlng) → väderpanelen hämtar punktprognos för klickplatsen.
 // Allt servas av backend – frontend pratar aldrig med externa källor.
 import React, { useEffect, useRef, useState } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import { fetchForecastGrid, fetchForecastGridCoords } from '../api.js';
+import { fmtTime } from '../status.js';
+import { nowIndex, paintWxGrid, WX_RAMPS } from '../lib/wxGrid.js';
 
 const NORDIC_CENTER = [64.5, 8];
 const NORDIC_ZOOM = 4;
@@ -68,12 +74,22 @@ function popupHtml(a) {
     + `<div class="mut">${TYPE_LABELS[a.type] ?? a.type} · källa: ${esc(a.source)}</div>${rows}</div>`;
 }
 
-export default function MapPanel({ area, country, assets = [], staticGeo = null, events = [] }) {
+export default function MapPanel({
+  area, country, assets = [], staticGeo = null, events = [],
+  forecastMeta = null, onMapClick = null,
+}) {
   const divRef = useRef(null);
   const mapRef = useRef(null);
   const layerRef = useRef(null);
+  const clickRef = useRef(null);
   const [size, setSize] = useState(readMapSize);
   const [resetNonce, setResetNonce] = useState(0);
+  const [wxParam, setWxParam] = useState(null);
+  const [wx, setWx] = useState(null);
+  const [wxErr, setWxErr] = useState(null);
+
+  // M8: väderprognosrutnätet aktiveras när föräldern skickar meta (område 11).
+  const wxOn = !!forecastMeta?.ready;
 
   const chooseSize = s => {
     setSize(s);
@@ -108,6 +124,63 @@ export default function MapPanel({ area, country, assets = [], staticGeo = null,
     return () => clearTimeout(t);
   }, [size]);
 
+  // M8: klick var som helst på kartan → onMapClick({lat, lon}). Händlern
+  // bindes en gång; senaste callbacken läses via ref (undviker att Leaflet
+  // lagar en stängd capture av en gammal onMapClick).
+  useEffect(() => { clickRef.current = onMapClick; }, [onMapClick]);
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map) return undefined;
+    const h = e => clickRef.current?.({ lat: e.latlng?.lat, lon: e.latlng?.lng });
+    map.on('click', h);
+    return () => map.off('click', h);
+  }, []);
+
+  // M8: prognosrutnät – nu-steg i aktuell cykel, parameterns värden +
+  // statiska rutnätskoordinater. Uppdateras vid cykelbyte, parametrabyte
+  // och var 30:e sekund.
+  useEffect(() => {
+    if (!wxOn) {
+      setWx(null);
+      setWxErr(null);
+      return;
+    }
+    if (!wxParam) setWxParam(forecastMeta.grid.parameters[0]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [wxOn, wxParam, forecastMeta?.createdTime]);
+
+  useEffect(() => {
+    if (!wxOn || !wxParam) return undefined;
+    let stop = false;
+    const load = async () => {
+      const time = forecastMeta.times[nowIndex(forecastMeta.times)];
+      const [g, c] = await Promise.all([
+        fetchForecastGrid(wxParam, time, forecastMeta.grid.downsample),
+        fetchForecastGridCoords(forecastMeta.grid.downsample),
+      ]);
+      if (stop) return;
+      if (g.ok && c.ok) {
+        setWx({
+          parameter: g.body.parameter,
+          values: g.body.values,
+          coords: c.body.coordinates,
+          time,
+          createdTime: g.body.createdTime,
+        });
+        setWxErr(null);
+      } else {
+        setWx(null);
+        setWxErr(g.body?.error ?? c.body?.error ?? 'Kunde inte hämta prognosrutnätet');
+      }
+    };
+    load().catch(() => {
+      if (!stop) { setWx(null); setWxErr('Kunde inte hämta prognosrutnätet'); }
+    });
+    const t = setInterval(load, 30000);
+    return () => { stop = true; clearInterval(t); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [wxOn, wxParam, forecastMeta?.createdTime]);
+
   // Datalagren uppdateras vid förändring – rör aldrig kartvalet (M6).
   useEffect(() => {
     const map = mapRef.current;
@@ -115,6 +188,18 @@ export default function MapPanel({ area, country, assets = [], staticGeo = null,
     if (!map || !layer) return;
     layer.clearLayers();
     const sel = country === 'ALL' ? null : country;
+
+    // M8: prognosrutnät först – imageOverlay ligger under alla datalager.
+    if (wx) {
+      const grid = paintWxGrid(wx.values, wx.coords, wx.parameter);
+      if (grid) {
+        L.imageOverlay(grid.url, grid.bbox, {
+          opacity: 0.55,
+          className: 'wxgrid',
+          interactive: false,
+        }).addTo(layer);
+      }
+    }
 
     // Landsgränser – markerat land framhäft.
     if (staticGeo?.countries?.features?.length) {
@@ -190,7 +275,7 @@ export default function MapPanel({ area, country, assets = [], staticGeo = null,
         onEachFeature: (f, l) => l.bindTooltip(f.properties.title),
       }).addTo(layer);
     }
-  }, [area.id, country, assets, staticGeo, events]);
+  }, [area.id, country, assets, staticGeo, events, wx]);
 
   // Kartvalet (M6): bara vid kontextbyte (område/land), när landsgränserna
   // har laddats, eller vid manuell "Återställ vy". 30 s-uppdateringen byter
@@ -230,6 +315,18 @@ export default function MapPanel({ area, country, assets = [], staticGeo = null,
       <h2>
         Karta
         <span className="maptools">
+          {wxOn && (
+            <select
+              className="wxsel"
+              value={wxParam ?? ''}
+              onChange={e => setWxParam(e.target.value)}
+              aria-label="Prognosparameter"
+            >
+              {forecastMeta.grid.parameters.map(p => (
+                <option key={p} value={p}>{WX_RAMPS[p]?.label ?? p}</option>
+              ))}
+            </select>
+          )}
           <span className="seg" role="group" aria-label="Kartstorlek">
             {Object.keys(MAP_SIZES).map(s => (
               <button key={s} type="button" className={s === size ? 'on' : ''}
@@ -260,6 +357,21 @@ export default function MapPanel({ area, country, assets = [], staticGeo = null,
         {hasKamera && <span><i className="pt" style={{ background: '#2f9e44' }} />Speedkamera (huvudvägar)</span>}
         {hasEvents && <span><i style={{ background: '#d4574a' }} />Trafikhändelse</span>}
       </div>
+      {wx && (
+        <div className="wxlegend mut">
+          <span className="ramp" style={{ background: WX_RAMPS[wx.parameter]?.css }} />
+          <span>
+            {WX_RAMPS[wx.parameter]?.label ?? wx.parameter}
+            {' '}({WX_RAMPS[wx.parameter]?.min}–{WX_RAMPS[wx.parameter]?.max}) ·
+            nu-steg {fmtTime(wx.time)} · cykel {fmtTime(wx.createdTime)} · klicka för punktprognos
+          </span>
+        </div>
+      )}
+      {wxErr && (
+        <div className="mut" style={{ color: 'var(--warn)', marginTop: 6 }}>
+          Prognosrutnät: {wxErr}
+        </div>
+      )}
       {empty && (
         <div className="mut" style={{ fontSize: 12.5, marginTop: 6 }}>
           Inga dynamiska geolager just nu – OSM-extraktionen sker veckovis och

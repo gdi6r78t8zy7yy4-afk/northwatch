@@ -11,7 +11,7 @@
 // anropen iaktskänbar; pollar var 5:e minut (6 anrop/cykel).
 // Kartposter (t:'a', type 'fartyg'): bara fartyg i rörelse (sog > 0.5 kn) –
 // legolägen i hamn skulle annars dominera lagret.
-import { jjson, now, sleep } from '../lib/http.js';
+import { jjson, now, sleep, safeContact } from '../lib/http.js';
 
 const CIRCLES = [
   { name: 'Helsingfors', lat: 60.17, lon: 24.95 },
@@ -25,7 +25,7 @@ const RADIUS_KM = 40;
 
 const H = () => ({
   'Digitraffic-User': process.env.CONTACT
-    ? `northwatch/0.1 (${process.env.CONTACT})`
+    ? `northwatch/0.1 (${safeContact(process.env.CONTACT)})`
     : 'northwatch/0.1 (contact: unset)',
   Accept: 'application/json',
   'Accept-Encoding': 'gzip',

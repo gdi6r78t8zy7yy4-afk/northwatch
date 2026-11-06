@@ -1,4 +1,4 @@
-// Källregistret – 33 källor: M1 (9) + M2 (9) + M3 (4 OSM/Overpass) + M4 (10)
+// Källregistret – 34 källor: M1 (9) + M2 (9) + M3 (4 OSM/Overpass) + M4 (10)
 // + svk-hist. SVK-omskrivning (2026-11-03): svk.js är ombyggd mot de nya
 // data.svk.se-UUID-resurserna (ingen API-nyckel, CKAN datastore_search) med
 // flöden + aFRR/mFRR-leveranser + sista FCR-bidmätningen; svk-hist.js pollar
@@ -45,10 +45,12 @@ import digitrafficMarine from './digitraffic-marine.js';
 import riksbank from './riksbank.js';
 import nve from './nve.js';
 import cds from './cds.js';
+import smhiForecast from './smhi-forecast.js';
 
 export const COLLECTORS = [
   smhi,
   smhiWarnings,
+  smhiForecast,
   metno,
   dmi,
   kev,
