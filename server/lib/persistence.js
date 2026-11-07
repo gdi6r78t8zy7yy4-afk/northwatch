@@ -139,6 +139,7 @@ function createFirestorePersistence() {
     for (const record of records) {
       const encoded = JSON.stringify(record);
       const size = Buffer.byteLength(encoded, 'utf8') + 1;
+      if (size > 450_000) throw new Error(`Firestore record for source ${source.id} exceeds the 450 kB snapshot chunk limit`);
       if (chunk.length && bytes + size > 450_000) {
         chunks.push(chunk); chunk = []; bytes = 2;
       }
