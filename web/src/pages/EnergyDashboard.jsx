@@ -123,6 +123,12 @@ function TrendChart({ series }) {
     value: min + ratio * (max - min),
   }));
   const formatValue = value => Number(value).toLocaleString('sv-SE', { maximumFractionDigits: 1 });
+  const formatAxisTime = timestamp => {
+    const date = new Date(timestamp);
+    return Number.isNaN(date.getTime()) ? '—' : date.toLocaleString('sv-SE', {
+      timeZone: 'UTC', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit',
+    });
+  };
   return <div className="energy-chart">
     <div className="energy-chart-meta"><b>{series.indicator}</b><span>{series.country} · {series.source} · {series.unit}</span></div>
     <svg viewBox="0 0 360 142" role="img"
@@ -143,10 +149,10 @@ function TrendChart({ series }) {
         <title>{fmtTime(point.ts)} · {formatValue(point.value)} {series.unit}</title>
       </circle>)}
       <text x={plot.left} y="120" textAnchor="start" fill="currentColor" opacity=".8" fontSize="9">
-        {fmtTime(first.ts)}
+        {formatAxisTime(first.ts)}
       </text>
       <text x={plot.right} y="120" textAnchor="end" fill="currentColor" opacity=".8" fontSize="9">
-        {fmtTime(last.ts)}
+        {formatAxisTime(last.ts)}
       </text>
       <text x={(plot.left + plot.right) / 2} y="137" textAnchor="middle" fill="currentColor" opacity=".7" fontSize="9">
         Time (UTC)
