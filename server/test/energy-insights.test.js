@@ -92,3 +92,28 @@ test('domestic production-demand analysis is country-generic and requires exact 
   assert.match(balances[0].title, /below demand/);
   assert.equal(balances[0].evidence[0].value - balances[0].evidence[1].value, -1000);
 });
+
+
+test('historical baseline ignores stale and future-dated latest samples', () => {
+  const base = Array.from({ length: 12 }, (_, i) => ({
+    t:'m', country:'SE', source:'svk', indicator:'Load', unit:'MW',
+    value:1000 + (i % 2), ts:new Date(Date.parse('2026-11-06T00:00:00Z') + i * 3600_000).toISOString(),
+  }));
+  const deviation = { ...base.at(-1), value:1600 };
+  const stale = [...base, { ...deviation, ts:'2026-11-07T00:00:00Z' }];
+  const future = [...base, { ...deviation, ts:'2026-11-07T02:00:00Z' }];
+  assert.equal(buildEnergyAnalysis([], '2026-11-07T10:00:00Z', stale).observations
+    .filter(item => item.category === 'anomaly').length, 0);
+  assert.equal(buildEnergyAnalysis([], '2026-11-07T01:00:00Z', future).observations
+    .filter(item => item.category === 'anomaly').length, 0);
+});
+
+test('historical baseline freshness follows the series median sampling interval', () => {
+  const history = Array.from({ length: 12 }, (_, i) => ({
+    t:'m', country:'SE', source:'svk', indicator:'Load', unit:'MW',
+    value:1000 + (i % 2), ts:new Date(Date.parse('2026-11-07T00:00:00Z') + i * 3600_000).toISOString(),
+  }));
+  history.push({ ...history.at(-1), value:1600, ts:'2026-11-07T12:00:00Z' });
+  const result = buildEnergyAnalysis([], '2026-11-07T13:00:00Z', history);
+  assert.ok(result.observations.some(item => item.category === 'anomaly'));
+});
