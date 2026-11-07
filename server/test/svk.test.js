@@ -225,7 +225,10 @@ test('reserve normalization does not invent missing prices or accept invalid row
     { start_time_utc:'2026-11-03T17:00:00', bidding_zone:'SE2', reserve_direction:'down', volume:'bad', volume_unit:'MW', price:'bad', price_unit:'EUR-MW' },
   ];
   const out = normalizeReserveRows('afrr', rows);
-  assert.equal(out.length, 1);
-  assert.equal(out[0].indicator, 'aFRR-kapacitet SE3 up');
-  assert.equal(out[0].value, 80);
+  // Capacity is emitted once; the legacy headline remains for the first
+  // valid row only. Invalid directions and volumes must not create metrics.
+  assert.equal(out.length, 2);
+  assert.ok(out.some(r => r.indicator === 'aFRR-kapacitet SE3 up' && r.value === 80));
+  assert.ok(out.some(r => r.indicator === 'aFRR-leverans 17:00 (SE3 up)' && r.value === 80));
+  assert.ok(!out.some(r => r.indicator.includes('SE4') || r.indicator.includes('SE2')));
 });
