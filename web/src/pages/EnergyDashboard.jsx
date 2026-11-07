@@ -21,9 +21,9 @@ function GenerationMix({ metrics }) {
   const wind = findMetric(metrics, r => r.indicator === 'Vindproduktion (DK)');
   const solar = findMetric(metrics, r => r.indicator === 'Solproduktion (DK)');
   const total = findMetric(metrics, r => r.indicator === 'Total produktion (DK)');
-  if (!wind && !solar && !total) return <p className="mut">Ingen verifierad produktionsmix tillgänglig för valt urval. Nuvarande mixdata täcker Danmark.</p>;
-  const parts = [{ name: 'Vind', value: Number(wind?.value ?? 0) }, { name: 'Sol', value: Number(solar?.value ?? 0) },
-    { name: 'Övrigt', value: Math.max(0, Number(total?.value ?? 0) - Number(wind?.value ?? 0) - Number(solar?.value ?? 0)) }];
+  if (!wind || !solar || !total) return <p className="mut">Ofullständig produktionsmix. Vind, sol och total produktion måste finnas för samma uppdatering innan mixen visas.</p>;
+  const parts = [{ name: 'Vind', value: Number(wind.value) }, { name: 'Sol', value: Number(solar.value) },
+    { name: 'Övrigt', value: Math.max(0, Number(total.value) - Number(wind.value) - Number(solar.value)) }];
   const sum = parts.reduce((a, p) => a + p.value, 0);
   return <><div className="energy-mixbar" aria-label="Danmarks produktionsmix">{parts.map(p => <span key={p.name} style={{ width: (sum ? p.value / sum * 100 : 0) + '%' }} title={p.name + ': ' + p.value + ' MW'} />)}</div>
     <div className="energy-legend">{parts.map(p => <span key={p.name}>{p.name}: {Math.round(p.value).toLocaleString('sv-SE')} MW</span>)}</div>
