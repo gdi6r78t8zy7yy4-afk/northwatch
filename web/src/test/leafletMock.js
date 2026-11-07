@@ -70,6 +70,7 @@ export const L = {
     return {
       setView(center, zoom) { __leaf.view.push({ type: 'setView', center, zoom }); return this; },
       fitBounds(b, opts) { __leaf.view.push({ type: 'fitBounds', opts: opts ?? {} }); return this; },
+      latLngToLayerPoint([lat, lng]) { return { x: lng, y: -lat }; },
       invalidateSize() { __leaf.invalidateSize += 1; return this; },
       remove() { __leaf.removed += 1; return this; },
       on(type, cb) { __leaf.handlers[type] = cb; return this; },
@@ -88,6 +89,8 @@ export const L = {
   geoJSON: (geo, options) => created('geoJSON', geo, options),
   circleMarker: (latlng, options) => created('circleMarker', latlng, options),
   polyline: (coords, options) => created('polyline', coords, options),
+  marker: (latlng, options) => created('marker', latlng, options),
+  divIcon: options => ({ ...options }),
 };
 
 export default L;
