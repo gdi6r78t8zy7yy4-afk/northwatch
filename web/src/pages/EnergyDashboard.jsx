@@ -3,6 +3,7 @@ import { COUNTRY_NAMES, fmtTime } from '../status.js';
 import StatusPill from '../components/StatusPill.jsx';
 import MapPanel from '../components/MapPanel.jsx';
 import { fetchEnergyOverview, fetchEnergyHistory, fetchEnergyAnalysis, fetchAssets, fetchStaticGeo } from '../api.js';
+import { formatObservationAge } from '../lib/metricFreshness.js';
 
 const ENERGY_AREA = { id: 1, name: 'Elförsörjning och energisystem', short: 'Energi', geo: true };
 const findMetric = (rows, test) => rows.find(r => test(r) && r.value !== null && Number.isFinite(Number(r.value))) ?? null;
@@ -196,7 +197,11 @@ function GenerationDemandPanel({ metrics }) {
     const renewableAligned = renewable && generation && renewable.ts === generation.ts &&
       renewable.unit === generation.unit && Number(generation.value) > 0;
     if (!generation && !demand && !renewable) return null;
-    return { country, generation, demand, renewable,
+    const observationAges = [
+      ['production', generation], ['consumption', demand], ['renewables', renewable],
+    ].filter(([, metric]) => metric).map(([label, metric]) =>
+      label + ' ' + formatObservationAge(metric.ts));
+    return { country, generation, demand, renewable, observationAges,
       balance: aligned ? Number(generation.value) - Number(demand.value) : null,
       renewableShare: renewableAligned ? Number(renewable.value) / Number(generation.value) * 100 : null,
       aligned };
@@ -228,6 +233,7 @@ function GenerationDemandPanel({ metrics }) {
       {row.country === 'DK' && row.demand?.indicator === 'Beräknad förbrukning (DK, SCADA)' ?
         <div className="mut">Consumption is derived from SCADA production plus net exchange; it is approximate, not a settlement measurement.</div> : null}
       <div className="mut energy-generation-time">Latest observation: {fmtTime(row.generation?.ts ?? row.demand?.ts ?? row.renewable?.ts)}</div>
+      <div className="mut energy-generation-freshness" aria-label="Observation age">Observation age · {row.observationAges.join(' · ')}</div>
     </article>)}</div> : <p className="mut">No generation, demand or wind/solar production measurements are currently available in this country scope.</p>}
     <p className="mut energy-generation-caveat">A domestic production-demand difference is not a system adequacy assessment. Imports, exports, losses, storage and balancing resources are not included. Missing and non-aligned measurements are left blank; no zeroes or estimates are synthesized.</p>
   </section>;
