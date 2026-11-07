@@ -101,7 +101,6 @@ describe('EnergyDashboard', () => {
     expect(screen.getByText('Day-ahead price · Sverige')).toBeInTheDocument();
     expect(screen.getByText('Renewable output · Danmark')).toBeInTheDocument();
     expect(screen.getAllByLabelText('Danmarks produktionsmix')).toHaveLength(2);
-    expect(screen.getByText('Renewable output · Danmark')).toBeInTheDocument();
   });
 
   test('country selector in the energy heading updates the global country scope', async () => {
