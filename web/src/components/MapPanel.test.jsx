@@ -474,29 +474,32 @@ describe('MapPanel – energilagerkontroller', () => {
 
   test('zoner kan döljas utan att dölja HVDC eller liveflöden', () => {
     renderMap({ area:{ id:1 }, assets:[flow] });
+    const start = __leaf.created.length;
     fireEvent.click(screen.getByRole('button',{name:'Zoner'}));
     expect(screen.getByRole('button',{name:'Zoner'})).toHaveAttribute('aria-pressed','false');
     expect(screen.getByRole('button',{name:'HVDC'})).toHaveAttribute('aria-pressed','true');
     expect(screen.getByRole('button',{name:'Liveflöden'})).toHaveAttribute('aria-pressed','true');
-    const current = latest();
+    const current = __leaf.created.slice(start);
     expect(current.some(c => c.kind === 'circleMarker')).toBe(false);
     expect(current.filter(c => c.kind === 'polyline')).toHaveLength(3); // 2 static links + live flow
   });
 
   test('HVDC kan döljas oberoende av zoner och liveflöden', () => {
     renderMap({ area:{ id:1 }, assets:[flow] });
+    const start = __leaf.created.length;
     fireEvent.click(screen.getByRole('button',{name:'HVDC'}));
     expect(screen.getByRole('button',{name:'HVDC'})).toHaveAttribute('aria-pressed','false');
-    const current = latest();
+    const current = __leaf.created.slice(start);
     expect(current.some(c => c.kind === 'circleMarker')).toBe(true);
     expect(current.filter(c => c.kind === 'polyline')).toHaveLength(1); // live flow only
   });
 
   test('liveflöden kan döljas utan att påverka statisk topologi', () => {
     renderMap({ area:{ id:1 }, assets:[flow] });
+    const start = __leaf.created.length;
     fireEvent.click(screen.getByRole('button',{name:'Liveflöden'}));
     expect(screen.getByRole('button',{name:'Liveflöden'})).toHaveAttribute('aria-pressed','false');
-    const current = latest();
+    const current = __leaf.created.slice(start);
     expect(current.filter(c => c.kind === 'polyline')).toHaveLength(2); // static HVDC links
   });
 
