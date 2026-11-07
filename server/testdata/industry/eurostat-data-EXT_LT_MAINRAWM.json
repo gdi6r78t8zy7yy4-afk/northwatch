@@ -1,0 +1,151 @@
+{
+ "version": "2.0",
+ "class": "data",
+ "label": "ESTAT: EXT_LT_MAINRAWM (key query, lastNObservations=1) – M10 fixture, formverifierad mot live CC 2026-11-07; värden är realistiska exempel (synthetiska)",
+ "source": "Eurostat",
+ "updated": "2026-11-05T08:00:00Z",
+ "id": [
+  "freq",
+  "indic_et",
+  "sitc06",
+  "partner",
+  "geo",
+  "time"
+ ],
+ "size": [
+  1,
+  1,
+  1,
+  22,
+  1,
+  1
+ ],
+ "dimension": {
+  "freq": {
+   "category": {
+    "index": {
+     "A": 0
+    },
+    "label": {
+     "A": "annual"
+    }
+   }
+  },
+  "indic_et": {
+   "category": {
+    "index": {
+     "MIO_IMP_VAL": 0
+    },
+    "label": {
+     "MIO_IMP_VAL": "Imports, million euro"
+    }
+   }
+  },
+  "sitc06": {
+   "category": {
+    "index": {
+     "SITC2_4": 0
+    },
+    "label": {
+     "SITC2_4": "SITC 2-4 digit (mining and industrial materials)"
+    }
+   }
+  },
+  "partner": {
+   "category": {
+    "index": {
+     "EFTA": 0,
+     "IS": 1,
+     "NO": 2,
+     "CH": 3,
+     "LI": 4,
+     "UK": 5,
+     "US": 6,
+     "CA": 7,
+     "MX": 8,
+     "BR": 9,
+     "CN_X_HK": 10,
+     "HK": 11,
+     "JP": 12,
+     "KR": 13,
+     "IN": 14,
+     "AU": 15,
+     "RU": 16,
+     "CIS": 17,
+     "ZA": 18,
+     "SA": 19,
+     "TR": 20,
+     "OPEC": 21
+    },
+    "label": {
+     "EFTA": "EFTA",
+     "IS": "Iceland",
+     "NO": "Norway",
+     "CH": "Switzerland",
+     "LI": "Liechtenstein",
+     "UK": "United Kingdom",
+     "US": "United States",
+     "CA": "Canada",
+     "MX": "Mexico",
+     "BR": "Brazil",
+     "CN_X_HK": "China (excl. Hong Kong)",
+     "HK": "Hong Kong",
+     "JP": "Japan",
+     "KR": "Korea, Rep.",
+     "IN": "India",
+     "AU": "Australia",
+     "RU": "Russia",
+     "CIS": "Commonwealth of Independent States",
+     "ZA": "South Africa",
+     "SA": "Saudi Arabia",
+     "TR": "Türkiye",
+     "OPEC": "OPEC"
+    }
+   }
+  },
+  "geo": {
+   "category": {
+    "index": {
+     "EU27_2020": 0
+    },
+    "label": {
+     "EU27_2020": "EU-27"
+    }
+   }
+  },
+  "time": {
+   "category": {
+    "index": {
+     "2024": 0
+    },
+    "label": {
+     "2024": "2024"
+    }
+   }
+  }
+ },
+ "value": {
+  "0": 5400,
+  "1": 320,
+  "2": 4100,
+  "3": 1890,
+  "4": 120,
+  "5": 13800,
+  "6": 61200,
+  "7": 15800,
+  "8": 9700,
+  "9": 38900,
+  "10": 98500,
+  "11": 4800,
+  "12": 42300,
+  "13": 33700,
+  "14": 21400,
+  "15": 8300,
+  "16": 54800,
+  "17": 5600,
+  "18": 7900,
+  "19": 12400,
+  "20": 24600,
+  "21": 15200
+ }
+}

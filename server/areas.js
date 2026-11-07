@@ -29,7 +29,7 @@ export const AREAS = [
     gaps: 'Inget bekräftat API; läkemedel och vårdkapacitet saknas' },
   { id: 7, slug: 'industri', name: 'Industri, tillverkning och försörjningskedjor', short: 'Industri', geo: false,
     scope: 'Insatsvaror, industriproduktion, lager, reservdelar, hamnflöden, råvaruberoenden',
-    gaps: 'Statistik (fördröjd, SE/NO/FI – månad/kvartal); DK ej tagit upp (TLS-mellanhänt mot api.stats.dk i testnätet); hamnflöden bara FI via Digitraffic Marine' },
+    gaps: 'M10: per-källa-paneler + beräknad industristatus per land (Eurostat/OECD/RMIS/Comtrade/Statice/SCB/SSB/StatFin). Återstående luckor: DK-statistik ej upptagen (TLS-mellanhänt mot api.stats.dk i testnätet); IEA har inget publikt API; IS industriproduktion via Eurostat (ingen nationell tabell sedan 2018); hamnflöden bara FI via Digitraffic Marine' },
   { id: 8, slug: 'livsmedel', name: 'Livsmedel och jordbruk', short: 'Livsmedel', geo: false,
     scope: 'Produktion, jordbruk, fiskeri, import, distributionsstörningar, beredskap',
     gaps: 'Fiskeri och distributionsstörningar saknas; nationella källor är portaler' },

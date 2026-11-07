@@ -26,14 +26,14 @@ npm start              # http://localhost:3000
 Frontendtester (offline – allt nätverk mockas):
 
 ```bash
-npm --prefix web test          # vitest run: 14 filer, 138 tester
+npm --prefix web test          # vitest run: 24 filer, 226 tester
 npm --prefix web run test:watch
 ```
 
 Backendtester (offline – live-verifierade fixtures i `server/testdata/`):
 
 ```bash
-node --test "server/test/*.test.js"   # 38 tester
+node --test "server/test/*.test.js"   # 166 tester
 ```
 
 ## Persistens och driftsättning
@@ -116,10 +116,14 @@ server/                 backend – ett enda JS-beroende: fast-xml-parser (ENTSO
   lib/energy.js         normaliserad energiöversikt
   lib/energy-insights.js historikserier + deterministiska energiobservationer
   lib/scheduler.js      pollar varje källa med sitt intervall (staggerad uppstart)
-  lib/jsonstat.js       json-stat 2.0-parser (SCB v2 + SSB v2, M4)
+  lib/jsonstat.js       json-stat 2.0-parser (SCB v2 + SSB v2, M4; Eurostats
+                        platta objektform, M10)
   lib/forecast.js       SMHI snow1g-prognos: cykelretention (12) + /api/forecast (M8)
   lib/cyber.js          cyberdatslager: NVD (veckosubfönster, TTL 15 min) + KEV-katalogen
                         + OSV.dev-watchlist + /api/cyber/* (M9, område 5)
+  lib/industry.js       industristatusanalys: tre komponenter (produktion/handel/
+                        kapacitet) → 0–100-poäng per land + NORDIC, ren funktion
+                        utan store-koppling (M10, område 7)
   lib/geolayers.js      statiska kartlager, zonmittpunkter, OSM/Overpass-utdrag (veckocache)
   assets/*.geojson      landsgränser (Natural Earth) + energilager (HVDC, zonankar)
   cache/                OSM-veckocache + SMHI-prognoscyklar på disk (gitignorerad)
@@ -174,8 +178,15 @@ asset  { t:'a', area, country, source, type, name, id?, geometry, attrs?, update
   ej upplösta)
 - `GET /api/cyber/overview` – sammanfattning av de tre cacherna (triggar aldrig
   källhämtning)
+- `GET /api/industry/status?country=NORDIC|SE|NO|DK|FI|IS` – beräknad industristatus:
+  poäng 0–100, tre komponenter (produktion/handel/kapacitet med tydbasis), drivfaktorer
+  och per-land-rader vid NORDIC; deterministisk derivation ur `store.js`-records
+  (triggar aldrig källhämtning) (M10, område 7)
+- `GET /api/industry/data?country=ALL|SE|NO|DK|FI|IS` – underliggande records per
+  källa + källstatus för per-källa-panelerna; landsvy inkluderar även NORDIC-records
+  (t.ex. RMIS-importberoendelarm som gäller hela blocket)
 
-## Källor (35 st)
+## Källor (41 st)
 
 | Källa | Område | Status |
 |-------|--------|--------|
@@ -216,6 +227,11 @@ asset  { t:'a', area, country, source, type, name, id?, geometry, attrs?, update
 | Riksbank (API-katalog) | 9 Finans (SE) | ok – öppen API-yta (5 gratis API:er); datagatewayns operationer ej publikt upptäckbara (17 testanrop, se kollektorn) |
 | NVE HydAPI | 4 Vatten (NO) | kräver `NVE_API_KEY` (gratis) – vattenstånd per station; 401 utan nyckel, verifierat 2026-11-02 |
 | CDS/ERA5 (Copernicus) | 11 Miljö/Väder (Nordiskt) | kräver `CDS_TOKEN` + `CDS_EMAIL` (gratis) – 2m-temperatur över Norden (yesterday 00 UTC); multipart-POST verifierat mot API:s kontrakt 2026-11-02 |
+| Eurostat SDMX 2.1 (industri- och råvaruflöden) | 7 Industri (Nordiskt) | ok – nyckelfri; sju flöden (se "Industri (M10, område 7)"), contentconstraint-drivena keyqueries; CC- och keyquery-kontraktet verifierat live 2026-11-07, data-API:t var systembrett nede samma dag → datafixtures är CC-formverifierade med synthetiska värden (canary: `NAMA_10_GDP/A.CP_MEUR.B1GQ.SE+NO+DK+FI+IS?format=JSON`) |
+| OECD SDMX (STI stålkapacitet) | 7 Industri (Nordiskt) | ok – nyckelfri; råstålkapacitet per land, årlig (Mt); CSV med kod+etikett-kolumnpar (högerankrade fält – "China (People's Republic of)" bär ett OTCITERAT kommatecken); DNK/ISL utan kapacitet släpps; verifierat live 2026-11-07 |
+| JRC RMIS / EU CRMs (kritiska råvaror) | 7 Industri (Nordiskt) | ok – nyckelfri; materialkatalogen (36 råvaror), EU-importberoende (händelser vid ≥50 %, high vid ≥80 %), nordisk leverans/utvinning till EU, nordiska reservor, MCI per land, CRMA-ambitioner; verifierat live 2026-11-07 |
+| UN Comtrade (varuhandel) | 7 Industri (Nordiskt) | preview-läge nyckelfri (hårt rate-limited → 4 s paus, `COMTRADE_PREVIEW_DELAY_MS`); `COMTRADE_API_KEY` (gratis, comtradeplus.un.org, ~500 anrop/dag) ger fullt data-API; export/import per land, senaste genomförda år, USD, partner=världen; preview-verifierat live 2026-11-07 |
+| Statistics Iceland (Hagstofan, pxwebapi v1) | 7 Industri (IS) | ok – nyckelfri; varuhandel UTA06002 (exports/imports fob, cif, balans, mISK, månad); 429 vid <8 s → 9 s paus (`STATICE_DELAY_MS`); ingen aktuell industriproduktionstabell (IDN01000 avslutad 2018) → produktion via Eurostat; verifierat live 2026-11-07 |
 
 OSM-källorna köas internt (den publika instansen 429:ar vid samtidighet) och återförs med
 backoff. Vid fortgående nätverksmisse återanvänds den senaste diskcachen och källan
@@ -395,6 +411,107 @@ domänen → `outsideDomain` och markeras i stadsvälgaren).
   mot fixtures ur en live-cykel 2026-11-05) + M8-webbtest – se
   "Kartwidget (M6)" → Frontendtestning.
 
+## Industri (M10, område 7)
+
+Per-källa-widgeter + beräknad industristatus per land. Landsvyn (SE/NO/DK/FI/IS)
+visar per-källa-detalj; den nordiska vyn (NORDIC/ALL) visar sammanfattning – poäng,
+komponenter, per-land-tabell – plus luckkort. Tio siffergrupper: Eurostat, OECD,
+JRC RMIS, UN Comtrade, Statistics Iceland och de nationella statistikbyråerna
+SCB/SSB/StatFin (M4). Analysen är en ren funktion (`lib/industry.js`) som
+deriverar poängen ur `store.js`-records vid varan `/api/industry/*`-slagning –
+ingen källhämtning, ingen cache (records ligger redan i store:t).
+
+**Statusmodell (0–100 per land, viktat snitt av tre komponenter;
+`saknad komponent` renormaliseras över de övriga vikterna):**
+
+| Komponent | Vikt | Indata (senaste värde per källa) | Formel (clampad 0–100) |
+|-----------|------|----------------------------------|------------------------|
+| Produktion | 0.5 | 12-månadersförändring % (Eurostat EI_ISIR_M, Statice) + produktionsindex (Eurostat EI_ISIN_M, SCB/SSB/StatFin) | `50 + 5·yoy` respektive `50 + 2·(index − 100)` per källa; snitt |
+| Handel | 0.3 | Handelsbalans per källa (nationella byråer balans/import, EFTA-handel) och UN Comtrade (export − import) | `50 + 100·balans/import` per källa (Comtrade: `50 + 100·(X−M)/M`); snitt; `fob-fob`-balansen föredras |
+| Kapacitet | 0.2 | Råstålkapacitet Mt (OECD) + antal material landet levererar till EU (RMIS) | `clamp(20 + 6·steelMt, 0, 70) + min(30, 2·material)` |
+
+Label: **≥65 Expansiv, 45–64.9 Stabilt, <45 Kontraktion, inget data Okänt.**
+NORDIC = snitt av de fem länderna (komponenterna var för sig, poängen över de
+länder som har en); `drivers` visar per land `XX: poäng (label)` och
+`countries` bär de fullständiga per-land-radiena till tabellen.
+
+**Kollektorer och flöden (alla nyckelfria utom UN Comtrade:s valfria nyckel):**
+
+- **Eurostat SDMX 2.1** (`eurostat-industry.js`) – sju flöden. Varje körning
+  hämtar contentconstraint (XML) per flöde, bygger keyquery ur de tillåtna
+  värdena och hämtar JSON-stat (`lastNObservations`; Eurostats platta
+  objektform `{obsIndex: värde}` hanteras i `lib/jsonstat.js`). Flöden:
+  `EI_ISIN_M` (index 2021=100, månad), `EI_ISIR_M` (12-månadersförändring %,
+  RT12), `TEIBS070` (lagerförändring tillverkning, DK/FI/SE), `GLOE_CRM_PS`
+  (företag som importerar kritiska råvaror, 2021–2023), `EXT_LT_INTERCC`
+  (EFTAs handel mot EU-27/utanför/världen, IS/NO), `EXT_LT_MAINRAWM`
+  (EU-27:s råvaruimport per partner), `NAMQ_10_A10` (mervärdetillökning, NACE C).
+  `EI_IS_M_VTG` distribueras inte (ERR_NOT_FOUND_2) och `EXT_LT_MAINEU` utesluts
+  (ersatt av INTERCC+MAINRAWM). Felisolering per flöde: misslyckas alla throwas,
+  misslyckas några → "Dataflöde {id}: hämtfel"-metrik + övriga records levereras.
+- **OECD** (`oecd.js`) – råstålkapacitet, årlig (Mt), via SDMX STI
+  `DSD_STEEL_CAPACITY@DF_CRUDE_STEEL` (CSV, kod+etikett-kolumnpar;
+  `UNIT_MULT=6` → Mt). Vänsterankrade fält förskjuts av "China (People's
+  Republic of)":s OTCITERADE kommatecken → högerankrade fält (OBS_VALUE −8,
+  TIME_PERIOD −10, OBS_STATUS −4, UNIT_MULT −2). DNK/ISL har tomt OBS_VALUE
+  (ingen kapacitet) → släpps. SE/NO/FI + DE/JP/CN som internationell kontext.
+- **JRC RMIS / EU CRMs** (`rmis.js`) – kommissionens offentliga råvaruportal
+  (materials/overview/exploration/processing/crma). Records: materialkatalogen
+  (36 råvaror) som metrik, topp-5 EU-import/produktion, MCI per nordiskt land,
+  **importberoende ≥50 % som händelser** (high vid ≥80 %, medel 50–79 %),
+  nordisk leverans/utvinning till EU (senaste år per land+material) och
+  nordiska reservor, CRMA-ambitioner. `env`-endpolet sanitykallas men ger inga
+  records (semantik obekräftad).
+- **UN Comtrade** (`comtrade.js`) – två lägen. **Utans nyckel:** preview-API:t
+  (`/public/v1/preview`), gratis men hårt rate-limited (429) → 4 s paus mellan
+  anropen (`COMTRADE_PREVIEW_DELAY_MS`, standard 4000). **Med `COMTRADE_API_KEY`:**
+  fullt data-API (`/data/v1/get`) med header `Ocp-Apim-Subscription-Key`;
+  gratisnyckel från **comtradeplus.un.org** (registrera med e-post, verifiera
+  via e-postlänk, skapa subscription under "My data", kopiera nyckeln;
+  ~500 anrop/dag). Data: export/import per land (reporter 752 SE / 578 NO /
+  208 DK / 246 FI / 352 IS, partner 0 = världen, cmd TOTAL, USD, senaste
+  genomförda år → år oberoende av när pollingen sker). Per-anrops-felisolering.
+- **Statistics Iceland** (`statice.js`) – pxwebapi v1, `Efnahagur/UTA06002.px`
+  (varuhandel, mISK: exports fob, imports fob/cif, balans fob-fob/cif-fob,
+  månad). 429 vid anrop tättare än ~8 s → 9 s paus mellan struktur- och
+  datafrågan (`STATICE_DELAY_MS`, standard 9000). Parsernot: data-radernas
+  `values`-array innehåller **endast de valda c-kolumnernas** värden (index 0 i
+  urvalet), inte alla kolumners. Ingen aktuell industriproduktionstabell
+  (IDN01000 avslutad 2018) → Islands produktion täcks via Eurostat.
+- **SCB / SSB / StatFin** (M4, oförändrade) – nationell utrikeshandel och
+  omsättningsindex (mrdSEK / mNOK / index) som ytterligare produktions- och
+  handelskällor per land.
+
+**API:** `/api/industry/status?country=` (beräknad poäng + komponenter +
+drivfaktorer; NORDIC ger dessutom `countries`) och
+`/api/industry/data?country=ALL|<land>` (records per källa + källstatus för
+panelerna; landsvy inkluderar NORDIC-records). Båda synkrona derivationer ur
+`store.js` – svarstiden är obefintlig.
+
+**Frontend:** `IndustryView` (två 120 s-feeds: status + data, dependens på
+valda land) distribuerar records + `meta {loading, error, fetchedAt, onRetry}`
+till presentationella paneler (`IndustryPanels.jsx`) – en panel per källa
+(Eurostat, OECD stål, Comtrade, RMIS, nationella byråer) + statuspanelen.
+Datafelet visar fel i alla per-källa-panelerna (records blir null, inte []),
+retry hämtar datat igen. Nordic-vyn visar luckkort (IEA har inget publikt API,
+Statistics Denmark ej upptaget – TLS-mellanhänt, Comtrade preview-nyckel).
+
+**Live-status 2026-11-07:** OECD, RMIS, Comtrade (preview) och Statice
+verifierade live. Eurostats **data-API var systembrett nede** samma dag
+(contentconstraint-kontraktet fungerade) → `server/testdata/industry/` har
+CC-formverifierade datafixtures med **syntetiska värden**; kollektorn pickar upp
+det riktiga datat automatiskt vid nästa körning. Canary för liveverifiering av
+de sju datafrågorna: `NAMA_10_GDP/A.CP_MEUR.B1GQ.SE+NO+DK+FI+IS?format=JSON`
+→ 200.
+
+**Tester:** `server/test/industry.test.js` (41 tester: kollektorns recordantal
+mot fixtures med URL-rutad fetch-mock, `parseCC`/`buildKey`, OECD `parseRow`,
+RMIS `latestByCountryMaterial` + `tradeQuery`, `classify`, komponentformlerna,
+`labelOf`, status-/data-regressionvärden per land + NORDIC) + webbtest
+(`industryPanels.test.jsx` – alla panels ok/fel/loading-lägen + IndustryView:s
+koppling; `DashboardPage.test.jsx` – område 7 grenar, övriga områden rör aldrig
+`/api/industry/*`).
+
 ## Nycklar och kredensials (`.env`)
 
 ```
@@ -422,6 +539,9 @@ NVD_API_KEY=…        # valfri – höjer NVD:s rate-limit (5→50 anrop/30 s),
                       #   sidfördröjningen och exponerar databastotalen på /api/cyber/nvd (M9)
 OSV_WATCH_PACKAGES=… # M9 – OSV.dev-watchlist "Ecosystem:Paket;…" (26 kurerade paket
                       #   som standard; Maven delas på första kolon, t.ex. "Maven:log4j:log4j-core")
+COMTRADE_API_KEY=…  # M10 – UN Comtrade, gratis: comtradeplus.un.org (header
+                     #   Ocp-Apim-Subscription-Key, ~500 anrop/dag). Utan nyckel:
+                     #   rate-limiteda preview-endpointen (4 s paus, COMTRADE_PREVIEW_DELAY_MS)
 NVE_API_KEY=…        # M4 – NVE HydAPI, gratis: https://hydapi.nve.no (header X-API-Key)
 NVE_STATIONS=…       # M4 – valfri fast stationslista "6.10.0,..." (annars hämtas
                      #   NVE_STATION_LIMIT första aktiva stationerna, standard 5)
@@ -516,6 +636,25 @@ SMHI_FCST_CACHE_DIR=…   # M8 – diskcache (standard server/cache/smhi-forecas
   panelerna och kopplingen (cyberPanels.test.jsx, DashboardPage). Allt verifierat
   live 2026-11-06.
 
+- **M10 (klart 2026-11-07):** industrikedjan (område 7) – fem nya kollektorer:
+  Eurostat SDMX 2.1 (sju industri-/råvaruflöden via contentconstraint-drivena
+  keyqueries), OECD råstålkapacitet (Mt, SDMX CSV), JRC RMIS/EU CRMs (kritiska
+  råvaror med importberoendelarm), UN Comtrade varuhandel (gratis preview-läge
+  eller fullt API med gratis `COMTRADE_API_KEY` från comtradeplus.un.org) och
+  Statistics Iceland varuhandel (pxwebapi v1). Rent analyslager `lib/industry.js`
+  beräknar 0–100-poäng per land + NORDIC i tre komponenter (produktion 0.5 /
+  handel 0.3 / kapacitet 0.2, vikterna renormaliseras vid saknad komponent) ur
+  de normaliserade recordsen; två synkrona endpointar `/api/industry/status` +
+  `/api/industry/data`. Frontend: per-källa-paneler (Eurostat, OECD, Comtrade,
+  RMIS, nationella byråer) + statuswidget – landsvy detalj, nordisk vy
+  sammanfattning + luckkort (IEA, Stats Denmark, Comtrade-nyckel) – ersätter de
+  generiska tabellerna; övriga 11 områden oförändrade. Eurostats data-API var
+  systembrett nede under dagen → datafixtures CC-formverifierade med
+  syntetiska värden (canary dokumenterad); OECD/RMIS/Comtrade (preview)/Statice
+  verifierade live 2026-11-07. Servertester (industry.test.js, 41 st) +
+  webbtest (industryPanels.test.jsx + DashboardPage) – fulla suite grön:
+  166 servertester, 24 webbfiler / 226 webbtester. Se "Industri (M10, område 7)".
+
 ## Datakällor och villkor
 
 - OSM-data: ODbL – tillståndskravl gäller (M3).
@@ -542,5 +681,14 @@ SMHI_FCST_CACHE_DIR=…   # M8 – diskcache (standard server/cache/smhi-forecas
   (`OSV_WATCH_PACKAGES`) uppdateras var 6:e timme.
 - CISA KEV (M9): publikt JSON, ingen nyckel. Hela katalogen cachas i minnet 6 timmar
   (används för prioritering, ej incidentdetektion).
+- UN Comtrade (M10): preview-API:t är gratis men hårt rate-limited (429 vid snabba
+  upprepningar) → 4 s paus mellan anropen (`COMTRADE_PREVIEW_DELAY_MS`, standard
+  4000). Gratis `COMTRADE_API_KEY` (comtradeplus.un.org, ~500 anrop/dag) växlar till
+  fullt data-API; nyckeln skickas som `Ocp-Apim-Subscription-Key`, bara i `.env`.
+- Eurostat SDMX 2.1 (M10): öppet API, ingen nyckel. Data hämtas via
+  contentconstraint + per-flödes keyqueries (skonsamt). Data-API:t var systembrett
+  nede 2026-11-07 – canary och status, se "Industri (M10, område 7)".
+- Statistics Iceland (M10): 429 vid anrop tättare än ~8 s → 9 s paus mellan
+  struktur- och datafrågan (`STATICE_DELAY_MS`, standard 9000).
 - Övrigt enligt respektive källas villkor – se API-katalogen
   (`nordic_critical_infrastructure_api_catalog_utokad.xlsx`).

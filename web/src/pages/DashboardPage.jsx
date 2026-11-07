@@ -10,6 +10,7 @@ import CyberNvdPanel from '../components/CyberNvdPanel.jsx';
 import CyberKevPanel from '../components/CyberKevPanel.jsx';
 import CyberOsvPanel from '../components/CyberOsvPanel.jsx';
 import CyberPrioritizedPanel from '../components/CyberPrioritizedPanel.jsx';
+import IndustryView from '../components/IndustryView.jsx';
 
 export default function DashboardPage({ country }) {
   const { id } = useParams();
@@ -147,7 +148,13 @@ export default function DashboardPage({ country }) {
         />
       )}
 
-      {area.id === 5 ? (
+      {area.id === 7 ? (
+        // M10: industri (område 7) – per-källa-widgeter (Eurostat, OECD,
+        // RMIS, Comtrade, nationella statistikbyråer) + beräknad
+        // industristatus per land. Landsvy visar detalj, NORDIC/ALL visar
+        // sammanfattning + luckkort. ERSÄTTS de generiska tabellerna.
+        <IndustryView country={country} />
+      ) : area.id === 5 ? (
         // M9: cyber (område 5) – de fyra widgeterna ersätter de generiska
         // indikator-/händelse-tabellerna (de innehåller en superset av
         // analysen). Varje panel hämtar sin egen /api/cyber/*-endpoint

@@ -1,5 +1,11 @@
-// Källregistret – 35 källor: M1 (9) + M2 (9) + M3 (4 OSM/Overpass) + M4 (10)
-// + svk-hist. SVK-omskrivning (2026-11-03): svk.js är ombyggd mot de nya
+// Källregistret – 43 källor: M1 (9) + M2 (9) + M3 (4 OSM/Overpass) + M4 (10)
+// + svk-hist + smhi-forecast (M8) + kev/nvd/osv (M9) + M10 (5:
+// eurostat-industry, oecd, rmis, comtrade, statice).
+// M10 (2026-11-07): industri-/tillverkningsområdet (7) – Eurostat SDMX 2.1
+// (sju flöden, CC-drivena keyqueries), OECD stålkapacitet (SDMX CSV),
+// JRC RMIS/EU CRMs (kritiska råvaror), UN Comtrade (preview eller gratisnyckel
+// COMTRADE_API_KEY) och Statistics Iceland (pxwebapi v1). Se README "M10".
+// SVK-omskrivning (2026-11-03): svk.js är ombyggd mot de nya
 // data.svk.se-UUID-resurserna (ingen API-nyckel, CKAN datastore_search) med
 // flöden + aFRR/mFRR-leveranser + sista FCR-bidmätningen; svk-hist.js pollar
 // de fyra frusna historiska dataseten (FCR-energi/kapacitet/aggregerade
@@ -50,6 +56,11 @@ import riksbank from './riksbank.js';
 import nve from './nve.js';
 import cds from './cds.js';
 import smhiForecast from './smhi-forecast.js';
+import eurostatIndustry from './eurostat-industry.js';
+import oecd from './oecd.js';
+import rmis from './rmis.js';
+import comtrade from './comtrade.js';
+import statice from './statice.js';
 
 export const COLLECTORS = [
   smhi,
@@ -87,4 +98,9 @@ export const COLLECTORS = [
   riksbank,
   nve,
   cds,
+  eurostatIndustry,
+  oecd,
+  rmis,
+  comtrade,
+  statice,
 ];

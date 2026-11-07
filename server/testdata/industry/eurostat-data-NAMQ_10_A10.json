@@ -1,0 +1,121 @@
+{
+ "version": "2.0",
+ "class": "data",
+ "label": "ESTAT: NAMQ_10_A10 (key query, lastNObservations=4) – M10 fixture, formverifierad mot live CC 2026-11-07; värden är realistiska exempel (synthetiska)",
+ "source": "Eurostat",
+ "updated": "2026-11-05T08:00:00Z",
+ "id": [
+  "freq",
+  "unit",
+  "s_adj",
+  "nace_r2",
+  "na_item",
+  "geo",
+  "time"
+ ],
+ "size": [
+  1,
+  1,
+  1,
+  1,
+  1,
+  3,
+  4
+ ],
+ "dimension": {
+  "freq": {
+   "category": {
+    "index": {
+     "Q": 0
+    },
+    "label": {
+     "Q": "quarterly"
+    }
+   }
+  },
+  "unit": {
+   "category": {
+    "index": {
+     "CP_MEUR": 0
+    },
+    "label": {
+     "CP_MEUR": "Current prices, millions of euro"
+    }
+   }
+  },
+  "s_adj": {
+   "category": {
+    "index": {
+     "SCA": 0
+    },
+    "label": {
+     "SCA": "Seasonally adjusted"
+    }
+   }
+  },
+  "nace_r2": {
+   "category": {
+    "index": {
+     "C": 0
+    },
+    "label": {
+     "C": "C: Manufacturing"
+    }
+   }
+  },
+  "na_item": {
+   "category": {
+    "index": {
+     "B1G": 0
+    },
+    "label": {
+     "B1G": "Gross value added"
+    }
+   }
+  },
+  "geo": {
+   "category": {
+    "index": {
+     "DK": 0,
+     "FI": 1,
+     "EU27_2020": 2
+    },
+    "label": {
+     "DK": "Denmark",
+     "FI": "Finland",
+     "EU27_2020": "EU-27"
+    }
+   }
+  },
+  "time": {
+   "category": {
+    "index": {
+     "2025-Q3": 0,
+     "2025-Q4": 1,
+     "2026-Q1": 2,
+     "2026-Q2": 3
+    },
+    "label": {
+     "2025-Q3": "2025-Q3",
+     "2025-Q4": "2025-Q4",
+     "2026-Q1": "2026-Q1",
+     "2026-Q2": "2026-Q2"
+    }
+   }
+  }
+ },
+ "value": {
+  "0": 14200,
+  "1": 13800,
+  "2": 14500,
+  "3": 14900,
+  "4": 11800,
+  "5": 11200,
+  "6": 12100,
+  "7": 12600,
+  "8": 428000,
+  "9": 412000,
+  "10": 435000,
+  "11": 449000
+ }
+}

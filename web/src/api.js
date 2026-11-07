@@ -74,3 +74,12 @@ export const fetchCyberOsv = ({ ecosystem = '' } = {}) =>
   getRaw(`/api/cyber/osv?ecosystem=${encodeURIComponent(ecosystem)}`);
 export const fetchCyberPrioritized = () => getRaw('/api/cyber/prioritized');
 export const fetchCyberOverview = () => getRaw('/api/cyber/overview');
+
+// M10: industri (område 7) – beräknad status + underliggande records per
+// källa, via backend /api/industry/*. getRaw behåller statuskod (502 om
+// inga records alls). country = SE/NO/DK/FI/IS för landsvy, NORDIC (eller
+// ALL) för den nordiska sammanfattningen.
+export const fetchIndustryStatus = (country = 'NORDIC') =>
+  getRaw(`/api/industry/status?country=${encodeURIComponent(country)}`);
+export const fetchIndustryData = (country = 'NORDIC') =>
+  getRaw(`/api/industry/data?country=${encodeURIComponent(country)}`);

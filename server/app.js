@@ -16,6 +16,7 @@ import { staticGeo } from './lib/geolayers.js';
 import { apiForecastMeta, apiForecastPoint, apiForecastGrid, apiForecastGridCoords } from './lib/forecast.js';
 import { apiCyberNvd, apiCyberKev, apiCyberOsv, apiCyberPrioritized, apiCyberOverview } from './lib/cyber.js';
 import { buildEnergyOverview } from './lib/energy.js';
+import { industryStatus, industryData } from './lib/industry.js';
 import { parseEnergyRange, buildEnergyHistory, buildEnergyAnalysis } from './lib/energy-insights.js';
 
 for (const c of COLLECTORS) registerSource(c);
@@ -127,6 +128,21 @@ const routes = {
 
   // M3: statiska kartlager (landsgränser + energilager) – ändras sällan.
   '/api/geo/static': () => ({ generatedAt: now(), ...staticGeo() }),
+
+  // M10: industristatus (område 7) – synkron, beräknad ur kollektornas
+  // records (lib/industry.js). /status ger poäng+drivfaktorer per land eller
+  // NORDIC; /data ger records + källstatus för per-källa-panelerna.
+  '/api/industry/status': u => {
+    const country = (u.searchParams.get('country') || 'NORDIC').toUpperCase();
+    const recs = areaSources(7).flatMap(s => s.records);
+    return { generatedAt: now(), ...industryStatus(country, recs) };
+  },
+
+  '/api/industry/data': u => {
+    const country = (u.searchParams.get('country') || 'NORDIC').toUpperCase();
+    const srcs = areaSources(7).map(s => ({ ...s, status: sourceStatus(s) }));
+    return { generatedAt: now(), country, ...industryData(country, srcs) };
+  },
 };
 
 // M8: SMHI-prognosapi:t – asynkront (påfrågan kan utlösa SMHI-hämtning

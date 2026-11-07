@@ -1,0 +1,87 @@
+{
+ "version": "2.0",
+ "class": "data",
+ "label": "ESTAT: TEIBS070 (key query, lastNObservations=2) – M10 fixture, formverifierad mot live CC 2026-11-07; värden är realistiska exempel (synthetiska)",
+ "source": "Eurostat",
+ "updated": "2026-11-05T08:00:00Z",
+ "id": [
+  "freq",
+  "indic",
+  "s_adj",
+  "geo",
+  "time"
+ ],
+ "size": [
+  1,
+  1,
+  1,
+  3,
+  2
+ ],
+ "dimension": {
+  "freq": {
+   "category": {
+    "index": {
+     "Q": 0
+    },
+    "label": {
+     "Q": "quarterly"
+    }
+   }
+  },
+  "indic": {
+   "category": {
+    "index": {
+     "BS-ICU-PC": 0
+    },
+    "label": {
+     "BS-ICU-PC": "BS-ICU-PC"
+    }
+   }
+  },
+  "s_adj": {
+   "category": {
+    "index": {
+     "NSA": 0
+    },
+    "label": {
+     "NSA": "Not seasonally adjusted"
+    }
+   }
+  },
+  "geo": {
+   "category": {
+    "index": {
+     "DK": 0,
+     "FI": 1,
+     "SE": 2
+    },
+    "label": {
+     "DK": "Denmark",
+     "FI": "Finland",
+     "SE": "Sweden"
+    }
+   }
+  },
+  "time": {
+   "category": {
+    "index": {
+     "2026-Q1": 0,
+     "2026-Q2": 1
+    },
+    "label": {
+     "2026-Q1": "2026-Q1",
+     "2026-Q2": "2026-Q2"
+    }
+   }
+  }
+ },
+ "value": {
+  "0": -0.8,
+  "1": 1.4,
+  "2": 0.6,
+  "3": -1.1,
+  "4": 1.2,
+  "5": 0.4
+ }
+}

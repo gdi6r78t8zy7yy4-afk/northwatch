@@ -8,11 +8,15 @@
 // månad i TAB4516/08864) förekommer inte som egen indexnivå.
 // Nästlade arrayer (om en annan källa väljer den formen) hanteras också,
 // där dimensioner med size 1 saknas i lagarna.
+//
+// M10: Eurostat SDMX 2.1 key queries levererar "value" som PLATT OBJEKT
+// {obsIndex: värde} – sparsa, rad-major per "size" (verifierat 2026-11-07
+// mot EXT_LT_MAINRAWM). Samma strides-dekning som platt array, men saknade
+// observationer (t.ex. lastNObservations) saknar helt index i objektet.
 
 // Yieldar { code: {dim: kod}, label: {dim: text}, value } för varje observation.
 export function* jsonstatRows(json) {
   const vals = json.value ?? json.values;
-  if (!Array.isArray(vals)) throw new Error('json-stat: "value" saknas i svaret');
   const dims = json.id ?? [];
   const sizes = (json.size ?? dims.map(() => 1)).map(Number);
   const total = sizes.reduce((a, b) => a * b, 1);
@@ -32,6 +36,22 @@ export function* jsonstatRows(json) {
     });
     return { code, label: lab, value };
   };
+  if (vals && typeof vals === 'object' && !Array.isArray(vals)) {
+    // Platt obs-index → multi-index via strides (rad-major per size, sista
+    // dimensionen byter snabbast). Saknade index = ingen observation.
+    for (const [k, v] of Object.entries(vals)) {
+      const f = Number(k);
+      if (!Number.isInteger(f) || f < 0 || f >= total) continue;
+      const pos = sizes.map((s, i) => {
+        let r = f;
+        for (let j = i + 1; j < dims.length; j++) r = Math.floor(r / sizes[j]);
+        return r % s;
+      });
+      yield buildRow(v, pos);
+    }
+    return;
+  }
+  if (!Array.isArray(vals)) throw new Error('json-stat: "value" saknas i svaret');
   if (vals.length === total) {
     // Platt array (SCB v2 + SSB v2, verifierad form).
     for (let i = 0; i < total; i++) {

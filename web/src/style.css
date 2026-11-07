@@ -251,6 +251,56 @@ tr.detail-row > td { background: var(--mut-bg); padding: 10px 12px; font-size: 1
 .osv-item a { color: var(--accent); font-size: 11.5px; word-break: break-all; text-decoration: none; }
 .osv-item a:hover { text-decoration: underline; }
 
+/* M10: industripaneler (område 7) – status, poängskala och per-källa-paneler */
+.industry-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(440px, 1fr));
+  gap: 12px; margin-bottom: 12px;
+}
+@media (max-width: 940px) { .industry-grid { grid-template-columns: 1fr; } }
+.industry-gapcard { grid-column: 1 / -1; border-left: 3px solid var(--warn); }
+.ind-badge {
+  display: inline-block; font-size: 11px; font-weight: 700; border-radius: 10px;
+  padding: 1px 9px; white-space: nowrap;
+}
+.ind-exp { color: var(--ok); background: var(--ok-bg); }
+.ind-stab { color: var(--accent); background: var(--mut-bg); }
+.ind-kon { color: var(--err); background: var(--err-bg); }
+.ind-unknown { color: var(--mut); background: var(--none-bg); }
+.ind-scorebar { display: inline-flex; align-items: center; gap: 8px; }
+.ind-scorebar .track {
+  position: relative; display: inline-block; width: 120px; height: 10px;
+  border-radius: 5px; background: var(--mut-bg); overflow: hidden;
+}
+.ind-scorebar .fill { display: block; height: 100%; border-radius: 5px; background: var(--accent); }
+.ind-scorebar .mid {
+  position: absolute; left: 50%; top: 0; bottom: 0; width: 2px;
+  background: var(--bd); transform: translateX(-1px);
+}
+.ind-scorebar .n { font-size: 12px; color: var(--mut); min-width: 28px; text-align: right; }
+.ind-components { display: flex; flex-direction: column; gap: 4px; margin: 8px 0; }
+.ind-comp {
+  display: grid; grid-template-columns: 92px 1fr; align-items: center;
+  gap: 8px; font-size: 12px;
+}
+.ind-comp .lbl { color: var(--mut); }
+.industry-status { display: flex; flex-direction: column; gap: 4px; }
+.ind-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; }
+.ind-score-big { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.ind-drivers { display: flex; flex-direction: column; gap: 3px; margin-top: 6px; }
+.ind-country-table { margin-top: 8px; }
+.ind-events { display: flex; flex-direction: column; gap: 4px; margin: 8px 0; }
+.ind-event {
+  display: flex; align-items: baseline; gap: 8px; font-size: 12px;
+  border: 1px solid var(--bd); border-left-width: 3px; border-radius: 6px;
+  padding: 5px 8px;
+}
+.ind-event.sev-high { border-left-color: var(--warn); }
+.ind-event.sev-med { border-left-color: var(--mut); }
+.ind-gaps { padding-left: 18px; line-height: 1.7; font-size: 12px; }
+.ind-gaps li { margin-bottom: 4px; }
+.neg { color: var(--err); }
+.pos { color: var(--ok); }
+
 /* Hybrid energy dashboard */
 .energy-page { color:var(--tx); }
 .energy-heading { display:flex; align-items:flex-start; justify-content:space-between; gap:18px; margin:4px 0 14px; }

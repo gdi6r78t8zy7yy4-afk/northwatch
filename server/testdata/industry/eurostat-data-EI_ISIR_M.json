@@ -1,0 +1,100 @@
+{
+ "version": "2.0",
+ "class": "data",
+ "label": "ESTAT: EI_ISIR_M (key query, lastNObservations=1) – M10 fixture, formverifierad mot live CC 2026-11-07; värden är realistiska exempel (synthetiska)",
+ "source": "Eurostat",
+ "updated": "2026-11-05T08:00:00Z",
+ "id": [
+  "freq",
+  "indic",
+  "nace_r2",
+  "unit",
+  "geo",
+  "time"
+ ],
+ "size": [
+  1,
+  1,
+  1,
+  1,
+  5,
+  1
+ ],
+ "dimension": {
+  "freq": {
+   "category": {
+    "index": {
+     "M": 0
+    },
+    "label": {
+     "M": "monthly"
+    }
+   }
+  },
+  "indic": {
+   "category": {
+    "index": {
+     "IS-IP-SCA": 0
+    },
+    "label": {
+     "IS-IP-SCA": "IS-IP-SCA"
+    }
+   }
+  },
+  "nace_r2": {
+   "category": {
+    "index": {
+     "B-D": 0
+    },
+    "label": {
+     "B-D": "B-D: Mining and manufacturing"
+    }
+   }
+  },
+  "unit": {
+   "category": {
+    "index": {
+     "RT12": 0
+    },
+    "label": {
+     "RT12": "Rate of change on previous period year"
+    }
+   }
+  },
+  "geo": {
+   "category": {
+    "index": {
+     "SE": 0,
+     "NO": 1,
+     "DK": 2,
+     "FI": 3,
+     "IS": 4
+    },
+    "label": {
+     "SE": "Sweden",
+     "NO": "Norway",
+     "DK": "Denmark",
+     "FI": "Finland",
+     "IS": "Iceland"
+    }
+   }
+  },
+  "time": {
+   "category": {
+    "index": {
+     "2026M09": 0
+    },
+    "label": {
+     "2026M09": "2026M09"
+    }
+   }
+  }
+ },
+ "value": {
+  "0": 2.4,
+  "1": 3.1,
+  "2": -0.6,
+  "3": 1.8,
+  "4": -2.3
+ }
+}

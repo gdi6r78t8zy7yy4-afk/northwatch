@@ -12,6 +12,7 @@ import {
   fetchDashboard, fetchAssets, fetchStaticGeo,
   fetchForecastMeta, fetchForecastPoint, fetchForecastGrid, fetchForecastGridCoords,
   fetchCyberNvd, fetchCyberKev, fetchCyberOsv, fetchCyberPrioritized,
+  fetchIndustryStatus, fetchIndustryData,
 } from '../api.js';
 
 const now = Date.now();
@@ -57,6 +58,8 @@ beforeEach(() => {
   vi.mocked(fetchCyberKev).mockReset();
   vi.mocked(fetchCyberOsv).mockReset();
   vi.mocked(fetchCyberPrioritized).mockReset();
+  vi.mocked(fetchIndustryStatus).mockReset();
+  vi.mocked(fetchIndustryData).mockReset();
 });
 
 describe('DashboardPage', () => {
@@ -345,6 +348,87 @@ describe('DashboardPage – cyber (M9, område 5)', () => {
     expect(fetchCyberKev).not.toHaveBeenCalled();
     expect(fetchCyberOsv).not.toHaveBeenCalled();
     expect(fetchCyberPrioritized).not.toHaveBeenCalled();
+    expect(screen.getByText('Indikatorer')).toBeInTheDocument();
+    expect(screen.getByText('Händelser och larm')).toBeInTheDocument();
+  });
+});
+
+// M10: industri (område 7) – per-källa-paneler + beräknad industristatus
+// ersätter de generiska indikator-/händelse-tabellerna; övriga områden
+// hämtar aldrig /api/industry/*. Renderingsdetaljer för varje panel täcks i
+// industryPanels.test.jsx – här verifieras kopplingen (vilken vy som sätts in).
+describe('DashboardPage – industri (M10, område 7)', () => {
+  const AREA_7 = {
+    id: 7, slug: 'industri', name: 'Industri, tillverkning och försörjningskedjor',
+    short: 'Industri', geo: false,
+    scope: 'Insatsvaror, industriproduktion, lager, reservdelar, hamnflöden, råvaruberoenden',
+    gaps: 'M10: per-källa-paneler + beräknad industristatus per land.',
+  };
+  const STATUS_NORDIC = {
+    generatedAt: '2026-11-07T10:00:00Z',
+    country: 'NORDIC', asOf: '2026-09', score: 50.4, label: 'Stabilt',
+    components: { production: { score: 52.8 }, trade: { score: 49.2 }, capacity: { score: 46.2 } },
+    drivers: ['SE: 55.6 (Stabilt)'],
+    sources: ['eurostat-industry'],
+    countries: [
+      { country: 'SE', score: 55.6, label: 'Stabilt', components: { production: { score: 57.6 }, trade: { score: 52.1 }, capacity: { score: 55.7 } } },
+      { country: 'NO', score: 59.7, label: 'Stabilt', components: { production: { score: 61.2 }, trade: { score: 61.2 }, capacity: { score: 53.7 } } },
+      { country: 'DK', score: 49.6, label: 'Stabilt', components: { production: { score: 49.4 }, trade: { score: 50 }, capacity: null } },
+      { country: 'FI', score: 51, label: 'Stabilt', components: { production: { score: 53.2 }, trade: { score: 50 }, capacity: { score: 47.2 } } },
+      { country: 'IS', score: 36.1, label: 'Kontraktion', components: { production: { score: 41.3 }, trade: { score: 32.7 }, capacity: { score: 28 } } },
+    ],
+  };
+  const DATA_ALL = {
+    generatedAt: '2026-11-07T10:00:00Z', country: 'ALL',
+    records: [
+      { t: 'm', area: 7, country: 'SE', source: 'eurostat-industry',
+        indicator: 'Industriproduktionsindex (2021=100), 2026-09', value: 101.6, unit: 'index 2021=100', ts: '2026-09' },
+    ],
+    sources: [],
+  };
+
+  test('område 7: industrivy med per-källa-paneler, ingen generell tabell', async () => {
+    vi.mocked(fetchDashboard).mockResolvedValue(PAYLOAD(AREA_7));
+    vi.mocked(fetchAssets).mockResolvedValue({ assets: [] });
+    vi.mocked(fetchStaticGeo).mockResolvedValue(null);
+    vi.mocked(fetchIndustryStatus).mockResolvedValue({ ok: true, status: 200, body: STATUS_NORDIC });
+    vi.mocked(fetchIndustryData).mockResolvedValue({ ok: true, status: 200, body: DATA_ALL });
+    const { container } = renderPage(7);
+
+    expect(await screen.findByText('7. Industri, tillverkning och försörjningskedjor')).toBeInTheDocument();
+    expect(container.querySelector('.industry-grid')).not.toBeNull();
+    // Status + alla per-källa-panelerna + luckkortet sätts in.
+    expect(await screen.findByText('Industristatus')).toBeInTheDocument();
+    expect(screen.getByText('Eurostat – industri & råvaror')).toBeInTheDocument();
+    expect(screen.getByText('Nationella statistikbyråer')).toBeInTheDocument();
+    expect(screen.getByText('Råstålkapacitet (OECD)')).toBeInTheDocument();
+    expect(screen.getByText('Varuhandel (UN Comtrade)')).toBeInTheDocument();
+    expect(screen.getByText('Kritiska råvaror (JRC RMIS / EU CRMs)')).toBeInTheDocument();
+    expect(screen.getByText('Kända luckor – industri & försörjningskedjor')).toBeInTheDocument();
+    // Records når rätt panel.
+    expect(screen.getByText('Industriproduktionsindex (2021=100), 2026-09')).toBeInTheDocument();
+    // De generiska tabellerna ersätts av widgeterna; källkartan finns kvar.
+    expect(screen.queryByText('Indikatorer')).not.toBeInTheDocument();
+    expect(screen.queryByText('Händelser och larm')).not.toBeInTheDocument();
+    // ALL → NORDIC för status, ALL för data (per-land-records visas alla).
+    expect(fetchIndustryStatus).toHaveBeenCalledWith('NORDIC');
+    expect(fetchIndustryData).toHaveBeenCalledWith('ALL');
+    expect(screen.getByText('Källor för området')).toBeInTheDocument();
+    expect(screen.getByText('Kända luckor (enligt API-katalogen)')).toBeInTheDocument();
+  });
+
+  test('annat område: inga industripaneler, inga /api/industry-frågor', async () => {
+    vi.mocked(fetchDashboard).mockResolvedValue(PAYLOAD(AREA_GEO));
+    vi.mocked(fetchAssets).mockResolvedValue({ assets: [] });
+    vi.mocked(fetchStaticGeo).mockResolvedValue(null);
+    renderPage(3);
+
+    expect(await screen.findByText('3. Transport och logistik')).toBeInTheDocument();
+    expect(screen.queryByText('Industristatus')).not.toBeInTheDocument();
+    expect(screen.queryByText('Eurostat – industri & råvaror')).not.toBeInTheDocument();
+    expect(screen.queryByText('Kända luckor – industri & försörjningskedjor')).not.toBeInTheDocument();
+    expect(fetchIndustryStatus).not.toHaveBeenCalled();
+    expect(fetchIndustryData).not.toHaveBeenCalled();
     expect(screen.getByText('Indikatorer')).toBeInTheDocument();
     expect(screen.getByText('Händelser och larm')).toBeInTheDocument();
   });
