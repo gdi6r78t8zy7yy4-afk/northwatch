@@ -22,7 +22,7 @@ function createLocalPersistence() {
     if (!historyLoaded) {
       try {
         const raw = await fs.readFile(historyPath(), 'utf8');
-        for (const line of raw.split('\\n')) {
+        for (const line of raw.split('\n')) {
           if (!line.trim()) continue;
           try { const item = JSON.parse(line); if (item?.id && item.record) history.set(item.id, item.record); } catch { /* ignore a partial final line */ }
         }
@@ -43,7 +43,7 @@ function createLocalPersistence() {
     const target = historyPath();
     writeQueue = writeQueue.then(async () => {
       await fs.mkdir(path.dirname(target), { recursive: true });
-      await fs.appendFile(target, fresh.join('\\n') + '\\n', { mode: 0o600 });
+      await fs.appendFile(target, fresh.join('\n') + '\n', { mode: 0o600 });
     }).catch(error => {
       warning = String(error?.message ?? error);
       console.error('[store] local energy history failed:', warning);
@@ -168,6 +168,29 @@ function createFirestorePersistence() {
       result.push(source);
     }
     return result;
+  }
+  async function loadEnergyMeasurements({ from, to } = {}) {
+    const start = new Date(from || Date.now() - 24 * 3600 * 1000);
+    const end = new Date(to || Date.now());
+    const days = [];
+    for (let d = new Date(Date.UTC(start.getUTCFullYear(), start.getUTCMonth(), start.getUTCDate()));
+      d <= end; d.setUTCDate(d.getUTCDate() + 1)) days.push(d.toISOString().slice(0, 10));
+    const records = [];
+    for (const day of days) {
+      const docs = await listDocuments(`${historyCollection}/${day}/measurements`);
+      for (const doc of docs) {
+        const record = readPayload(doc);
+        if (record && (!from || record.ts >= from) && (!to || record.ts <= to)) records.push(record);
+      }
+    }
+    return records;
+  }
+  async function saveEnergyMeasurements(records) {
+    for (const record of records) {
+      const day = utcDay(record.ts);
+      const id = historyId(record);
+      await request('PATCH', `${historyCollection}/${day}/measurements/${id}`, fieldPayload(record));
+    }
   }
   async function saveSource(source) {
     const snapshotId = randomUUID();
