@@ -339,11 +339,11 @@ export default function EnergyDashboard({ country = 'ALL', onCountryChange }) {
     const scoped = scope ? metrics.filter(r => r.country === scope) : metrics.filter(r => r.country !== 'NORDIC');
     const latest = test => scoped.filter(r => test(r) && r.value != null && Number.isFinite(Number(r.value)) && r.ts)
       .sort((a, b) => String(b.ts).localeCompare(String(a.ts)))[0] ?? null;
-    const production = latest(r => /^Total produktion \\([A-Z]{2}\\)$/.test(r.indicator));
-    const consumption = latest(r => /^Total förbrukning \\([A-Z]{2}\\)$/.test(r.indicator) ||
+    const production = latest(r => /^Total produktion \([A-Z]{2}\)$/.test(r.indicator));
+    const consumption = latest(r => /^Total förbrukning \([A-Z]{2}\)$/.test(r.indicator) ||
       (r.country === 'DK' && r.indicator === 'Beräknad förbrukning (DK, SCADA)'));
     const price = latest(r => /^Dag-ahead-pris /.test(r.indicator));
-    const renewable = latest(r => /^(Vindproduktion|Solproduktion|Förnybar produktion) \\(/.test(r.indicator));
+    const renewable = latest(r => /^(Vindproduktion|Solproduktion|Förnybar produktion) \(/.test(r.indicator));
     const labelCountry = metric => metric ? COUNTRY_NAMES[metric.country] ?? metric.country : '';
     return [
       { label: production ? `Production · ${labelCountry(production)}` : 'Production', metric: production, fallback: 'No production measurement in this country scope' },
