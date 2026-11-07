@@ -15,6 +15,7 @@ test('collector records and source health survive a process restart', async () =
     registerSource({ id: 'test-source', name: 'Test source', area: 1, country: 'SE', every: 60 });
     const records = [{ t: 'm', area: 1, country: 'SE', source: 'test-source', indicator: 'test', value: 42, unit: 'n', ts: '2026-11-07T00:00:00.000Z' }];
     setResult('test-source', records, 12);
+    const expectedLastOk = state.sources.get('test-source').lastOk;
     await flushStore();
 
     state.sources.clear();
@@ -23,7 +24,7 @@ test('collector records and source health survive a process restart', async () =
 
     const restored = state.sources.get('test-source');
     assert.deepEqual(restored.records, records);
-    assert.equal(restored.lastOk, '2026-11-07T00:00:00.000Z'.replace('2026-11-07T00:00:00.000Z', restored.lastOk));
+    assert.equal(restored.lastOk, expectedLastOk);
     assert.equal(restored.ms, 12);
     assert.equal(restored.status, 'stale');
   } finally {
