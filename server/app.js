@@ -148,7 +148,9 @@ const asyncRoutes = {
     const metrics = [...state.sources.values()].filter(s => s.area === 1)
       .flatMap(s => s.records ?? []).filter(r => r.t === 'm' &&
         (country === 'ALL' || r.country === country || r.country === 'NORDIC'));
-    return { status: 200, body: buildEnergyAnalysis(metrics, now()) };
+    const historyFrom = new Date(Date.now() - 30 * 86400_000).toISOString();
+    const historyRecords = await loadEnergyMeasurements({ from: historyFrom, to: now() });
+    return { status: 200, body: buildEnergyAnalysis(metrics, now(), historyRecords) };
   },
 
   '/api/forecast/meta': u => apiForecastMeta(u),
