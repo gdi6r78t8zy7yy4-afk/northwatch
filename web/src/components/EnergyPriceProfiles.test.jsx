@@ -72,6 +72,16 @@ describe('EnergyPriceProfiles', () => {
     expect(screen.getByText('SE · SE')).toBeInTheDocument();
   });
 
+  test('shows explicit date/time and price axis titles with the source unit', () => {
+    render(<EnergyPriceProfiles metrics={[
+      row('SE', 30, '2026-11-07T13:00:00Z'),
+      row('SE', 80, '2026-11-07T14:00:00Z'),
+    ]} now={now}/>);
+    expect(screen.getByText('Date / time (UTC)')).toBeInTheDocument();
+    expect(screen.getByText('Price (EUR/MWh)')).toBeInTheDocument();
+    expect(screen.getByRole('img', { name:/X-axis: date and time UTC\. Y-axis: price in EUR\/MWh/ })).toBeInTheDocument();
+  });
+
   test('renders source-attributed profile values', () => {
     render(<EnergyPriceProfiles metrics={[
       row('SE', 30, '2026-11-07T13:00:00Z'),
