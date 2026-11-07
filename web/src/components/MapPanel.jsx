@@ -124,6 +124,8 @@ export default function MapPanel({
   const [energyLayers, setEnergyLayers] = useState({ zones: true, links: true, flows: true });
   const [selectedItem, setSelectedItem] = useState(null);
 
+  useEffect(() => { setSelectedItem(null); }, [area.id, country, energyLayers]);
+
   // M8: väderprognosrutnätet aktiveras när föräldern skickar meta (område 11).
   const wxOn = !!forecastMeta?.ready;
 
@@ -311,7 +313,7 @@ export default function MapPanel({
         // Signed flow values reverse the direction of the visible arrow.
         const directed = a.type === 'flow' && Number(mw) < 0 ? [...coords].reverse() : coords;
         const flowLabel = a.type === 'flow'
-          ? `${Number(mw) < 0 ? (a.attrs?.to ?? '') : (a.attrs?.from ?? '')} → ${Number(mw) < 0 ? (a.attrs?.from ?? '') : (a.attrs?.to ?? '')} · ${Math.round(Math.abs(mw))} MW`
+          ? `${Number(mw) < 0 ? (a.attrs?.to ?? '') : (a.attrs?.from ?? '')} → ${Number(mw) < 0 ? (a.attrs?.from ?? '') : (a.attrs?.to ?? '')} · ${{mw == null ? '—' : Math.round(Math.abs(mw))} MW`
           : a.name;
         L.polyline(directed, { color: '#07111c', weight: a.type === 'flow' ? 8 : 6, opacity: 0.95 }).addTo(layer);
         L.polyline(directed, {
@@ -429,7 +431,7 @@ export default function MapPanel({
       </h2>
       <div className="map-workspace">
         <div ref={divRef} className="mapbox" style={{ height: MAP_SIZES[size] }} />
-        <aside className="map-item-inspector" style={{ height: MAP_SIZES[size] }} aria-label="Information om valt kartobjekt" aria-live="polite">
+        <aside className="map-item-inspector" aria-label="Information om valt kartobjekt" aria-live="polite">
           {selectedItem ? <>
             <div className="map-item-inspector-head">
               <div><span>VALT KARTOBJEKT</span><h3>{selectedItem.name ?? selectedItem.title ?? 'Namnlöst objekt'}</h3></div>
