@@ -410,3 +410,7 @@ tr.detail-row > td { background: var(--mut-bg); padding: 10px 12px; font-size: 1
 .energy-price-profile-range b { color:var(--tx); font-variant-numeric:tabular-nums; }
 .energy-price-profile > .mut { margin-top:4px; }
 .energy-price-profiles-note { margin:8px 0 0; line-height:1.5; }
+
+.energy-price-profiles-heading > div { display:flex; flex-direction:column; gap:3px; }
+.energy-price-horizon-control { display:flex; align-items:center; gap:6px; color:var(--mut); font-size:9px; white-space:nowrap; }
+.energy-price-horizon-control select { min-width:82px; padding:4px 6px; border:1px solid var(--bd); border-radius:4px; background:#101a25; color:var(--tx); font:inherit; }
