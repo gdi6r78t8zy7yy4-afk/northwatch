@@ -182,13 +182,6 @@ function MarketSignals({ metrics, comparisons = [], country = 'ALL' }) {
   const prices = [...priceGroups.values()].map(item => item.row)
     .sort((a, b) => a.indicator.localeCompare(b.indicator) || a.source.localeCompare(b.source));
   const renewableCountry = country === 'ALL' ? 'DK' : country;
-  const wind = findMetric(scopedMetrics, r => r.country === renewableCountry && r.indicator === `Vindproduktion (${renewableCountry})`);
-  const solar = findMetric(metrics, r => r.country === renewableCountry && r.indicator === `Solproduktion (${renewableCountry})`);
-  const total = findMetric(metrics, r => r.country === renewableCountry && r.indicator === `Total produktion (${renewableCountry})`);
-  const aligned = wind && solar && total && wind.ts === solar.ts && wind.ts === total.ts &&
-    wind.unit === solar.unit && wind.unit === total.unit && Number(total.value) > 0;
-  const renewable = aligned ? Number(wind.value) + Number(solar.value) : null;
-  const share = aligned ? renewable / Number(total.value) * 100 : null;
   return <div className="energy-market-grid">
     <div className="energy-market-panel">
       <h3>Day-ahead prices</h3>
