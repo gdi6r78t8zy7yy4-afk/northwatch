@@ -115,6 +115,18 @@ export default function DashboardPage({ country }) {
       </h1>
       <div className="mut" style={{ marginBottom: 12 }}>{area.scope}</div>
 
+      {area.id === 1 && (
+        <div className="card" style={{ background: '#131e2e', border: '1px solid #2b5278', marginBottom: 16 }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem', flexWrap: 'wrap' }}>
+            <div>
+              <h2 style={{ margin: '0 0 4px 0', fontSize: '1.05rem', color: '#93c5fd' }}>⚡ Specialiserad Energi-dashboard tillgänglig</h2>
+              <div className="mut">Se detaljerad produktionsmix, spotpriser, elflöden, aFRR/mFRR-reserver och marknadssignaler i realtid.</div>
+            </div>
+            <a href="#/energy" className="pill" style={{ textDecoration: 'none', background: '#2563eb', color: '#ffffff', padding: '8px 16px', fontWeight: 600 }}>Öppna Energi-dashboarden</a>
+          </div>
+        </div>
+      )}
+
       {area.geo && (
         <MapPanel
           area={area}
