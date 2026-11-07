@@ -4,7 +4,7 @@ import StatusPill from '../components/StatusPill.jsx';
 import EnergySourceHealth from '../components/EnergySourceHealth.jsx';
 import EnergyPriceProfiles from '../components/EnergyPriceProfiles.jsx';
 import EnergyPriceMovementAnalysis from '../components/EnergyPriceMovementAnalysis.jsx';
-import EnergyGenerationDemandTrends from '../components/EnergyGenerationDemandTrends.jsx';
+import EnergyGenerationDemandTrends, { filterRenewableGenerationSeries } from '../components/EnergyGenerationDemandTrends.jsx';
 import MapPanel from '../components/MapPanel.jsx';
 import { fetchEnergyOverview, fetchEnergyHistory, fetchEnergyAnalysis, fetchAssets, fetchStaticGeo } from '../api.js';
 import { formatObservationAge } from '../lib/metricFreshness.js';
@@ -316,6 +316,7 @@ export default function EnergyDashboard({ country = 'ALL' }) {
   useEffect(() => { let stopped = false; fetchAssets(1, country).then(r => { if (!stopped) setAssets(r.assets ?? []); }).catch(() => {}); return () => { stopped = true; }; }, [country]);
   useEffect(() => { let stopped = false; fetchStaticGeo().then(r => { if (!stopped) setGeo(r); }).catch(() => {}); return () => { stopped = true; }; }, []);
   const metrics = data?.metrics ?? [];
+  const renewableHistory = useMemo(() => filterRenewableGenerationSeries(history?.series ?? []), [history?.series]);
   const kpi = useMemo(() => ({
     export: findMetric(metrics, r => r.indicator === 'Svensk nettoexport (SE1–SE4)'),
     generation: findMetric(metrics, r => r.indicator === 'Total produktion (DK)'),
@@ -362,6 +363,13 @@ export default function EnergyDashboard({ country = 'ALL' }) {
       <div className="mut energy-history-meta">{history?.count ?? 0} observations · range {history?.from ? fmtTime(history.from) : '—'} – {history?.to ? fmtTime(history.to) : '—'}</div>
     </section>
     <EnergyGenerationDemandTrends series={history?.series ?? []}/>
+    <section className="card energy-history-section energy-renewable-history-section">
+      <div className="energy-section-head"><div><h2>Renewable generation history</h2>
+        <div className="mut">Selectable source-reported renewable technology time series. Each country, source, indicator and unit remains independent.</div></div>
+        <span className="tag">{renewableHistory.length} series</span></div>
+      {renewableHistory.length ? <HistoryExplorer series={renewableHistory}/>
+        : <p className="mut">No renewable generation history with two or more recorded observations is available in this time window. No values are estimated or backfilled.</p>}
+    </section>
     <section className="card energy-market-section">
       <EnergyPriceMovementAnalysis series={history?.series ?? []}/>
     </section>

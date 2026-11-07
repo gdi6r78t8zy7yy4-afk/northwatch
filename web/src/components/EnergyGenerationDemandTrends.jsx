@@ -4,6 +4,10 @@ const GENERATION = /^Total produktion \(([A-Z]{2})\)$/;
 const CONSUMPTION = /^(Total förbrukning \(([A-Z]{2})\)|Beräknad förbrukning \(([A-Z]{2}),?[^)]*\))/;
 const RENEWABLE = /^(Vindproduktion|Solproduktion|Vattenkraftproduktion|Geotermisk produktion|Förnybar produktion|Vind\+sol-produktion)/;
 
+export function filterRenewableGenerationSeries(series = []) {
+  return series.filter(item => RENEWABLE.test(item.indicator ?? ''));
+}
+
 function renewableTechnology(indicator) {
   if (indicator.startsWith('Vind+sol-')) return 'Wind + solar';
   if (indicator.startsWith('Vindproduktion')) return 'Wind';
