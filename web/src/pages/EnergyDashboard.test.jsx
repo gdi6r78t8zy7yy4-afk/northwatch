@@ -100,7 +100,7 @@ describe('EnergyDashboard', () => {
     expect(screen.getByText('Consumption · Sverige')).toBeInTheDocument();
     expect(screen.getByText('Day-ahead price · Sverige')).toBeInTheDocument();
     expect(screen.getByText('Renewable output · Danmark')).toBeInTheDocument();
-    expect(screen.getByLabelText('Danmarks produktionsmix')).toBeInTheDocument();
+    expect(screen.getAllByLabelText('Danmarks produktionsmix')).toHaveLength(2);
   });
 
   test('country selector in the energy heading updates the global country scope', async () => {
@@ -128,7 +128,7 @@ describe('EnergyDashboard', () => {
   test('Finland shows its reported wind, hydro, nuclear and CHP components', async () => {
     render(<EnergyDashboard country="FI" />);
     expect(await screen.findByText('Reported generation technologies · Finland')).toBeInTheDocument();
-    expect(screen.getByLabelText('Finlands produktionsmix')).toBeInTheDocument();
+    expect(screen.getAllByLabelText('Finlands produktionsmix')).toHaveLength(2);
     expect(screen.getByText(/Hydro: 250 MW/)).toBeInTheDocument();
     expect(screen.getByText(/Nuclear: 300 MW/)).toBeInTheDocument();
     expect(screen.getByText(/not an exhaustive generation mix/)).toBeInTheDocument();
@@ -137,7 +137,7 @@ describe('EnergyDashboard', () => {
   test('Iceland shows geothermal, hydro and oil instead of a wind/solar placeholder', async () => {
     render(<EnergyDashboard country="IS" />);
     expect(await screen.findByText('Reported generation technologies · Island')).toBeInTheDocument();
-    expect(screen.getByLabelText('Islands produktionsmix')).toBeInTheDocument();
+    expect(screen.getAllByLabelText('Islands produktionsmix')).toHaveLength(2);
     expect(screen.getByText(/Geothermal: 200 MW/)).toBeInTheDocument();
     expect(screen.getByText(/Hydro: 300 MW/)).toBeInTheDocument();
     expect(screen.getByText(/Oil: 10 MW/)).toBeInTheDocument();
