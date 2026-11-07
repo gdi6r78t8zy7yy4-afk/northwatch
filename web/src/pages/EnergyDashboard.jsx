@@ -21,7 +21,7 @@ function GenerationMix({ metrics }) {
   const wind = findMetric(metrics, r => r.indicator === 'Vindproduktion (DK)');
   const solar = findMetric(metrics, r => r.indicator === 'Solproduktion (DK)');
   const total = findMetric(metrics, r => r.indicator === 'Total produktion (DK)');
-  if (!wind || !solar || !total) return <p className="mut">Ofullständig produktionsmix. Vind, sol och total produktion måste finnas för samma uppdatering innan mixen visas.</p>;
+  if (!wind || !solar || !total || wind.ts !== solar.ts || wind.ts !== total.ts) return <p className="mut">Ofullständig produktionsmix. Vind, sol och total produktion måste finnas för samma uppdatering innan mixen visas.</p>;
   const parts = [{ name: 'Vind', value: Number(wind.value) }, { name: 'Sol', value: Number(solar.value) },
     { name: 'Övrigt', value: Math.max(0, Number(total.value) - Number(wind.value) - Number(solar.value)) }];
   const sum = parts.reduce((a, p) => a + p.value, 0);
@@ -42,7 +42,7 @@ function TrendChart({ series }) {
   const first = points[0], last = points[points.length - 1];
   const delta = last.value - first.value;
   return <div className="energy-chart">
-    <div className="energy-chart-meta"><b>{series.indicator}</b><span>{series.country} · {series.unit}</span></div>
+    <div className="energy-chart-meta"><b>{series.indicator}</b><span>{series.country} · {series.source} · {series.unit}</span></div>
     <svg viewBox="0 0 300 88" role="img" aria-label={series.indicator + ' historical trend'}>
       <path d="M8 76 H292" stroke="currentColor" opacity=".18" fill="none"/>
       <path d={path} stroke="#68a9e8" strokeWidth="2.5" fill="none" strokeLinejoin="round" strokeLinecap="round"/>
@@ -100,6 +100,18 @@ export default function EnergyDashboard({ country = 'ALL' }) {
       <Kpi label="CO₂-intensitet · Danmark" metric={kpi.co2} fallback="Ej täckt i valt urval"/>
       <Kpi label="mFRR-behov · Danmark" metric={kpi.mfrr} fallback="Ingen aktuell mFRR-mätning"/>
     </div>
+    <div className="energy-main-grid">
+      <section className="card energy-map-card"><div className="energy-section-head"><div><h2>Nordic grid · live observations</h2>
+        <div className="mut">Zonankare och vissa länkar är schematiska approximationer, inte verifierad fysisk nätgeometri.</div></div><span className="tag">{data?.coverage?.flowCount ?? 0} flödeslänkar</span></div>
+        <MapPanel area={ENERGY_AREA} country={country} assets={assets} staticGeo={geo} events={[]}/></section>
+      <section className="card energy-assessment"><h2>Operational assessment</h2>
+        <div className="energy-assessment-row"><span className="mut">Källor i urvalet</span><b>{data?.coverage?.sourceCount ?? '—'}</b></div>
+        <div className="energy-assessment-row"><span className="mut">Mätvärden</span><b>{data?.coverage?.metricCount ?? '—'}</b></div>
+        <div className="energy-assessment-row"><span className="mut">Flödeslänkar</span><b>{data?.coverage?.flowCount ?? '—'}</b></div>
+        <div className="energy-note"><b>Datatolkning</b><p>Värden visas med källans mättid. Fördröjda, frysta eller framtida leveransblock ska inte tolkas som momentan driftstatus.</p></div>
+        <div className="energy-note"><b>Täckningsluckor</b><p>Verifierat liveunderlag är ojämnt mellan länder. Finland kräver Fingrid-nyckel och dataset; Island saknar ännu ansluten elkälla. Marknadspriser och full nordisk produktionsmix är inte komplett integrerade.</p></div>
+      </section>
+    </div>
     <section className="card energy-history-section">
       <div className="energy-section-head"><div><h2>Historical measurements & trends</h2>
         <div className="mut">Collector snapshots stored with their original measurement timestamps.</div></div>
@@ -108,7 +120,7 @@ export default function EnergyDashboard({ country = 'ALL' }) {
           <option value="7d">Last 7 days</option><option value="30d">Last 30 days</option>
         </select></div>
       {history?.series?.length ? <div className="energy-chart-grid">{history.series.slice(0, 8).map(s =>
-        <TrendChart key={s.country + '-' + s.indicator + '-' + s.unit} series={s}/>)}</div>
+        <TrendChart key={s.country + '-' + s.source + '-' + s.indicator + '-' + s.unit} series={s}/>)}</div>
         : <p className="mut">Historical data is accumulating. Charts will populate as new collector measurements are recorded; the system does not backfill invented values.</p>}
       <div className="mut energy-history-meta">{history?.count ?? 0} observations · range {history?.from ? fmtTime(history.from) : '—'} – {history?.to ? fmtTime(history.to) : '—'}</div>
     </section>
@@ -124,18 +136,6 @@ export default function EnergyDashboard({ country = 'ALL' }) {
         </article>)}</div> : <p className="mut">No observations can currently be derived from matching, timestamp-aligned measurements.</p>}
       <div className="mut">{analysis?.methodology}</div>
     </section>
-    <div className="energy-main-grid">
-      <section className="card energy-map-card"><div className="energy-section-head"><div><h2>Nordic grid · live observations</h2>
-        <div className="mut">Zonankare och vissa länkar är schematiska approximationer, inte verifierad fysisk nätgeometri.</div></div><span className="tag">{data?.coverage?.flowCount ?? 0} flödeslänkar</span></div>
-        <MapPanel area={ENERGY_AREA} country={country} assets={assets} staticGeo={geo} events={[]}/></section>
-      <section className="card energy-assessment"><h2>Operational assessment</h2>
-        <div className="energy-assessment-row"><span className="mut">Källor i urvalet</span><b>{data?.coverage?.sourceCount ?? '—'}</b></div>
-        <div className="energy-assessment-row"><span className="mut">Mätvärden</span><b>{data?.coverage?.metricCount ?? '—'}</b></div>
-        <div className="energy-assessment-row"><span className="mut">Flödeslänkar</span><b>{data?.coverage?.flowCount ?? '—'}</b></div>
-        <div className="energy-note"><b>Datatolkning</b><p>Värden visas med källans mättid. Fördröjda, frysta eller framtida leveransblock ska inte tolkas som momentan driftstatus.</p></div>
-        <div className="energy-note"><b>Täckningsluckor</b><p>Verifierat liveunderlag är ojämnt mellan länder. Finland kräver Fingrid-nyckel och dataset; Island saknar ännu ansluten elkälla. Marknadspriser och full nordisk produktionsmix är inte komplett integrerade.</p></div>
-      </section>
-    </div>
     <div className="energy-lower-grid"><section className="card"><h2>Generation mix · Denmark</h2><GenerationMix metrics={metrics}/></section>
       <section className="card"><h2>Cross-border physical flows</h2>
         {data?.flows?.length ? <div className="energy-table-wrap"><table><thead><tr><th>Förbindelse</th><th>MW</th><th>Källa</th><th>Mättid</th></tr></thead><tbody>
