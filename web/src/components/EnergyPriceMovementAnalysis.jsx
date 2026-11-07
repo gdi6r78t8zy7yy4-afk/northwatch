@@ -1,7 +1,7 @@
 import React from 'react';
 
 function buildEnergyPriceMovements(series = []) {
-  return series.filter(item => /^Dag-ahead-pris\\s+/.test(item.indicator ?? ''))
+  return series.filter(item => /^Dag-ahead-pris\s+/.test(item.indicator ?? ''))
     .map(item => {
       const points = (item.points ?? []).filter(point =>
         Number.isFinite(Number(point.value)) && Number.isFinite(Date.parse(point.ts ?? '')))
@@ -46,7 +46,7 @@ export default function EnergyPriceMovementAnalysis({ series = [] }) {
     {movements.length ? <div className="energy-price-movement-grid">{movements.map(item => {
       const direction = item.delta > 0 ? 'up' : item.delta < 0 ? 'down' : 'unchanged';
       return <article className="energy-price-movement-row" key={[item.country,item.source,item.indicator,item.unit].join('|')}>
-        <div className="energy-price-movement-title"><b>{item.country} · {item.indicator.replace(/^Dag-ahead-pris\\s+/, '')}</b>
+        <div className="energy-price-movement-title"><b>{item.country} · {item.indicator.replace(/^Dag-ahead-pris\s+/, '')}</b>
           <span className={'energy-price-movement-direction ' + direction}>{direction === 'up' ? '▲' : direction === 'down' ? '▼' : '—'} {fmt(item.delta)} {item.unit}</span></div>
         <div className="energy-price-movement-values">
           <span>Previous <b>{fmt(item.previous.value)}</b></span>
