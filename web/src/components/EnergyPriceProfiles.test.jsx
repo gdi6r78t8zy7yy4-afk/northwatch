@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import EnergyPriceProfiles, { buildEnergyPriceProfiles } from './EnergyPriceProfiles.jsx';
 
 const now = Date.parse('2026-11-07T12:00:00.000Z');
@@ -59,6 +59,18 @@ describe('EnergyPriceProfiles', () => {
   test('renders the empty state when no current or upcoming prices exist', () => {
     render(<EnergyPriceProfiles metrics={[]} now={now}/>);
     expect(screen.getByText(/No current or upcoming day-ahead delivery intervals/)).toBeInTheDocument();
+  });
+
+  test('lets the user expand the visible delivery window to 48 hours', () => {
+    render(<EnergyPriceProfiles metrics={[
+      row('SE', 30, '2026-11-07T13:00:00Z'),
+      row('SE', 80, '2026-11-08T18:00:00Z'),
+    ]} now={now}/>);
+    expect(screen.getByText('Current & next 24 hours')).toBeInTheDocument();
+    expect(screen.getByText(/No current or upcoming day-ahead delivery intervals/)).toBeInTheDocument();
+    fireEvent.change(screen.getByRole('combobox', { name:'Price profile time range' }), { target:{ value:'48' } });
+    expect(screen.getByText('Current & next 48 hours')).toBeInTheDocument();
+    expect(screen.getByText('SE · SE')).toBeInTheDocument();
   });
 
   test('renders source-attributed profile values', () => {
