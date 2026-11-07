@@ -1,8 +1,8 @@
 import React from 'react';
 
-const GENERATION = /^Total produktion \\(([A-Z]{2})\\)$/;
-const CONSUMPTION = /^(Total förbrukning \\(([A-Z]{2})\\)|Beräknad förbrukning \\(([A-Z]{2}),?[^)]*\\))/;
-const RENEWABLE = /^Förnybar produktion \\(([A-Z]{2})\\)$/;
+const GENERATION = /^Total produktion \(([A-Z]{2})\)$/;
+const CONSUMPTION = /^(Total förbrukning \(([A-Z]{2})\)|Beräknad förbrukning \(([A-Z]{2}),?[^)]*\))/;
+const RENEWABLE = /^Förnybar produktion \(([A-Z]{2})\)$/;
 
 export function buildEnergyGenerationDemandTrends(series = []) {
   const rows = [];
