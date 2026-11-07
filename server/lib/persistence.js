@@ -19,6 +19,20 @@ function createLocalPersistence() {
   const history = new Map();
   const pendingHistory = new Set();
   const flush = () => writeQueue;
+  async function loadSources() {
+    try {
+      const raw = await fs.readFile(sourcePath(), 'utf8');
+      const saved = JSON.parse(raw);
+      if (!Array.isArray(saved?.sources)) {
+        throw new Error('Local persistence file has an invalid sources payload');
+      }
+      sources = new Map(saved.sources.filter(source => source && typeof source.id === 'string').map(source => [source.id, source]));
+      return [...sources.values()];
+    } catch (error) {
+      if (error?.code === 'ENOENT') return [];
+      throw error;
+    }
+  }
   async function loadEnergyMeasurements({ from, to } = {}) {
     if (!historyLoaded) {
       try {
