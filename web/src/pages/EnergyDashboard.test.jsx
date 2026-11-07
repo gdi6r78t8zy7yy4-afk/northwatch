@@ -26,6 +26,8 @@ const MOCK_OVERVIEW = {
   country: 'ALL',
   metrics: [
     { indicator: 'Svensk nettoexport (SE1–SE4)', value: 1250, unit: 'MW', ts: MOCK_TIMESTAMP, country: 'SE', source: 'svk', sourceName: 'Svenska kraftnät' },
+    { indicator: 'Total produktion (SE)', value: 16000, unit: 'MW', ts: MOCK_TIMESTAMP, country: 'SE', source: 'svk', sourceName: 'Svenska kraftnät' },
+    { indicator: 'Total förbrukning (SE)', value: 14500, unit: 'MW', ts: MOCK_TIMESTAMP, country: 'SE', source: 'svk', sourceName: 'Svenska kraftnät' },
     { indicator: 'Total produktion (DK)', value: 3400, unit: 'MW', ts: MOCK_TIMESTAMP, country: 'DK', source: 'energinet', sourceName: 'Energi Data Service' },
     { indicator: 'Total förbrukning (DK)', value: 3100, unit: 'MW', ts: MOCK_TIMESTAMP, country: 'DK', source: 'energinet', sourceName: 'Energi Data Service' },
     { indicator: 'Vindproduktion (DK)', value: 1800, unit: 'MW', ts: MOCK_TIMESTAMP, country: 'DK', source: 'energinet', sourceName: 'Energi Data Service' },
@@ -86,6 +88,19 @@ describe('EnergyDashboard', () => {
     expect(await screen.findByText('Nordic Energy Situation')).toBeInTheDocument();
     expect(screen.getByText('Svensk nettoexport')).toBeInTheDocument();
     expect(screen.getByLabelText('Danmarks produktionsmix')).toBeInTheDocument();
+  });
+
+  test('country selection renders only country-specific generation and KPI measurements', async () => {
+    render(<EnergyDashboard country="SE" />);
+    expect(await screen.findByText('Generation & demand · Sverige')).toBeInTheDocument();
+    expect(screen.getByText('Production · Sverige')).toBeInTheDocument();
+    expect(screen.queryByText('Production · Danmark')).not.toBeInTheDocument();
+    expect(screen.queryByText('Wind + solar · Denmark')).not.toBeInTheDocument();
+    expect(screen.queryByText('Denmark (regional overview)')).not.toBeInTheDocument();
+    expect(fetchEnergyOverview).toHaveBeenCalledWith('SE');
+    expect(fetchEnergyHistory).toHaveBeenCalledWith('SE', '24h');
+    expect(fetchEnergyAnalysis).toHaveBeenCalledWith('SE');
+    expect(fetchAssets).toHaveBeenCalledWith(1, 'SE');
   });
 
   test('renders market comparisons and price spread list without error', async () => {
