@@ -1,5 +1,5 @@
 import { test, expect, describe, beforeEach, vi } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import React from 'react';
 import EnergyDashboard from './EnergyDashboard.jsx';
 
@@ -88,6 +88,15 @@ describe('EnergyDashboard', () => {
     expect(await screen.findByText('Nordic Energy Situation')).toBeInTheDocument();
     expect(screen.getByText('Svensk nettoexport')).toBeInTheDocument();
     expect(screen.getByLabelText('Danmarks produktionsmix')).toBeInTheDocument();
+  });
+
+  test('country selector in the energy heading updates the global country scope', async () => {
+    const onCountryChange = vi.fn();
+    render(<EnergyDashboard country="SE" onCountryChange={onCountryChange} />);
+    const selector = await screen.findByRole('combobox', { name: 'Select energy dashboard country' });
+    expect(selector).toHaveValue('SE');
+    fireEvent.change(selector, { target: { value: 'NO' } });
+    expect(onCountryChange).toHaveBeenCalledWith('NO');
   });
 
   test('country selection renders only country-specific generation and KPI measurements', async () => {
