@@ -453,3 +453,55 @@ describe('MapPanel – prognosrutnät (M8)', () => {
       .not.toBeInTheDocument();
   });
 });
+
+
+describe('MapPanel – energilagerkontroller', () => {
+  const flow = {
+    id:'flow-1', name:'SE2→SE3', type:'flow', source:'svk',
+    geometry:{ type:'LineString', coordinates:[[15,58],[16,60]] },
+    attrs:{ mw:450, from:'SE2', to:'SE3' }, updated:'2026-11-07T10:00:00Z',
+  };
+  const latest = () => __leaf.created.slice().reverse().slice(0, 20);
+
+  test('energiområdet visar tre oberoende lagerknappar med aktivt standardläge', () => {
+    renderMap({ area:{ id:1 }, assets:[flow] });
+    for (const label of ['Zoner','HVDC','Liveflöden']) {
+      expect(screen.getByRole('button',{name:label})).toHaveAttribute('aria-pressed','true');
+    }
+    expect(__leaf.created.some(c => c.kind === 'circleMarker')).toBe(true);
+    expect(__leaf.created.some(c => c.kind === 'polyline')).toBe(true);
+  });
+
+  test('zoner kan döljas utan att dölja HVDC eller liveflöden', () => {
+    renderMap({ area:{ id:1 }, assets:[flow] });
+    fireEvent.click(screen.getByRole('button',{name:'Zoner'}));
+    expect(screen.getByRole('button',{name:'Zoner'})).toHaveAttribute('aria-pressed','false');
+    expect(screen.getByRole('button',{name:'HVDC'})).toHaveAttribute('aria-pressed','true');
+    expect(screen.getByRole('button',{name:'Liveflöden'})).toHaveAttribute('aria-pressed','true');
+    const current = latest();
+    expect(current.some(c => c.kind === 'circleMarker')).toBe(false);
+    expect(current.filter(c => c.kind === 'polyline')).toHaveLength(3); // 2 static links + live flow
+  });
+
+  test('HVDC kan döljas oberoende av zoner och liveflöden', () => {
+    renderMap({ area:{ id:1 }, assets:[flow] });
+    fireEvent.click(screen.getByRole('button',{name:'HVDC'}));
+    expect(screen.getByRole('button',{name:'HVDC'})).toHaveAttribute('aria-pressed','false');
+    const current = latest();
+    expect(current.some(c => c.kind === 'circleMarker')).toBe(true);
+    expect(current.filter(c => c.kind === 'polyline')).toHaveLength(1); // live flow only
+  });
+
+  test('liveflöden kan döljas utan att påverka statisk topologi', () => {
+    renderMap({ area:{ id:1 }, assets:[flow] });
+    fireEvent.click(screen.getByRole('button',{name:'Liveflöden'}));
+    expect(screen.getByRole('button',{name:'Liveflöden'})).toHaveAttribute('aria-pressed','false');
+    const current = latest();
+    expect(current.filter(c => c.kind === 'polyline')).toHaveLength(2); // static HVDC links
+  });
+
+  test('energilagerkontroller visas inte för andra områden', () => {
+    renderMap({ area:{ id:3 } });
+    expect(screen.queryByRole('group',{name:'Energilager'})).toBeNull();
+  });
+});
