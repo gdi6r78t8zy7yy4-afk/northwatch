@@ -196,6 +196,7 @@ asset  { t:'a', area, country, source, type, name, id?, geometry, attrs?, update
 | ENTSO-E Transparency Platform | 1 Energi (SE/NO/FI) | struktur verifierad; datalagret tomt 2026-11-01 (kollektorn aktiverar sig automatiskt när data finns) |
 | Statnett driftsdata | 1 Energi (NO/Nordiskt) | nyckelfritt – fysiska gränsflöden per zon + norsk nationell produktion/förbrukning (MW, timvärden); 1–2 % felmarginal; förbrukning beräknas från produktion och nettoimport/export |
 | Energi Data Service | 1 Energi (DK) | ok – produktion/förbrukning/nettoflöde/CO₂ per 15 min; kompletteras av Energinet PowerSystemRightNow (1 min, SCADA-baserat, approximativt) |
+| Landsnet Amper (Iceland) | 1 Energi (IS) | publikt JSON-endpoint som används av Electricity Maps – senaste produktionsmixen geotermisk/vattenkraft/olja (MW); endast aktuell snapshot, ingen historik eller förbrukningsserie; naiva tidsstämplar tolkas som Islandstid (UTC) |
 | Trafikverket öppna dataplattform (datacache v2) | 3 Transport (SE) | kräver `TRAFIKVERKET_KEY` – omskriven till datacache-API:t 2026-11-02 (M5); väg, väglag, trafikflöden, vägväder, järnväg, färjor + speedkameror på huvudvägar (kartlager), järnvägskorsningar i drift, aktiva stationmeddelanden och ersättningsbussar för inställda tåg (M7) |
 | Digitraffic vägtrafikmeddelanden | 3 Transport (FI) | ok – v1/messages verifierad 2026-11-01 |
 | PeeringDB (IX) | 2 Digital infrastruktur (Nordiskt) | ok – verifierad 2026-11-01 |
