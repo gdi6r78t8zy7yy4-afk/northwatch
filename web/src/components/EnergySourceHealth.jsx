@@ -3,7 +3,7 @@ import { COUNTRY_NAMES, fmtTime } from '../status.js';
 import StatusPill from './StatusPill.jsx';
 import { formatObservationAge } from '../lib/metricFreshness.js';
 
-const duration = value => Number.isFinite(Number(value)) ? `${Math.round(Number(value))} ms` : '—';
+const duration = value => value == null || value === '' || !Number.isFinite(Number(value)) ? '—' : `${Math.round(Number(value))} ms`;
 const cadence = value => {
   const seconds = Number(value);
   if (!Number.isFinite(seconds) || seconds <= 0) return '—';
