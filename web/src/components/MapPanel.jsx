@@ -268,7 +268,7 @@ export default function MapPanel({
         }).bindTooltip(a.type === 'flow'
           ? `${Number(mw) < 0 ? (a.attrs?.to ?? '') : (a.attrs?.from ?? '')} → ${Number(mw) < 0 ? (a.attrs?.from ?? '') : (a.attrs?.to ?? '')} · ${Math.round(Math.abs(mw))} MW` : a.name)
           .addTo(layer);
-        if (a.type === 'flow' && directed.length >= 2) {
+        if (a.type === 'flow' && directed.length >= 2 && typeof map.latLngToLayerPoint === 'function') {
           const start = map.latLngToLayerPoint(directed[0]);
           const finish = map.latLngToLayerPoint(directed[directed.length - 1]);
           const angle = Math.atan2(finish.y - start.y, finish.x - start.x);
