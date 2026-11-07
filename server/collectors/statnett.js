@@ -35,7 +35,7 @@ export function normalizeProductionConsumption(payload) {
   const latest = (values, indicator) => {
     for (let i = values.length - 1; i >= 0; i -= 1) {
       const value = Number(values[i]);
-      if (values[i] == null || !Number.isFinite(value)) continue;
+      if (values[i] == null || (typeof values[i] === 'string' && !values[i].trim()) || !Number.isFinite(value)) continue;
       const timestamp = start + i * tick;
       if (!Number.isFinite(timestamp) || timestamp <= 0) continue;
       return { t: 'm', area: 1, country: 'NO', source: 'statnett',
