@@ -19,40 +19,6 @@ function createLocalPersistence() {
   const history = new Map();
   const flush = () => writeQueue;
   async function loadEnergyMeasurements({ from, to } = {}) {
-    const start = new Date(from || Date.now() - 24 * 3600 * 1000);
-    const end = new Date(to || Date.now());
-    const days = [];
-    for (let d = new Date(Date.UTC(start.getUTCFullYear(), start.getUTCMonth(), start.getUTCDate()));
-      d <= end; d.setUTCDate(d.getUTCDate() + 1)) days.push(d.toISOString().slice(0, 10));
-    const records = [];
-    for (const day of days) {
-      const docs = await listDocuments(`${historyCollection}/${day}/measurements`);
-      for (const doc of docs) {
-        const record = readPayload(doc);
-        if (record && (!from || record.ts >= from) && (!to || record.ts <= to)) records.push(record);
-      }
-    }
-    return records;
-  }
-  async function saveEnergyMeasurements(records) {
-    for (const record of records) {
-      const day = utcDay(record.ts);
-      const id = historyId(record);
-      await request('PATCH', `${historyCollection}/${day}/measurements/${id}`, fieldPayload(record));
-    }
-  }
-  async function loadSources() {
-    try {
-      const snapshot = JSON.parse(await fs.readFile(sourcePath(), 'utf8'));
-      if (snapshot?.version === 1 && Array.isArray(snapshot.sources)) {
-        sources = new Map(snapshot.sources.map(source => [source.id, source]));
-      }
-    } catch (error) {
-      if (error?.code !== 'ENOENT') throw error;
-    }
-    return [...sources.values()];
-  }
-  async function loadEnergyMeasurements({ from, to } = {}) {
     if (!historyLoaded) {
       try {
         const raw = await fs.readFile(historyPath(), 'utf8');
