@@ -186,8 +186,9 @@ function GenerationDemandPanel({ metrics }) {
     const wind = latestFor(country, `Vindproduktion (${country})`);
     const solar = latestFor(country, `Solproduktion (${country})`);
     const combinedRenewables = latestFor(country, `Vind+sol-produktion ${country}`);
-    let renewable = combinedRenewables;
-    if (wind && solar && wind.ts === solar.ts && wind.unit === solar.unit) {
+    const icelandRenewables = country === 'IS' ? latestFor(country, 'Förnybar produktion (IS)') : null;
+    let renewable = icelandRenewables ?? combinedRenewables;
+    if (!icelandRenewables && wind && solar && wind.ts === solar.ts && wind.unit === solar.unit) {
       renewable = { value: Number(wind.value) + Number(solar.value), unit: wind.unit,
         ts: wind.ts, sourceName: wind.sourceName ?? wind.source };
     }
@@ -214,15 +215,16 @@ function GenerationDemandPanel({ metrics }) {
       <div className="energy-generation-values">
         <div><span>Production</span><b>{value(row.generation)}</b></div>
         <div><span>Consumption</span><b>{value(row.demand)}</b></div>
-        <div><span>Wind + solar</span><b>{value(row.renewable)}</b></div>
+        <div><span>{row.country === 'IS' ? 'Hydro + geothermal' : 'Wind + solar'}</span><b>{value(row.renewable)}</b></div>
       </div>
       <div className="energy-generation-assessment">
         {row.aligned ? <span className={row.balance < 0 ? 'energy-balance deficit' : 'energy-balance surplus'}>
           Domestic balance {row.balance > 0 ? '+' : ''}{row.balance.toLocaleString('sv-SE', { maximumFractionDigits: 1 })} {row.generation.unit}
         </span> : <span className="mut">Balance unavailable · timestamps or units do not align</span>}
-        {row.renewableShare != null ? <span className="mut">Wind + solar: {row.renewableShare.toLocaleString('sv-SE', { maximumFractionDigits: 1 })}% of reported production</span>
-          : <span className="mut">Renewable share unavailable · requires aligned wind, solar and total production</span>}
+        {row.renewableShare != null ? <span className="mut">{row.country === 'IS' ? 'Hydro + geothermal' : 'Wind + solar'}: {row.renewableShare.toLocaleString('sv-SE', { maximumFractionDigits: 1 })}% of reported production</span>
+          : <span className="mut">Renewable share unavailable · requires aligned renewable and total production</span>}
       </div>
+      {row.country === 'IS' ? <div className="mut">Landsnet reports geothermal, hydro and oil generation in its transmission-system snapshot. It does not provide consumption here; generation connected only to distribution networks may not be represented.</div> : null}
       {row.country === 'DK' && row.demand?.indicator === 'Beräknad förbrukning (DK, SCADA)' ?
         <div className="mut">Consumption is derived from SCADA production plus net exchange; it is approximate, not a settlement measurement.</div> : null}
       <div className="mut energy-generation-time">Latest observation: {fmtTime(row.generation?.ts ?? row.demand?.ts ?? row.renewable?.ts)}</div>
