@@ -72,7 +72,8 @@ function createLocalPersistence() {
 function createFirestorePersistence() {
   const projectId = process.env.GOOGLE_CLOUD_PROJECT || process.env.GCLOUD_PROJECT || process.env.FIREBASE_PROJECT_ID;
   const databaseId = process.env.FIRESTORE_DATABASE_ID || '(default)';
-  const collection = process.env.FIRESTORE_COLLECTION || 'northwatch_sources';\n  const historyCollection = process.env.FIRESTORE_ENERGY_HISTORY_COLLECTION || 'northwatch_energy_history';
+  const collection = process.env.FIRESTORE_COLLECTION || 'northwatch_sources';
+  const historyCollection = process.env.FIRESTORE_ENERGY_HISTORY_COLLECTION || 'northwatch_energy_history';
   const emulator = process.env.FIRESTORE_EMULATOR_HOST;
   if (!projectId) throw new Error('GOOGLE_CLOUD_PROJECT (or FIREBASE_PROJECT_ID) is required for STORE_DRIVER=firestore');
   const base = emulator
