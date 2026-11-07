@@ -161,6 +161,43 @@ function MarketSignals({ metrics }) {
   </div>;
 }
 
+
+function ReserveMarketPanel({ metrics }) {
+  const capacities = metrics.filter(r => /^(aFRR|mFRR)-kapacitet /.test(r.indicator) &&
+    r.value != null && Number.isFinite(Number(r.value)) && r.ts);
+  const latestTs = capacities.reduce((latest, row) => row.ts > latest ? row.ts : latest, '');
+  const current = capacities.filter(row => row.ts === latestTs)
+    .sort((a,b) => a.indicator.localeCompare(b.indicator));
+  const prices = new Map(metrics.filter(r => /^(aFRR|mFRR)-kapacitetspris /.test(r.indicator) &&
+    r.ts === latestTs && r.value != null && Number.isFinite(Number(r.value)))
+    .map(r => [r.indicator.replace('-kapacitetspris ', '-kapacitet '), r]));
+  return <section className="card energy-reserve-section">
+    <div className="energy-section-head"><div><h2>Reserve capacity market · aFRR / mFRR</h2>
+      <div className="mut">Published delivery-block capacity and capacity prices, by bidding zone and direction.</div></div>
+      {latestTs ? <span className="tag">Block {fmtTime(latestTs)}</span> : null}
+    </div>
+    {current.length ? <div className="energy-table-wrap"><table>
+      <thead><tr><th>Product</th><th>Zone</th><th>Direction</th><th>Published capacity</th><th>Capacity price</th><th>Source</th></tr></thead>
+      <tbody>{current.map(row => {
+        const match = row.indicator.match(/^(aFRR|mFRR)-kapacitet (.+) (up|down)$/);
+        if (!match) return null;
+        const [, product, zone, direction] = match;
+        const price = prices.get(row.indicator);
+        return <tr key={row.indicator}>
+          <td><b>{product}</b></td><td>{zone}</td><td>{direction === 'up' ? 'Upward' : 'Downward'}</td>
+          <td className="mono">{Number(row.value).toLocaleString('sv-SE',{maximumFractionDigits:1})} {row.unit}</td>
+          <td className="mono">{price ? Number(price.value).toLocaleString('sv-SE',{maximumFractionDigits:2})+' '+price.unit : '—'}</td>
+          <td>{row.sourceName ?? row.source}</td>
+        </tr>;
+      })}</tbody>
+    </table></div> : <p className="mut">No current reserve-capacity delivery block is available in the selected country scope.</p>}
+    <div className="energy-reserve-notes">
+      <p className="mut">Capacity volume is the published volume for a delivery block. Capacity price is shown only when supplied by the same source and block.</p>
+      <p className="mut">These are capacity-market products, not activated balancing energy, instantaneous reserve availability or remaining system headroom. Missing prices are left blank.</p>
+    </div>
+  </section>;
+}
+
 export default function EnergyDashboard({ country = 'ALL' }) {
   const [data, setData] = useState(null), [assets, setAssets] = useState([]), [geo, setGeo] = useState(null);
   const [error, setError] = useState(null), [updated, setUpdated] = useState(null);
@@ -236,6 +273,7 @@ export default function EnergyDashboard({ country = 'ALL' }) {
       <div className="mut">Latest source observations; comparisons are limited to values with compatible timestamps and units.</div></div></div>
       <MarketSignals metrics={metrics} comparisons={data?.marketComparisons ?? []}/>
     </section>
+    <ReserveMarketPanel metrics={metrics}/>
     <section className="card energy-analysis-section"><div className="energy-section-head"><div><h2>Evidence-based observations</h2>
       <div className="mut">Deterministic comparisons of measurements; not incident declarations or forecasts.</div></div></div>
       {analysis?.observations?.length ? <div className="energy-observations">{analysis.observations.map(o =>
