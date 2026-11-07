@@ -444,3 +444,16 @@ tr.detail-row > td { background: var(--mut-bg); padding: 10px 12px; font-size: 1
 .energy-price-movement-values b { color:var(--tx); font-size:12px; font-variant-numeric:tabular-nums; overflow-wrap:anywhere; }
 .energy-price-movement-row > .mut,.energy-price-movement-note { font-size:9px; line-height:1.5; overflow-wrap:anywhere; }
 .energy-price-movement-note { margin:10px 0 0; }
+
+
+/* Nordic historical generation and consumption trends */
+.energy-generation-history { min-width:0; }
+.energy-generation-history-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(245px,1fr)); gap:8px; }
+.energy-generation-history-row { min-width:0; padding:10px; border:1px solid var(--bd); border-radius:6px; background:#101a25; }
+.energy-generation-history-title { display:flex; justify-content:space-between; align-items:flex-start; gap:8px; flex-wrap:wrap; font-size:10px; }
+.energy-generation-history-values { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:6px; margin:10px 0 7px; }
+.energy-generation-history-values span { display:flex; flex-direction:column; gap:3px; color:var(--mut); font-size:9px; }
+.energy-generation-history-values b { color:var(--tx); font-size:11px; font-variant-numeric:tabular-nums; overflow-wrap:anywhere; }
+.energy-generation-history-row > .mut,.energy-generation-history-note { font-size:9px; line-height:1.5; overflow-wrap:anywhere; }
+.energy-generation-history-note { margin:10px 0 0; }
+.energy-derived-label { margin-top:6px; color:#e5b66b; font-size:9px; }
