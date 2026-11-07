@@ -13,15 +13,22 @@ describe('filterEnergyHistorySeries', () => {
     expect(filterEnergyHistorySeries(series, '  ')).toEqual(series);
   });
 
-  test('matches country, technology, indicator, source and unit case-insensitively', () => {
+  test('matches country, source and unit case-insensitively', () => {
     expect(filterEnergyHistorySeries(series, 'dk')).toEqual([series[0]]);
-    expect(filterEnergyHistorySeries(series, 'HYDRO')).toEqual([series[1]]);
     expect(filterEnergyHistorySeries(series, 'landsnet')).toEqual([series[2]]);
     expect(filterEnergyHistorySeries(series, 'mw')).toEqual(series);
   });
 
+  test('matches common English and Swedish technology names', () => {
+    expect(filterEnergyHistorySeries(series, 'HYDRO')).toEqual([series[1]]);
+    expect(filterEnergyHistorySeries(series, 'vattenkraft')).toEqual([series[1]]);
+    expect(filterEnergyHistorySeries(series, 'WIND')).toEqual([series[0]]);
+    expect(filterEnergyHistorySeries(series, 'geothermal')).toEqual([series[2]]);
+    expect(filterEnergyHistorySeries(series, 'geotermisk')).toEqual([series[2]]);
+  });
+
   test('returns an empty list when nothing matches', () => {
-    expect(filterEnergyHistorySeries(series, 'nuclear')).toEqual([]);
+    expect(filterEnergyHistorySeries(series, 'biomass')).toEqual([]);
   });
 
   test('handles missing metadata safely', () => {
