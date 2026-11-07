@@ -304,7 +304,12 @@ tr.detail-row > td { background: var(--mut-bg); padding: 10px 12px; font-size: 1
 
 /* Direction indicators for interconnector flow lines. */
 .flow-direction-icon { background:transparent; border:0; }
-.flow-direction-icon span { display:block; font-size:15px; line-height:16px; font-weight:800; text-shadow:0 0 3px #fff, 0 0 5px #fff; }
+.flow-direction-icon span {
+  display:flex; align-items:center; justify-content:center; width:23px; height:23px;
+  border:2px solid #fff; border-radius:50%; background:#101a25; color:#fff;
+  box-shadow:0 0 0 2px #101a25, 0 2px 7px rgba(0,0,0,.8);
+  font-size:17px; line-height:1; font-weight:900; text-shadow:0 1px 2px #000;
+}
 .energy-page .maplegend { gap:10px 14px; }
 
 /* Energy history and evidence panels */
