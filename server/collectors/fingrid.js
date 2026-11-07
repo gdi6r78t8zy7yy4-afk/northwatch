@@ -71,12 +71,12 @@ export default {
   fetch: async () => {
     const out = [];
     const datasets = configuredDatasets();
-    for (const [id, name] of datasets) {
+    for (const [index, [id, name]] of datasets.entries()) {
       const response = await jjson(`https://data.fingrid.fi/api/datasets/${id}/data/latest`, {
         headers: { 'x-api-key': process.env.FINGRID_KEY },
       });
       out.push(normalizeLatestData(id, name, response));
-      if (id !== datasets.at(-1)[0]) await sleep(2100); // max 1 request / 2 s
+      if (index < datasets.length - 1) await sleep(2100); // max 1 request / 2 s
     }
     return out;
   },
