@@ -45,7 +45,7 @@ export default function EnergyCountryCoverage({ metrics = [] }) {
       <div className="mut">Presence and freshness of the latest valid observations by country and indicator group.</div>
     </div><span className="tag">{rows.filter(row => row.production || row.consumption || row.price || row.componentCount).length}/5 countries with observations</span></div>
     <div className="energy-table-wrap">
-      <table className="energy-coverage-table">
+      <table className="energy-coverage-table" aria-label="Nordic energy data coverage">
         <thead><tr><th>Country</th><th>Total production</th><th>Consumption</th><th>Day-ahead price</th><th>Generation components</th></tr></thead>
         <tbody>{rows.map(row => <tr key={row.country}>
           <td><b>{COUNTRY_NAMES[row.country] ?? row.country}</b></td>
