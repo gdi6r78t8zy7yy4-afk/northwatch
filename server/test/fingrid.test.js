@@ -42,3 +42,25 @@ test('Fingrid latest response rejects missing timestamps instead of inventing on
   }), /missing or invalid timestamp/);
   assert.throws(() => normalizeLatestData(193, 'Consumption', []), /empty latest response/);
 });
+
+
+test('Fingrid defaults include total production/consumption and separately identified generation types', async () => {
+  const { configuredDatasets } = await import('../collectors/fingrid.js');
+  assert.deepEqual(configuredDatasets(''), [
+    [192, 'Total produktion (FI)'],
+    [193, 'Total förbrukning (FI)'],
+    [181, 'Vindproduktion (FI)'],
+    [191, 'Vattenkraftproduktion (FI)'],
+    [188, 'Kärnkraftsproduktion (FI)'],
+    [202, 'Industriell kraftvärmeproduktion (FI)'],
+  ]);
+});
+
+test('Fingrid custom dataset configuration continues to override defaults', async () => {
+  const { configuredDatasets } = await import('../collectors/fingrid.js');
+  assert.deepEqual(configuredDatasets('74:Historisk produktion,181:Vindkraft'), [
+    [74, 'Historisk produktion'],
+    [181, 'Vindkraft'],
+  ]);
+  assert.throws(() => configuredDatasets('bad:Missing id'), /Ogiltig FINGRID_DATASETS-post/);
+});
