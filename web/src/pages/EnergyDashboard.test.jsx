@@ -131,6 +131,23 @@ describe('EnergyDashboard', () => {
     expect(fetchAssets).toHaveBeenCalledWith(1, 'SE');
   });
 
+  test('historical measurements only offer and chart the selected country series', async () => {
+    vi.mocked(fetchEnergyHistory).mockResolvedValue({
+      count: 4,
+      series: [
+        { country:'SE', source:'svk', indicator:'Total produktion (SE)', unit:'MW',
+          points:[{ value:100, ts:'2026-11-07T08:00:00Z' }, { value:120, ts:'2026-11-07T09:00:00Z' }] },
+        { country:'DK', source:'energinet', indicator:'Total produktion (DK)', unit:'MW',
+          points:[{ value:200, ts:'2026-11-07T08:00:00Z' }, { value:220, ts:'2026-11-07T09:00:00Z' }] },
+      ],
+    });
+    render(<EnergyDashboard country="SE" />);
+    expect(await screen.findByRole('button', { name:/SE Total produktion \(SE\)/ })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name:/DK Total produktion \(DK\)/ })).not.toBeInTheDocument();
+    expect(screen.getByText('SE · svk · MW')).toBeInTheDocument();
+    expect(screen.queryByText('DK · energinet · MW')).not.toBeInTheDocument();
+  });
+
   test('Finland shows its reported wind, hydro, nuclear and CHP components', async () => {
     render(<EnergyDashboard country="FI" />);
     expect(await screen.findByText('Reported generation technologies · Finland')).toBeInTheDocument();
