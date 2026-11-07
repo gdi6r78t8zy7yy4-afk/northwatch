@@ -131,6 +131,20 @@ function MarketSignals({ metrics }) {
         </div>)}</div>
         : <p className="mut">No comparable day-ahead price observations are currently available from connected sources.</p>}
       <p className="mut">Prices are shown as published by each source. Currency and unit are retained; values are not converted.</p>
+      <div className="energy-spread-section">
+        <h4>Aligned Nordic price spreads</h4>
+        {comparisons.length ? <div className="energy-spread-list">{comparisons.slice(0, 6).map(snapshot =>
+          <article className="energy-spread-row" key={snapshot.asOf + snapshot.unit}>
+            <div className="energy-spread-heading"><b>{snapshot.spread.toLocaleString('sv-SE',{maximumFractionDigits:2})} {snapshot.unit}</b><span>{snapshot.countryCount} bidding zones · {fmtTime(snapshot.asOf)}</span></div>
+            <div className="energy-spread-track" role="img" aria-label={`Lowest ${snapshot.low.country} ${snapshot.low.value}; highest ${snapshot.high.country} ${snapshot.high.value}`}>
+              {snapshot.observations.map(item => <span key={item.country} style={{left:(snapshot.high.value === snapshot.low.value ? 50 : (item.value-snapshot.low.value)/(snapshot.high.value-snapshot.low.value)*100)+'%'}} title={item.country+': '+item.value+' '+item.unit}><i/></span>)}
+            </div>
+            <div className="energy-spread-detail"><span>Low: {snapshot.low.country} · {snapshot.low.value.toLocaleString('sv-SE')}</span><span>High: {snapshot.high.country} · {snapshot.high.value.toLocaleString('sv-SE')}</span></div>
+            <div className="mut">{snapshot.observations.map(item => item.country + ' ' + item.sourceName).join(' · ')}</div>
+          </article>)}</div>
+          : <p className="mut">No aligned cross-country price snapshots yet. At least two countries must report the same timestamp and price unit.</p>}
+        <p className="mut">Spread is the highest minus the lowest reported price. Only identical timestamps and units are compared; currencies are not converted.</p>
+      </div>
     </div>
     <div className="energy-market-panel">
       <h3>Wind + solar · Denmark</h3>
@@ -220,7 +234,7 @@ export default function EnergyDashboard({ country = 'ALL' }) {
     {history?.series?.length ? <GridOperationsExplorer series={history.series}/> : null}
     <section className="card energy-market-section"><div className="energy-section-head"><div><h2>Market & renewable signals</h2>
       <div className="mut">Latest source observations; comparisons are limited to values with compatible timestamps and units.</div></div></div>
-      <MarketSignals metrics={metrics}/>
+      <MarketSignals metrics={metrics} comparisons={data?.marketComparisons ?? []}/>
     </section>
     <section className="card energy-analysis-section"><div className="energy-section-head"><div><h2>Evidence-based observations</h2>
       <div className="mut">Deterministic comparisons of measurements; not incident declarations or forecasts.</div></div></div>
