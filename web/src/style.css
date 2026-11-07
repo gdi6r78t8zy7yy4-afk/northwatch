@@ -426,3 +426,21 @@ tr.detail-row > td { background: var(--mut-bg); padding: 10px 12px; font-size: 1
 .energy-spread-movement-row span { color:var(--mut); }
 .energy-spread-movement-row small { grid-column:1 / -1; color:var(--mut); }
 .energy-spread-movement > .mut { margin:7px 0 0; font-size:9px; line-height:1.5; }
+
+
+/* Historical observed day-ahead price changes */
+.energy-price-movement { min-width:0; }
+.energy-price-movement-heading { display:flex; justify-content:space-between; align-items:flex-start; gap:12px; margin-bottom:10px; }
+.energy-price-movement-heading h3 { margin:0 0 4px; font-size:12px; }
+.energy-price-movement-heading p { margin:0; font-size:10px; }
+.energy-price-movement-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:8px; }
+.energy-price-movement-row { min-width:0; padding:10px; border:1px solid var(--bd); border-radius:6px; background:#101a25; }
+.energy-price-movement-title { display:flex; justify-content:space-between; align-items:flex-start; gap:8px; flex-wrap:wrap; font-size:10px; }
+.energy-price-movement-direction { white-space:nowrap; font-weight:700; font-variant-numeric:tabular-nums; }
+.energy-price-movement-direction.up { color:#e5a35c; }
+.energy-price-movement-direction.down { color:#8cc7a5; }
+.energy-price-movement-values { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:6px; margin:10px 0 7px; }
+.energy-price-movement-values span { display:flex; flex-direction:column; gap:3px; color:var(--mut); font-size:9px; }
+.energy-price-movement-values b { color:var(--tx); font-size:12px; font-variant-numeric:tabular-nums; overflow-wrap:anywhere; }
+.energy-price-movement-row > .mut,.energy-price-movement-note { font-size:9px; line-height:1.5; overflow-wrap:anywhere; }
+.energy-price-movement-note { margin:10px 0 0; }
