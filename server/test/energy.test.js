@@ -9,6 +9,18 @@ const sources = [
 ];
 test('energy overview includes only energy metrics and flow assets', () => { const out=buildEnergyOverview(sources); assert.equal(out.metrics.length,2); assert.equal(out.flows.length,2); assert.equal(out.coverage.sourceCount,3); });
 test('country filter retains country measurements and Nordic flow assets', () => { const out=buildEnergyOverview(sources,{country:'SE'}); assert.deepEqual(out.metrics.map(r=>r.indicator),['Nettoexport']); assert.equal(out.flows.length,2); assert.equal(out.sources.length,1); });
+test('energy source health includes collector cadence, run time and duration', () => {
+  const out = buildEnergyOverview([{
+    id:'svk', name:'Svenska kraftnät', area:1, country:'SE', status:'ok',
+    every:300, lastRun:'2026-11-07T10:00:00.000Z', lastOk:'2026-11-07T10:00:00.000Z',
+    lastError:null, ms:842, error:null, records:[]
+  }]);
+  assert.deepEqual(
+    { every:out.sources[0].every, lastRun:out.sources[0].lastRun, lastOk:out.sources[0].lastOk, ms:out.sources[0].ms },
+    { every:300, lastRun:'2026-11-07T10:00:00.000Z', lastOk:'2026-11-07T10:00:00.000Z', ms:842 }
+  );
+});
+
 test('missing measurements are not synthesized as zeroes', () => { const out=buildEnergyOverview([{id:'fi',name:'Fingrid',area:1,country:'FI',status:'no_key',records:[]}]); assert.equal(out.metrics.length,0); assert.equal(out.coverage.metricCount,0); assert.equal(out.sources[0].status,'no_key'); });
 
 import { buildEnergyMarketComparisons } from '../lib/energy.js';
