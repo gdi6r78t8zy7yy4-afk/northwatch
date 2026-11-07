@@ -15,6 +15,7 @@ import { now } from './lib/http.js';
 import { staticGeo } from './lib/geolayers.js';
 import { apiForecastMeta, apiForecastPoint, apiForecastGrid, apiForecastGridCoords } from './lib/forecast.js';
 import { apiCyberNvd, apiCyberKev, apiCyberOsv, apiCyberPrioritized, apiCyberOverview } from './lib/cyber.js';
+import { buildEnergyOverview } from './lib/energy.js';
 
 for (const c of COLLECTORS) registerSource(c);
 // Restore the last snapshot before the first collector run, so the dashboard
@@ -85,6 +86,11 @@ function enrich(records) {
 
 const routes = {
   '/api/health': () => ({ health: healthList() }),
+
+  '/api/energy/overview': u => buildEnergyOverview(
+    [...state.sources.values()].map(source => ({ ...source, status: sourceStatus(source) })),
+    { country: u.searchParams.get('country') || 'ALL', generatedAt: now() },
+  ),
 
   '/api/dashboards': () => ({ generatedAt: now(), areas: areaMatrix() }),
 
