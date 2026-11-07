@@ -89,5 +89,6 @@ test('domestic production-demand analysis is country-generic and requires exact 
   assert.equal(balances.length, 1);
   assert.equal(balances[0].country, 'NO');
   assert.equal(balances[0].id, 'no-domestic-balance');
-  assert.match(balances[0].summary, /-1.000 MW/);
+  assert.match(balances[0].title, /below demand/);
+  assert.equal(balances[0].evidence[0].value - balances[0].evidence[1].value, -1000);
 });
