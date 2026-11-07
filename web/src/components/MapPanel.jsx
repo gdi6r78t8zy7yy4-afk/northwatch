@@ -313,7 +313,7 @@ export default function MapPanel({
         // Signed flow values reverse the direction of the visible arrow.
         const directed = a.type === 'flow' && Number(mw) < 0 ? [...coords].reverse() : coords;
         const flowLabel = a.type === 'flow'
-          ? `${Number(mw) < 0 ? (a.attrs?.to ?? '') : (a.attrs?.from ?? '')} → ${Number(mw) < 0 ? (a.attrs?.from ?? '') : (a.attrs?.to ?? '')} · ${{mw == null ? '—' : Math.round(Math.abs(mw))} MW`
+          ? `${Number(mw) < 0 ? (a.attrs?.to ?? '') : (a.attrs?.from ?? '')} → ${Number(mw) < 0 ? (a.attrs?.from ?? '') : (a.attrs?.to ?? '')} · ${mw == null ? '—' : Math.round(Math.abs(mw))} MW`
           : a.name;
         L.polyline(directed, { color: '#07111c', weight: a.type === 'flow' ? 8 : 6, opacity: 0.95 }).addTo(layer);
         L.polyline(directed, {
