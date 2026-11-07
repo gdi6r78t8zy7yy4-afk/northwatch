@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { COUNTRY_NAMES, fmtTime } from '../status.js';
 import StatusPill from '../components/StatusPill.jsx';
 import EnergySourceHealth from '../components/EnergySourceHealth.jsx';
+import EnergyPriceProfiles from '../components/EnergyPriceProfiles.jsx';
 import MapPanel from '../components/MapPanel.jsx';
 import { fetchEnergyOverview, fetchEnergyHistory, fetchEnergyAnalysis, fetchAssets, fetchStaticGeo } from '../api.js';
 import { formatObservationAge } from '../lib/metricFreshness.js';
@@ -140,6 +141,7 @@ function MarketSignals({ metrics }) {
           <span className="mut">{row.sourceName ?? row.source} · {fmtTime(row.ts)}</span>
         </div>)}</div>
         : <p className="mut">No comparable day-ahead price observations are currently available from connected sources.</p>}
+      <EnergyPriceProfiles metrics={metrics}/>
       <p className="mut">Prices are shown as published by each source. Currency and unit are retained; values are not converted. Spot prices exclude VAT, supplier markups and taxes.</p>
       <p className="mut">Swedish bidding-zone prices: <a href="https://www.elprisetjustnu.se" target="_blank" rel="noreferrer">Elpriset just nu.se</a>.</p>
       <div className="energy-spread-section">
