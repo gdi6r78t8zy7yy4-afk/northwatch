@@ -61,9 +61,11 @@ function HistoryExplorer({ series }) {
     setSelected(current => current === null ? keys.slice(0, 6) : current.filter(key => keys.includes(key)));
   }, [keys.join('||')]);
   const visible = series.filter(s => selected?.includes([s.country,s.source,s.indicator,s.unit].join('|')));
-  const toggle = key => setSelected(current => current.includes(key)
-    ? current.filter(item => item !== key)
-    : current.length < 8 ? [...current, key] : current);
+  const toggle = key => setSelected(current => {
+    const active = current ?? keys.slice(0, 6);
+    return active.includes(key) ? active.filter(item => item !== key)
+      : active.length < 8 ? [...active, key] : active;
+  });
   return <>
     <div className="energy-series-picker" aria-label="Choose historical series">
       {series.map(s => {
@@ -80,6 +82,30 @@ function HistoryExplorer({ series }) {
       <TrendChart key={[s.country,s.source,s.indicator,s.unit].join('|')} series={s}/>)}</div>
       : <p className="mut">Select a series above to display its history.</p>}
   </>;
+}
+
+
+function GridOperationsExplorer({ series }) {
+  const interconnectors = series.filter(s => /^Nettoflöde .+→.+/.test(s.indicator));
+  const reserves = series.filter(s => /^(aFRR|mFRR)-leverans /.test(s.indicator));
+  return <section className="card energy-grid-operations">
+    <div className="energy-section-head"><div><h2>Grid operations · flow & balancing history</h2>
+      <div className="mut">Historical source measurements for cross-border exchange and reserve-capacity products.</div></div></div>
+    <div className="energy-grid-operations-columns">
+      <div className="energy-grid-operations-panel">
+        <h3>Interconnector physical-flow measurements</h3>
+        <p className="mut">Shows the source-reported signed MW series for each route. Sign conventions can differ by source; the chart does not infer transfer direction or available capacity.</p>
+        {interconnectors.length ? <HistoryExplorer series={interconnectors}/>
+          : <p className="mut">No historical interconnector measurements in this time window.</p>}
+      </div>
+      <div className="energy-grid-operations-panel">
+        <h3>aFRR / mFRR capacity products</h3>
+        <p className="mut">Shows published delivery-block volumes. These are not necessarily activated reserves or currently available headroom.</p>
+        {reserves.length ? <HistoryExplorer series={reserves}/>
+          : <p className="mut">No historical aFRR/mFRR delivery-block measurements in this time window.</p>}
+      </div>
+    </div>
+  </section>;
 }
 
 function MarketSignals({ metrics }) {
@@ -191,6 +217,7 @@ export default function EnergyDashboard({ country = 'ALL' }) {
         : <p className="mut">Historical data is accumulating. Charts will populate as new collector measurements are recorded; the system does not backfill invented values.</p>}
       <div className="mut energy-history-meta">{history?.count ?? 0} observations · range {history?.from ? fmtTime(history.from) : '—'} – {history?.to ? fmtTime(history.to) : '—'}</div>
     </section>
+    {history?.series?.length ? <GridOperationsExplorer series={history.series}/> : null}
     <section className="card energy-market-section"><div className="energy-section-head"><div><h2>Market & renewable signals</h2>
       <div className="mut">Latest source observations; comparisons are limited to values with compatible timestamps and units.</div></div></div>
       <MarketSignals metrics={metrics}/>
