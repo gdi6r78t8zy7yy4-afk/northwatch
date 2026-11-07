@@ -148,6 +148,31 @@ describe('EnergyDashboard', () => {
     expect(screen.queryByText('DK · energinet · MW')).not.toBeInTheDocument();
   });
 
+  test('historical trend chart labels both axes and exposes exact point readings', async () => {
+    vi.mocked(fetchEnergyHistory).mockResolvedValue({
+      count: 2,
+      series: [{
+        country:'SE', source:'svk', indicator:'Total produktion (SE)', unit:'MW',
+        points:[
+          { value:100, ts:'2026-11-07T08:00:00Z' },
+          { value:120, ts:'2026-11-07T09:00:00Z' },
+        ],
+      }],
+    });
+    const { container } = render(<EnergyDashboard country="SE" />);
+    const chart = await screen.findByRole('img', {
+      name:/Total produktion \(SE\) historical trend, value axis in MW, time axis in UTC/,
+    });
+    expect(chart).toBeInTheDocument();
+    expect(container.querySelector('.energy-chart svg text')).toHaveTextContent('MW');
+    expect(container.querySelector('.energy-chart svg')).toHaveTextContent('Time (UTC)');
+    const pointTitles = [...container.querySelectorAll('.energy-chart svg circle title')].map(node => node.textContent);
+    expect(pointTitles).toHaveLength(2);
+    expect(pointTitles[0]).toContain('100 MW');
+    expect(pointTitles[1]).toContain('120 MW');
+    expect(pointTitles[1]).toContain('2026-11-07');
+  });
+
   test('Finland shows its reported wind, hydro, nuclear and CHP components', async () => {
     render(<EnergyDashboard country="FI" />);
     expect(await screen.findByText('Reported generation technologies · Finland')).toBeInTheDocument();
