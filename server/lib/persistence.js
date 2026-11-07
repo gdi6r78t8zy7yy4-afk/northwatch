@@ -1,4 +1,5 @@
 import fs from 'node:fs/promises';
+import fsSync from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { randomUUID } from 'node:crypto';
@@ -58,21 +59,30 @@ function createFirestorePersistence() {
     if (emulator) return null;
     if (process.env.FIRESTORE_ACCESS_TOKEN) return process.env.FIRESTORE_ACCESS_TOKEN;
     if (tokenCache.value && Date.now() < tokenCache.expiresAt - 60_000) return tokenCache.value;
-    const response = await fetch('http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/token', {
-      headers: { 'Metadata-Flavor': 'Google' },
-      signal: AbortSignal.timeout(5000),
-    });
-    if (!response.ok) throw new Error(`Google metadata token request failed: HTTP ${response.status}`);
-    const body = await response.json();
-    tokenCache = { value: body.access_token, expiresAt: Date.now() + Number(body.expires_in || 300) * 1000 };
-    return tokenCache.value;
+    try {
+      const response = await fetch('http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/token', {
+        headers: { 'Metadata-Flavor': 'Google' },
+        signal: AbortSignal.timeout(2000),
+      });
+      if (!response.ok) throw new Error(`Google metadata token request failed: HTTP ${response.status}`);
+      const body = await response.json();
+      tokenCache = { value: body.access_token, expiresAt: Date.now() + Number(body.expires_in || 300) * 1000 };
+      return tokenCache.value;
+    } catch {
+      return null;
+    }
   }
 
   async function request(method, resource, body) {
     const token = await accessToken();
     const headers = { 'Content-Type': 'application/json' };
     if (token) headers.Authorization = `Bearer ${token}`;
-    const response = await fetch(`${base}/${resource}`, {
+    const apiKey = process.env.FIREBASE_API_KEY;
+    let url = `${base}/${resource}`;
+    if (!token && apiKey) {
+      url += (url.includes('?') ? '&' : '?') + `key=${encodeURIComponent(apiKey)}`;
+    }
+    const response = await fetch(url, {
       method, headers, ...(body === undefined ? {} : { body: JSON.stringify(body) }),
       signal: AbortSignal.timeout(20000),
     });

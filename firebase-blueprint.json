@@ -1,0 +1,42 @@
+{
+  "entities": {
+    "SourceMeta": {
+      "title": "SourceMeta",
+      "description": "Collector source status and active snapshot pointer",
+      "type": "object",
+      "properties": {
+        "payload": {
+          "type": "string",
+          "description": "Serialized JSON metadata for collector source"
+        }
+      },
+      "required": [
+        "payload"
+      ]
+    },
+    "SnapshotChunk": {
+      "title": "SnapshotChunk",
+      "description": "Chunked serialized records belonging to a snapshot",
+      "type": "object",
+      "properties": {
+        "payload": {
+          "type": "string",
+          "description": "Serialized JSON array of records"
+        }
+      },
+      "required": [
+        "payload"
+      ]
+    }
+  },
+  "firestore": {
+    "/northwatch_sources/{sourceId}": {
+      "schema": "SourceMeta",
+      "description": "Metadata document for each collector source"
+    },
+    "/northwatch_sources/{sourceId}/snapshots/{snapshotId}/chunks/{chunkId}": {
+      "schema": "SnapshotChunk",
+      "description": "Snapshot chunk documents containing records"
+    }
+  }
+}
