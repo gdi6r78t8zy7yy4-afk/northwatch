@@ -6,6 +6,7 @@ import EnergyPriceProfiles from '../components/EnergyPriceProfiles.jsx';
 import MapPanel from '../components/MapPanel.jsx';
 import { fetchEnergyOverview, fetchEnergyHistory, fetchEnergyAnalysis, fetchAssets, fetchStaticGeo } from '../api.js';
 import { formatObservationAge } from '../lib/metricFreshness.js';
+import { buildEnergyPriceSpreadMovements } from '../lib/energyPriceAnalysis.js';
 
 const ENERGY_AREA = { id: 1, name: 'Elförsörjning och energisystem', short: 'Energi', geo: true };
 const findMetric = (rows, test) => rows.find(r => test(r) && r.value !== null && Number.isFinite(Number(r.value))) ?? null;
@@ -111,7 +112,7 @@ function GridOperationsExplorer({ series }) {
   </section>;
 }
 
-function MarketSignals({ metrics }) {
+function MarketSignals({ metrics, comparisons = [] }) {
   const priceGroups = new Map();
   const now = Date.now();
   for (const row of metrics.filter(r => /^Dag-ahead-pris /.test(r.indicator) && Number.isFinite(Number(r.value)) && Number.isFinite(Date.parse(r.ts ?? '')))) {
@@ -123,6 +124,7 @@ function MarketSignals({ metrics }) {
     const rank = at <= now ? now - at : Number.MAX_SAFE_INTEGER + at;
     if (!previous || rank < previous.rank) priceGroups.set(key, { row, rank });
   }
+  const spreadMovements = buildEnergyPriceSpreadMovements(comparisons);
   const prices = [...priceGroups.values()].map(item => item.row)
     .sort((a, b) => a.indicator.localeCompare(b.indicator) || a.source.localeCompare(b.source));
   const wind = findMetric(metrics, r => r.indicator === 'Vindproduktion (DK)');
@@ -157,6 +159,15 @@ function MarketSignals({ metrics }) {
           </article>)}</div>
           : <p className="mut">No aligned cross-country price snapshots yet. At least two countries must report the same timestamp and price unit.</p>}
         <p className="mut">Spread is the highest minus the lowest reported price. Only identical timestamps and units are compared; currencies are not converted.</p>
+        <div className="energy-spread-movement">
+          <h4>Spread movement · same countries, sources and unit</h4>
+          {spreadMovements.length ? spreadMovements.slice(0, 4).map(movement => <div className="energy-spread-movement-row" key={movement.unit + movement.countries.join('-')}>
+            <b>{movement.change > 0 ? '+' : ''}{movement.change.toLocaleString('sv-SE',{maximumFractionDigits:2})} {movement.unit}</b>
+            <span>{movement.change > 0 ? 'Wider spread' : movement.change < 0 ? 'Narrower spread' : 'Unchanged spread'} · {movement.countries.join(', ')}</span>
+            <small>{fmtTime(movement.previousAsOf)} → {fmtTime(movement.latestAsOf)} · {movement.previousSpread.toLocaleString('sv-SE',{maximumFractionDigits:2})} → {movement.latestSpread.toLocaleString('sv-SE',{maximumFractionDigits:2})} {movement.unit}</small>
+          </div>) : <p className="mut">A spread trend needs at least two snapshots with identical countries, sources and units.</p>}
+          <p className="mut">This describes a change in observed price separation only. It does not establish congestion, available transfer capacity or its cause.</p>
+        </div>
       </div>
     </div>
     <div className="energy-market-panel">
