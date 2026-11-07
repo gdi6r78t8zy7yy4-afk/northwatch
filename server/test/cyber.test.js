@@ -24,6 +24,7 @@ const {
   trimKev, fetchKevCatalog, apiCyberKev,
   parseWatchEnv, WATCH, DEFAULT_WATCH, sevRank, trimOsv, fetchOsvWatchlist, apiCyberOsv,
   nvdScoreForCve, apiCyberPrioritized, apiCyberOverview,
+  nvdJson,
 } = await import('../lib/cyber.js');
 const nvdCollector = (await import('../collectors/nvd.js')).default;
 const kevCollector = (await import('../collectors/kev.js')).default;
@@ -676,15 +677,16 @@ describe('apiCyberOverview', () => {
 describe('kollektorer', () => {
   const metr = (recs, indicator) => recs.find(r => r.t === 'm' && r.indicator === indicator).value;
 
-  test('nvd: 5 metrikvärden + kritisk-event (severity high vid > 10 kritiska)', async () => {
+  test('nvd: 6 metrikvärden med dbTotal + kritisk-event (severity high vid > 10 kritiska)', async () => {
     const crit = Array.from({ length: 11 }, (_, k) => ({
       id: `CVE-C${k}`, published: daysAgo(1), modified: '', status: '', desc: 'kritisk',
       score: 9.5, severity: 'CRITICAL', vector: '', cwe: '', refs: [],
     }));
     seedNvd([...crit, { id: 'CVE-H', published: daysAgo(2), modified: '', status: '', desc: '', score: 7.5, severity: 'HIGH', vector: '', cwe: '', refs: [] }]);
     const recs = await nvdCollector.fetch();
-    assert.equal(recs.filter(r => r.t === 'm').length, 5);
-    assert.equal(metr(recs, 'NVD – totalt antal CVE'), 420000); // seedNvd:s dbTotal
+    assert.equal(recs.filter(r => r.t === 'm').length, 6);
+    assert.equal(metr(recs, 'NVD – totalt antal CVE i databasen'), 420000); // seedNvd:s dbTotal
+    assert.equal(metr(recs, 'NVD – CVE i hämtat 30-dagarsfönster'), 12);
     assert.equal(metr(recs, 'NVD – nya CVE senaste 7 dagarna'), 12);
     assert.equal(metr(recs, 'NVD – kritiska (CVSS ≥ 9) senaste 7 dagarna'), 11);
     assert.equal(metr(recs, 'NVD – hög allvarlighet (CVSS 7–8.9) senaste 7 dagarna'), 1);
@@ -710,6 +712,14 @@ describe('kollektorer', () => {
     assert.equal(recs.filter(r => r.t === 'e').length, 0);
     assert.equal(metr(recs, 'NVD – medelvärde CVSS senaste 30 dagarna'), '–');
     assert.equal(metr(recs, 'NVD – nya CVE senaste 7 dagarna'), 1);
+  });
+
+  test('nvd: utan dbTotal returneras endast de 5 fönstermetriken', async () => {
+    cyber.nvd = { fetchedAt: new Date().toISOString(), dbTotal: null, capped: false, rows: [], error: null };
+    const recs = await nvdCollector.fetch();
+    assert.equal(recs.filter(r => r.t === 'm').length, 5);
+    assert.equal(metr(recs, 'NVD – CVE i hämtat 30-dagarsfönster'), 0);
+    assert.equal(recs.find(r => r.indicator === 'NVD – totalt antal CVE i databasen'), undefined);
   });
 
   test('kev: 5 metrikvärden + senaste-tillägg-event (high vid inkommande frist)', async () => {
@@ -762,4 +772,43 @@ describe('kollektorer', () => {
     assert.equal(e[1].severity, 'warn');
     assert.match(e[1].title, /1 OSV-paket kunde inte hämtas/);
   });
-});;
+});
+
+describe('nvdJson queue & retry', () => {
+  test('lyckat anrop returnerar parsad json', async () => {
+    fetchImpl = () => ({
+      ok: true,
+      status: 200,
+      json: async () => ({ totalResults: 42 }),
+    });
+    const res = await nvdJson('https://services.nvd.nist.gov/rest/json/cves/2.0?resultsPerPage=1');
+    assert.equal(res.totalResults, 42);
+  });
+
+  test('återförsöker vid HTTP 429 och lyckas på andra försöket', async () => {
+    let callCount = 0;
+    fetchImpl = () => {
+      callCount++;
+      if (callCount === 1) {
+        return { ok: false, status: 429, text: async () => 'Rate limit exceeded' };
+      }
+      return { ok: true, status: 200, json: async () => ({ totalResults: 99 }) };
+    };
+    const res = await nvdJson('https://services.nvd.nist.gov/rest/json/cves/2.0?resultsPerPage=1');
+    assert.equal(callCount, 2);
+    assert.equal(res.totalResults, 99);
+  });
+
+  test('kastar omedelbart utan onödiga återförsök vid icke-återförsökningsbara fel som HTTP 404', async () => {
+    let callCount = 0;
+    fetchImpl = () => {
+      callCount++;
+      return { ok: false, status: 404, text: async () => 'Not Found' };
+    };
+    await assert.rejects(
+      async () => nvdJson('https://services.nvd.nist.gov/rest/json/cves/2.0?cveId=CVE-NOTFOUND'),
+      /HTTP 404/,
+    );
+    assert.equal(callCount, 1, 'ska inte återförsöka 404');
+  });
+});

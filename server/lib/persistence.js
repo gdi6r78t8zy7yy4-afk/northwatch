@@ -52,6 +52,7 @@ function createFirestorePersistence() {
     : `https://firestore.googleapis.com/v1/projects/${projectId}/databases/${databaseId}/documents`;
   let tokenCache = { value: null, expiresAt: 0 };
   let writeQueue = Promise.resolve();
+  let warning = null;
 
   async function accessToken() {
     if (emulator) return null;
@@ -162,13 +163,17 @@ function createFirestorePersistence() {
     if (previous && previous !== snapshotId) await deleteSnapshot(source.id, previous);
   }
   function queueSave(source) {
-    writeQueue = writeQueue.then(() => saveSource(source));
+    writeQueue = writeQueue.then(async () => {
+      await saveSource(source);
+      warning = null;
+    });
     writeQueue = writeQueue.catch(error => {
+      warning = String(error?.message ?? error);
       console.error('[store] Firestore persistence failed:', error);
     });
     return writeQueue;
   }
-  return { loadSources, saveSource: queueSave, flush: () => writeQueue, get warning() { return null; }, driver: 'firestore' };
+  return { loadSources, saveSource: queueSave, flush: () => writeQueue, get warning() { return warning; }, driver: 'firestore' };
 }
 
 export function createPersistence() {

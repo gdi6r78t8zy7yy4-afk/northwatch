@@ -390,6 +390,28 @@ test('point: katalogpunkt, anpassad plats, utanför domänen, saknade param', as
   // (känd namn utanför domänen är i stället 404, se ovan).
   assert.equal((await apiForecastPoint(url('/api/forecast/point'))).status, 400);
   assert.equal((await apiForecastPoint(url('/api/forecast/point?point=FinnsInte'))).status, 400);
+
+  // Validering av anpassade koordinater: icke-numeriska och utanför giltigt intervall.
+  const nanRes = await apiForecastPoint(url('/api/forecast/point?lat=abc&lon=12.5'));
+  assert.equal(nanRes.status, 400);
+  assert.match(nanRes.body.error, /numeriska och inom lat/);
+
+  const latOutOfRange = await apiForecastPoint(url('/api/forecast/point?lat=95&lon=12.5'));
+  assert.equal(latOutOfRange.status, 400);
+  assert.match(latOutOfRange.body.error, /numeriska och inom lat/);
+
+  const lonOutOfRange = await apiForecastPoint(url('/api/forecast/point?lat=60&lon=190'));
+  assert.equal(lonOutOfRange.status, 400);
+  assert.match(lonOutOfRange.body.error, /numeriska och inom lat/);
+
+  // Hastighetsbegränsning per klientnyckel vid anpassade prognoser.
+  const clientKey = 'test-rate-limit-client';
+  let lastStatus = 200;
+  for (let i = 0; i < 21; i++) {
+    const res = await apiForecastPoint(url('/api/forecast/point?lat=59.91&lon=10.75'), clientKey);
+    lastStatus = res.status;
+  }
+  assert.equal(lastStatus, 429);
 });
 
 test('grid-coords: statiska rutnätskoordinater', async () => {

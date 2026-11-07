@@ -2,7 +2,7 @@
 // hämtar-/fel-/okänt-område-lägen, karta bara när area.geo, statusaggregering,
 // källor, luckor och 30 s-hämtning. M8: väderprognos (SMHI snow1g) i område 11.
 import { test, expect, describe, beforeEach, vi } from 'vitest';
-import { render, screen, act, waitFor } from '@testing-library/react';
+import { render, screen, act, waitFor, fireEvent } from '@testing-library/react';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import DashboardPage from './DashboardPage.jsx';
 import { __fireLeaf } from '../test/leafletMock.js';
@@ -243,6 +243,37 @@ describe('DashboardPage – väderprognos (M8, område 11)', () => {
     __fireLeaf('click', { latlng: { lat: 59.325, lng: 18.065 } });
     expect(await screen.findByText('📍 Anpassad plats (59.33, 18.07)')).toBeInTheDocument();
     expect(fetchForecastPoint).toHaveBeenCalledWith({ lat: 59.33, lon: 18.07 });
+
+    // Rensa anpassad plats via rensningsknappen
+    const clearBtn = screen.getByTitle('Tillbaka till katalogstäderna');
+    fireEvent.click(clearBtn);
+    expect(screen.queryByText('📍 Anpassad plats (59.33, 18.07)')).not.toBeInTheDocument();
+    expect(screen.getByRole('combobox', { name: 'Val av stad' })).toBeInTheDocument();
+  });
+
+  test('klick på kartan med ogiltiga/icke-numeriska koordinater ignoreras', async () => {
+    await renderWxPage();
+
+    __fireLeaf('click', { latlng: { lat: NaN, lng: 18.065 } });
+    expect(screen.queryByText(/Anpassad plats/)).not.toBeInTheDocument();
+    expect(screen.getByRole('combobox', { name: 'Val av stad' })).toBeInTheDocument();
+  });
+
+  test('fel vid hämtning av punktprognos (t.ex. 429 rate limit) visas i panelen', async () => {
+    vi.mocked(fetchDashboard).mockResolvedValue(PAYLOAD(AREA_WX));
+    vi.mocked(fetchAssets).mockResolvedValue({ assets: [] });
+    vi.mocked(fetchStaticGeo).mockResolvedValue(null);
+    vi.mocked(fetchForecastMeta).mockResolvedValue({ ok: true, status: 200, body: WX_META });
+    vi.mocked(fetchForecastPoint).mockResolvedValue({
+      ok: false,
+      status: 429,
+      body: { error: 'För många anpassade prognosförfrågningar' },
+    });
+    vi.mocked(fetchForecastGrid).mockResolvedValue(gridOk);
+    vi.mocked(fetchForecastGridCoords).mockResolvedValue(coordsOk);
+    renderPage(11);
+
+    expect(await screen.findByText('För många anpassade prognosförfrågningar')).toBeInTheDocument();
   });
 
   test('annat område: ingen prognospanel, inga prognosfrågor', async () => {

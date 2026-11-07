@@ -10,8 +10,10 @@ test('collector records and source health survive a process restart', async () =
   const previousDriver = process.env.STORE_DRIVER;
   process.env.STORE_DRIVER = 'local';
   process.env.NORTHWATCH_STORE_FILE = file;
+  let storeState;
   try {
     const { state, registerSource, setResult, initStore, flushStore } = await import('../lib/store.js?local-persistence-test');
+    storeState = state;
     state.sources.clear();
     registerSource({ id: 'test-source', name: 'Test source', area: 1, country: 'SE', every: 60 });
     const records = [{ t: 'm', area: 1, country: 'SE', source: 'test-source', indicator: 'test', value: 42, unit: 'n', ts: '2026-11-07T00:00:00.000Z' }];
@@ -29,7 +31,7 @@ test('collector records and source health survive a process restart', async () =
     assert.equal(restored.ms, 12);
     assert.equal(restored.status, 'stale');
   } finally {
-    state.sources.clear();
+    storeState?.sources?.clear();
     if (previous === undefined) delete process.env.NORTHWATCH_STORE_FILE;
     else process.env.NORTHWATCH_STORE_FILE = previous;
     if (previousDriver === undefined) delete process.env.STORE_DRIVER;
