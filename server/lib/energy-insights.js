@@ -104,13 +104,20 @@ export function buildEnergyAnalysis(metrics, generatedAt = new Date().toISOStrin
     if (!old || String(r.ts) > String(old.ts)) latest.set(key, r);
   }
   const observations = [];
-  const generation = latest.get('DK|Total produktion (DK)');
-  const demand = latest.get('DK|Total förbrukning (DK)');
-  if (generation && demand && generation.ts === demand.ts && generation.unit === demand.unit) {
+  // Compare domestic production and demand for every country that publishes
+  // the standardized indicators. Never align samples by proximity: timestamp
+  // and unit must match exactly.
+  const countries = [...new Set([...latest.values()].map(r => r.country))]
+    .filter(country => /^[A-Z]{2}$/.test(country)).sort();
+  for (const country of countries) {
+    const generation = latest.get(`${country}|Total produktion (${country})`);
+    const demand = latest.get(`${country}|Total förbrukning (${country})`);
+    if (!generation || !demand || generation.ts !== demand.ts || generation.unit !== demand.unit) continue;
     const gap = Number(generation.value) - Number(demand.value);
     observations.push({
-      id:'dk-domestic-balance', category:'balance', severity:gap < 0 ? 'medium' : 'info',
-      country:'DK', title:gap < 0 ? 'Domestic generation below demand' : 'Domestic generation covers demand',
+      id:country.toLowerCase() + '-domestic-balance', category:'balance',
+      severity:gap < 0 ? 'medium' : 'info', country,
+      title:gap < 0 ? country + ' domestic generation below demand' : country + ' domestic generation covers demand',
       summary:'Reported production minus consumption: ' + Math.round(gap).toLocaleString('sv-SE') + ' ' + generation.unit + '.',
       observedAt:generation.ts, confidence:'medium',
       caveat:'This is a domestic production-demand comparison, not a system adequacy assessment. Cross-border imports, exports, losses and other balancing resources are not included.',
