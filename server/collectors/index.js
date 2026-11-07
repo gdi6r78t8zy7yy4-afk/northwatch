@@ -24,6 +24,7 @@ import osv from './osv.js';
 import svk from './svk.js';
 import svkHist from './svk-hist.js';
 import fingrid from './fingrid.js';
+import elprisetjustnu from './elprisetjustnu.js';
 import trafikverket from './trafikverket.js';
 import digitraffic from './digitraffic.js';
 import entsoe from './entsoe.js';
@@ -62,6 +63,7 @@ export const COLLECTORS = [
   svk,
   svkHist,
   fingrid,
+  elprisetjustnu,
   entsoe,
   statnett,
   energidataservice,
