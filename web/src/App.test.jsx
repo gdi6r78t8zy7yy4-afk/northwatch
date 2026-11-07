@@ -48,7 +48,7 @@ describe('App', () => {
     defaults();
     render(<App />);
     expect(await screen.findByText('Översikt – alla dashboardområden')).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: '1. Energi' })).toHaveAttribute('href', '#/d/1');
+    expect(screen.getByRole('link', { name: 'Energi' })).toHaveAttribute('href', '#/energy');
     expect(screen.getByRole('link', { name: '2. Digital infrastruktur' })).toBeInTheDocument();
   });
 
