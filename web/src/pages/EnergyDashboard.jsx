@@ -163,7 +163,7 @@ function MarketSignals({ metrics, comparisons = [], country = 'ALL' }) {
         : <p className="mut">No comparable day-ahead price observations are currently available from connected sources.</p>}
       <EnergyPriceProfiles metrics={metrics}/>
       <p className="mut">Prices are shown as published by each source. Currency and unit are retained; values are not converted. Spot prices exclude VAT, supplier markups and taxes.</p>
-      <p className="mut">Swedish bidding-zone prices: <a href="https://www.elprisetjustnu.se" target="_blank" rel="noreferrer">Elpriset just nu.se</a>.</p>
+      {country === 'ALL' || country === 'SE' ? <p className="mut">Swedish bidding-zone prices: <a href="https://www.elprisetjustnu.se" target="_blank" rel="noreferrer">Elpriset just nu.se</a>.</p> : null}
       <div className="energy-spread-section">
         <h4>Aligned Nordic price spreads</h4>
         {regionalComparisons.length ? <div className="energy-spread-list">{regionalComparisons.slice(0, 6).map(snapshot =>
@@ -313,6 +313,7 @@ export default function EnergyDashboard({ country = 'ALL', onCountryChange }) {
   const [historyRange, setHistoryRange] = useState('24h'), [history, setHistory] = useState(null), [analysis, setAnalysis] = useState(null);
   useEffect(() => {
     let stopped = false;
+    setData(null); setHistory(null); setAnalysis(null); setAssets([]);
     const load = async () => { try { const result = await fetchEnergyOverview(country); if (!stopped) { setData(result); setError(null); setUpdated(new Date().toISOString()); } }
       catch (e) { if (!stopped) setError(e.message); } };
     load(); const timer = setInterval(load, 60000);
