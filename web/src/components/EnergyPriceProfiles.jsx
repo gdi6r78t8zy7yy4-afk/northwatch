@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react';
+import { analyzeEnergyPriceProfile } from '../lib/energyPriceAnalysis.js';
 
 const DAY_AHEAD_PREFIX = /^Dag-ahead-pris\s+/;
 const formatClock = value => new Intl.DateTimeFormat('sv-SE', {
@@ -38,6 +39,8 @@ function PriceProfile({ series }) {
   const y = value => 70 - (value - min) / span * 54;
   const path = points.map((point,index) => (index ? 'L' : 'M') + x(point.at).toFixed(1) + ' ' + y(point.value).toFixed(1)).join(' ');
   const low = Math.min(...values), high = Math.max(...values);
+  const analysis = analyzeEnergyPriceProfile(series);
+  const formatDelta = value => (value > 0 ? '+' : '') + value.toLocaleString('sv-SE', { maximumFractionDigits:2 });
   return <article className="energy-price-profile">
     <div className="energy-price-profile-head"><b>{series.country} · {series.label}</b><span>{series.source}</span></div>
     <svg viewBox="0 0 300 88" role="img" aria-label={series.country + ' ' + series.label + ' day-ahead price profile'}>
@@ -49,6 +52,14 @@ function PriceProfile({ series }) {
     </svg>
     <div className="energy-price-profile-range"><span>{formatClock(points[0].at)}</span><b>{low.toLocaleString('sv-SE',{maximumFractionDigits:2})} – {high.toLocaleString('sv-SE',{maximumFractionDigits:2})} {series.unit}</b><span>{formatClock(points.at(-1).at)}</span></div>
     <div className="mut">{points.length} delivery interval{points.length === 1 ? '' : 's'} · {series.source}</div>
+    <div className="energy-price-profile-analysis" aria-label="Price movement analysis">
+      {analysis.netChange === null
+        ? <span>Movement: one published interval only</span>
+        : <span>First-to-last movement: <b>{formatDelta(analysis.netChange)} {series.unit}</b></span>}
+      {analysis.largestStep ? <span>Largest adjacent move: <b>{formatDelta(analysis.largestStep.change)} {series.unit}</b>
+        <small>{formatClock(analysis.largestStep.from)} → {formatClock(analysis.largestStep.to)} UTC</small></span> : null}
+      {analysis.negativeIntervals > 0 ? <span>Negative-price intervals: <b>{analysis.negativeIntervals}</b></span> : null}
+    </div>
   </article>;
 }
 
