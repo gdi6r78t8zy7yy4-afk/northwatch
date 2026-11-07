@@ -5,7 +5,7 @@ import { test, expect, describe, beforeEach, vi } from 'vitest';
 import { render, screen, act, waitFor, fireEvent } from '@testing-library/react';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import DashboardPage from './DashboardPage.jsx';
-import { __fireLeaf } from '../test/leafletMock.js';
+import { __fireLeaf, __leaf } from '../test/leafletMock.js';
 
 vi.mock('../api.js');
 import {
@@ -240,7 +240,10 @@ describe('DashboardPage – väderprognos (M8, område 11)', () => {
   test('klick på kartan → anpassad plats (2 decimaler) + punktprognos per lat/lon', async () => {
     await renderWxPage();
 
-    __fireLeaf('click', { latlng: { lat: 59.325, lng: 18.065 } });
+    // The dashboard is revealed as soon as its data resolves; wait for the
+    // Leaflet mount effect before simulating a map click.
+    await waitFor(() => expect(__leaf.handlers.click).toBeTypeOf('function'));
+    act(() => __fireLeaf('click', { latlng: { lat: 59.325, lng: 18.065 } }));
     expect(await screen.findByText('📍 Anpassad plats (59.33, 18.07)')).toBeInTheDocument();
     expect(fetchForecastPoint).toHaveBeenCalledWith({ lat: 59.33, lon: 18.07 });
 
