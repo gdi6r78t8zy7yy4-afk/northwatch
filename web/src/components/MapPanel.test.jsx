@@ -9,7 +9,7 @@
 import { test, expect, describe, beforeEach, vi } from 'vitest';
 import { render, screen, fireEvent, act, waitFor } from '@testing-library/react';
 import MapPanel from './MapPanel.jsx';
-import { __leaf, __resetLeaflet, __fireLeaf } from '../test/leafletMock.js';
+import { __leaf, __resetLeaflet, __fireLeaf, __fireLayer } from '../test/leafletMock.js';
 
 // M8: prognosrutnätet hämtas via backend – mockat som alla övriga anrop.
 vi.mock('../api.js');
@@ -192,6 +192,28 @@ describe('MapPanel – lager', () => {
     // popups bär namn + typ + källa
     expect(byPopup('StockholmIX').popup).toContain('Internetutbyte (IX)');
     expect(byPopup('StockholmIX').popup).toContain('peeringdb');
+  });
+
+  test('klick på kartobjekt öppnar en beständig detaljpanel med samtliga tillgängliga attribut', () => {
+    renderMap({
+      assets: [point({
+        id: 'plant-42', name: 'Forsmark', type: 'kraftanläggning', source: 'osm',
+        updated: '2026-11-07T08:15:00Z',
+        attrs: { Effekt: '3000 MW', Status: 'I drift', Operatör: 'Vattenfall' },
+      })],
+    });
+    expect(screen.getByText('Välj ett objekt på kartan')).toBeInTheDocument();
+    const marker = __leaf.created.find(c => c.kind === 'circleMarker' && c.popup?.includes('Forsmark'));
+    act(() => __fireLayer(marker));
+    expect(screen.getByText('Forsmark')).toBeInTheDocument();
+    expect(screen.getByText('kraftanläggning')).toBeInTheDocument();
+    expect(screen.getByText('osm')).toBeInTheDocument();
+    expect(screen.getByText('3000 MW')).toBeInTheDocument();
+    expect(screen.getByText('I drift')).toBeInTheDocument();
+    expect(screen.getByText('Vattenfall')).toBeInTheDocument();
+    expect(screen.getByText('18, 59.3')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Stäng objektinformation' }));
+    expect(screen.getByText('Välj ett objekt på kartan')).toBeInTheDocument();
   });
 
   test('speedkameror (M7) med egen färg, liten radie, popup och legendpost', () => {
