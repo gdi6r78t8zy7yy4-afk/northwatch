@@ -68,7 +68,7 @@ export function setResult(id, records, ms) {
   if (!source) throw new Error(`Unknown collector: ${id}`);
   source.records = records;
   if (source.area === 1) {
-    const measurements = records.filter(record => record.t === 'm' && record.ts && Number.isFinite(Number(record.value)));
+    const measurements = records.filter(record => record.t === 'm' && record.ts && record.value !== null && record.value !== undefined && record.value !== '' && Number.isFinite(Number(record.value)));
     if (measurements.length) void persistence.saveEnergyMeasurements(measurements);
   }
   source.status = 'ok';
