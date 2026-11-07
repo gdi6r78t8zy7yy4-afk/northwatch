@@ -9,7 +9,7 @@ export function buildEnergyHistory(records, { country = 'ALL', indicator = null,
     (!indicator || r.indicator === indicator));
   const seriesMap = new Map();
   for (const r of filtered) {
-    const key = [r.country, r.indicator, r.unit].join('|');
+    const key = [r.country, r.source, r.indicator, r.unit].join('|');
     if (!seriesMap.has(key)) seriesMap.set(key, { country:r.country, indicator:r.indicator, unit:r.unit, source:r.source, points:[] });
     seriesMap.get(key).points.push({ ts:r.ts, value:Number(r.value) });
   }
