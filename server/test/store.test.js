@@ -9,6 +9,8 @@ test('collector records and source health survive a process restart', async () =
   const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'northwatch-store-'));
   const file = path.join(dir, 'store.json');
   const previous = process.env.NORTHWATCH_STORE_FILE;
+  const previousDriver = process.env.STORE_DRIVER;
+  process.env.STORE_DRIVER = 'local';
   process.env.NORTHWATCH_STORE_FILE = file;
   try {
     state.sources.clear();
@@ -31,6 +33,8 @@ test('collector records and source health survive a process restart', async () =
     state.sources.clear();
     if (previous === undefined) delete process.env.NORTHWATCH_STORE_FILE;
     else process.env.NORTHWATCH_STORE_FILE = previous;
+    if (previousDriver === undefined) delete process.env.STORE_DRIVER;
+    else process.env.STORE_DRIVER = previousDriver;
     await fs.rm(dir, { recursive: true, force: true });
   }
 });
