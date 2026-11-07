@@ -23,18 +23,35 @@ const median = values => {
   return sorted.length % 2 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2;
 };
 
-function baselineObservations(records) {
+// Statistical deviations are only evaluated when the newest observation is
+// recent relative to that series' own median sampling interval. This prevents
+// an old last-known value from being presented as a current operational signal.
+function baselineObservations(records, generatedAt) {
+  const analysisTime = Date.parse(generatedAt);
+  if (!Number.isFinite(analysisTime)) return [];
   const groups = new Map();
-  for (const r of records.filter(x => x.t === 'm' && x.ts && Number.isFinite(Number(x.value)))) {
+  for (const r of records.filter(x => x.t === 'm' && x.value != null && x.value !== '' &&
+    Number.isFinite(Number(x.value)) && Number.isFinite(Date.parse(x.ts ?? '')))) {
     const key = [r.country, r.source, r.indicator, r.unit].join('|');
-    if (!groups.has(key)) groups.set(key, []);
-    groups.get(key).push(r);
+    if (!groups.has(key)) groups.set(key, new Map());
+    groups.get(key).set(new Date(Date.parse(r.ts)).toISOString(), r);
   }
   const observations = [];
-  for (const rows of groups.values()) {
-    const ordered = rows.sort((a,b) => String(a.ts).localeCompare(String(b.ts)));
+  for (const samples of groups.values()) {
+    const ordered = [...samples.values()].sort((a,b) => Date.parse(a.ts) - Date.parse(b.ts));
     if (ordered.length < 9) continue;
     const latest = ordered.at(-1);
+    const latestAt = Date.parse(latest.ts);
+    const intervals = ordered.slice(-25).slice(1).map((row, index) =>
+      Date.parse(row.ts) - Date.parse(ordered.slice(-25)[index].ts))
+      .filter(interval => Number.isFinite(interval) && interval > 0);
+    if (!intervals.length) continue;
+    const typicalInterval = median(intervals);
+    const ageMs = analysisTime - latestAt;
+    // Three median intervals tolerate ordinary publication jitter while
+    // excluding stale and future-dated samples from current anomaly analysis.
+    if (ageMs < 0 || ageMs > typicalInterval * 3) continue;
+
     // Compare the newest sample with up to 96 earlier samples. Never include
     // the value being tested in its own baseline.
     const baselineRows = ordered.slice(-97, -1);
@@ -58,7 +75,7 @@ function baselineObservations(records) {
       summary: 'Latest value ' + value.toLocaleString('sv-SE') + ' ' + latest.unit +
         ' versus a historical median of ' + center.toLocaleString('sv-SE') + ' ' + latest.unit + '.',
       observedAt:latest.ts, confidence,
-      caveat:'Statistical deviation only. This may reflect normal operating changes, source corrections or data quality; it is not evidence of an outage or security incident.',
+      caveat:'Statistical deviation only. The latest sample passed a freshness check (within three median sampling intervals). This may reflect normal operating changes, source corrections or data quality; it is not evidence of an outage or security incident.',
       evidence:[
         { indicator:latest.indicator, value:latest.value, unit:latest.unit, ts:latest.ts, source:latest.source },
         { indicator:'Historical median (' + baselineRows.length + ' prior samples)', value:center, unit:latest.unit, ts:baselineRows[0].ts + ' – ' + baselineRows.at(-1).ts, source:latest.source },
@@ -147,7 +164,7 @@ export function buildEnergyAnalysis(metrics, generatedAt = new Date().toISOStrin
   });
   const spread = priceSpreadObservation([...latest.values()]);
   if (spread) observations.push(spread);
-  observations.push(...baselineObservations(historyRecords));
+  observations.push(...baselineObservations(historyRecords, generatedAt));
   observations.sort((a,b) => String(b.observedAt).localeCompare(String(a.observedAt)));
-  return { generatedAt, observations, methodology:'Deterministic source comparisons, comparable day-ahead price snapshots and robust historical baselines. Statistical deviations are signals for review, not inferred incidents or forecasts.' };
+  return { generatedAt, observations, methodology:'Deterministic source comparisons, comparable day-ahead price snapshots and robust historical baselines. Statistical deviations are signals for review, not inferred incidents or forecasts. Historical-baseline anomalies are evaluated only when the latest sample is within three median sampling intervals.' };
 }
