@@ -9,6 +9,7 @@ import MapPanel from '../components/MapPanel.jsx';
 import { fetchEnergyOverview, fetchEnergyHistory, fetchEnergyAnalysis, fetchAssets, fetchStaticGeo } from '../api.js';
 import { formatObservationAge } from '../lib/metricFreshness.js';
 import { buildEnergyPriceSpreadMovements } from '../lib/energyPriceAnalysis.js';
+import { filterEnergyHistorySeries } from '../lib/energyHistoryExplorer.js';
 
 const ENERGY_AREA = { id: 1, name: 'Elförsörjning och energisystem', short: 'Energi', geo: true };
 const findMetric = (rows, test) => rows.find(r => test(r) && r.value !== null && Number.isFinite(Number(r.value))) ?? null;
@@ -63,18 +64,29 @@ function TrendChart({ series }) {
 function HistoryExplorer({ series }) {
   const keys = useMemo(() => series.map(s => [s.country,s.source,s.indicator,s.unit].join('|')), [series]);
   const [selected, setSelected] = useState(null);
+  const [search, setSearch] = useState('');
   useEffect(() => {
     setSelected(current => current === null ? keys.slice(0, 6) : current.filter(key => keys.includes(key)));
   }, [keys.join('||')]);
+  const filtered = useMemo(() => filterEnergyHistorySeries(series, search), [series, search]);
   const visible = series.filter(s => selected?.includes([s.country,s.source,s.indicator,s.unit].join('|')));
   const toggle = key => setSelected(current => {
     const active = current ?? keys.slice(0, 6);
     return active.includes(key) ? active.filter(item => item !== key)
       : active.length < 8 ? [...active, key] : active;
   });
+  const selectVisible = () => setSelected(filtered.slice(0, 8).map(item =>
+    [item.country,item.source,item.indicator,item.unit].join('|')));
   return <>
+    <div className="energy-series-controls">
+      <input type="search" aria-label="Filter historical series" placeholder="Filter by country, technology, indicator or source…"
+        value={search} onChange={event => setSearch(event.target.value)}/>
+      <span className="mut">{filtered.length} of {series.length} series</span>
+      <button type="button" onClick={selectVisible} disabled={!filtered.length}>Select visible</button>
+      <button type="button" onClick={() => setSelected([])} disabled={!selected?.length}>Clear selection</button>
+    </div>
     <div className="energy-series-picker" aria-label="Choose historical series">
-      {series.map(s => {
+      {filtered.map(s => {
         const key = [s.country,s.source,s.indicator,s.unit].join('|');
         const active = selected?.includes(key);
         return <button type="button" key={key} className={'energy-series-chip' + (active ? ' on' : '')}
@@ -83,6 +95,7 @@ function HistoryExplorer({ series }) {
         </button>;
       })}
     </div>
+    {!filtered.length ? <p className="mut">No historical series match this filter.</p> : null}
     <div className="mut energy-series-help">Select up to 8 series. Different units and sources remain separate; values are never combined.</div>
     {visible.length ? <div className="energy-chart-grid">{visible.map(s =>
       <TrendChart key={[s.country,s.source,s.indicator,s.unit].join('|')} series={s}/>)}</div>
