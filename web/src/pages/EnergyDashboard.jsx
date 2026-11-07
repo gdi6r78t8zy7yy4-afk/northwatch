@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { COUNTRY_NAMES, fmtTime } from '../status.js';
 import StatusPill from '../components/StatusPill.jsx';
 import EnergySourceHealth from '../components/EnergySourceHealth.jsx';
+import EnergyCountryCoverage from '../components/EnergyCountryCoverage.jsx';
 import EnergyPriceProfiles from '../components/EnergyPriceProfiles.jsx';
 import EnergyPriceMovementAnalysis from '../components/EnergyPriceMovementAnalysis.jsx';
 import EnergyGenerationDemandTrends, { filterRenewableGenerationSeries } from '../components/EnergyGenerationDemandTrends.jsx';
@@ -437,6 +438,7 @@ export default function EnergyDashboard({ country = 'ALL', onCountryChange }) {
         <div className="energy-note"><b>Coverage gaps</b><p>Verified live coverage remains uneven. Finland requires a Fingrid API key and configured datasets. Iceland's Landsnet feed currently provides a latest generation snapshot only; it does not provide demand or historical series here. Market-price and generation-mix coverage is not complete across all countries.</p></div>
       </section>
     </div>
+    <EnergyCountryCoverage metrics={metrics}/>
     <section className="card energy-history-section">
       <div className="energy-section-head"><div><h2>Historical measurements & trends</h2>
         <div className="mut">Collector snapshots stored with their original measurement timestamps.</div></div>
