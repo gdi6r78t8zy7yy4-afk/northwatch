@@ -129,8 +129,8 @@ describe('EnergyDashboard', () => {
     render(<EnergyDashboard country="FI" />);
     expect(await screen.findByText('Reported generation technologies · Finland')).toBeInTheDocument();
     expect(screen.getAllByLabelText('Finlands produktionsmix')).toHaveLength(2);
-    expect(screen.getByText(/Hydro: 250 MW/)).toBeInTheDocument();
-    expect(screen.getByText(/Nuclear: 300 MW/)).toBeInTheDocument();
+    expect(screen.getAllByText(/Hydro: 250 MW/)).toHaveLength(2);
+    expect(screen.getAllByText(/Nuclear: 300 MW/)).toHaveLength(2);
     expect(screen.getByText(/not an exhaustive generation mix/)).toBeInTheDocument();
   });
 
@@ -138,9 +138,9 @@ describe('EnergyDashboard', () => {
     render(<EnergyDashboard country="IS" />);
     expect(await screen.findByText('Reported generation technologies · Island')).toBeInTheDocument();
     expect(screen.getAllByLabelText('Islands produktionsmix')).toHaveLength(2);
-    expect(screen.getByText(/Geothermal: 200 MW/)).toBeInTheDocument();
-    expect(screen.getByText(/Hydro: 300 MW/)).toBeInTheDocument();
-    expect(screen.getByText(/Oil: 10 MW/)).toBeInTheDocument();
+    expect(screen.getAllByText(/Geothermal: 200 MW/)).toHaveLength(2);
+    expect(screen.getAllByText(/Hydro: 300 MW/)).toHaveLength(2);
+    expect(screen.getAllByText(/Oil: 10 MW/)).toHaveLength(2);
   });
 
   test('renders market comparisons and price spread list without error', async () => {
