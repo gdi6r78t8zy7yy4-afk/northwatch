@@ -298,3 +298,25 @@ tr.detail-row > td { background: var(--mut-bg); padding: 10px 12px; font-size: 1
 .severity-medium { background:#493719; color:#f1c56b; }
 .severity-info { background:#203b53; color:#8cc7f5; }
 @media (max-width:760px) { .energy-chart-grid,.energy-observations { grid-template-columns:1fr; } }
+
+
+/* Energy market signals and history series selector */
+.energy-series-picker { display:flex; flex-wrap:wrap; gap:6px; margin:10px 0 4px; }
+.energy-series-chip { border:1px solid var(--bd); background:#131d28; color:var(--mut); border-radius:14px; padding:5px 9px; font:inherit; font-size:10.5px; cursor:pointer; }
+.energy-series-chip span { color:var(--accent); font-weight:800; margin-right:3px; }
+.energy-series-chip:hover,.energy-series-chip.on { border-color:var(--accent); color:var(--tx); background:#1b3043; }
+.energy-series-chip:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
+.energy-series-help { margin:5px 0 10px; font-size:10px; }
+.energy-market-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
+.energy-market-panel { min-width:0; border:1px solid var(--bd); border-radius:7px; background:#131d28; padding:12px; }
+.energy-market-panel h3 { margin:0 0 10px; font-size:12px; }
+.energy-price-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:8px; }
+.energy-price-cell { display:flex; flex-direction:column; gap:3px; min-width:0; border:1px solid var(--bd); border-radius:6px; padding:9px; font-size:11px; }
+.energy-price-cell > span:first-child { color:var(--mut); font-size:10px; }
+.energy-price-cell b { font-size:17px; font-variant-numeric:tabular-nums; overflow-wrap:anywhere; }
+.energy-price-cell b small { font-size:10px; font-weight:500; color:var(--mut); }
+.energy-price-cell .mut { font-size:9px; }
+.energy-renewable-value { font-size:30px; font-weight:800; letter-spacing:-.04em; font-variant-numeric:tabular-nums; }
+.energy-renewable-track { height:9px; border-radius:6px; overflow:hidden; background:var(--mut-bg); margin:8px 0 12px; }
+.energy-renewable-track span { display:block; height:100%; background:#3b9c83; border-radius:6px; }
+@media (max-width:760px) { .energy-market-grid { grid-template-columns:1fr; } }
