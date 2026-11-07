@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { COUNTRY_NAMES, fmtTime } from '../status.js';
 import StatusPill from '../components/StatusPill.jsx';
+import EnergySourceHealth from '../components/EnergySourceHealth.jsx';
 import MapPanel from '../components/MapPanel.jsx';
 import { fetchEnergyOverview, fetchEnergyHistory, fetchEnergyAnalysis, fetchAssets, fetchStaticGeo } from '../api.js';
 import { formatObservationAge } from '../lib/metricFreshness.js';
@@ -331,7 +332,7 @@ export default function EnergyDashboard({ country = 'ALL' }) {
         <div className="energy-assessment-row"><span className="mut">Mätvärden</span><b>{data?.coverage?.metricCount ?? '—'}</b></div>
         <div className="energy-assessment-row"><span className="mut">Flödeslänkar</span><b>{data?.coverage?.flowCount ?? '—'}</b></div>
         <div className="energy-note"><b>Datatolkning</b><p>Värden visas med källans mättid. Fördröjda, frysta eller framtida leveransblock ska inte tolkas som momentan driftstatus.</p></div>
-        <div className="energy-note"><b>Täckningsluckor</b><p>Verifierat liveunderlag är ojämnt mellan länder. Finland kräver Fingrid-nyckel och dataset; Island saknar ännu ansluten elkälla. Marknadspriser och full nordisk produktionsmix är inte komplett integrerade.</p></div>
+        <div className="energy-note"><b>Coverage gaps</b><p>Verified live coverage remains uneven. Finland requires a Fingrid API key and configured datasets. Iceland's Landsnet feed currently provides a latest generation snapshot only; it does not provide demand or historical series here. Market-price and generation-mix coverage is not complete across all countries.</p></div>
       </section>
     </div>
     <section className="card energy-history-section">
@@ -370,11 +371,9 @@ export default function EnergyDashboard({ country = 'ALL' }) {
           {data.flows.map((f, i) => <tr key={f.source + '-' + f.name + '-' + i}><td><b>{Number(f.attrs?.mw) < 0 ? (f.attrs?.to ?? '—') : (f.attrs?.from ?? '—')} → {Number(f.attrs?.mw) < 0 ? (f.attrs?.from ?? '—') : (f.attrs?.to ?? '—')}</b></td><td className="mono">{Math.abs(Number(f.attrs?.mw)).toLocaleString('sv-SE', { maximumFractionDigits: 1 })}</td><td>{f.sourceName}</td><td>{fmtTime(f.updated)}</td></tr>)}
         </tbody></table></div> : <p className="mut">Inga flödeslänkar tillgängliga i valt urval just nu.</p>}
       </section></div>
-    <section className="card"><h2>Source coverage & freshness</h2>
-      {data?.sources?.length ? <div className="energy-table-wrap"><table><thead><tr><th>Källa</th><th>Land</th><th>Status</th><th>Poster</th><th>Senast OK</th><th>Fel</th></tr></thead><tbody>
-        {data.sources.map(s => <tr key={s.id}><td><b>{s.name}</b><div className="mut mono">{s.id}</div></td><td>{s.country === 'NORDIC' ? 'Nordiskt' : COUNTRY_NAMES[s.country] ?? s.country}</td><td><StatusPill status={s.status}/></td><td className="mono">{s.records}</td><td>{s.lastOk ? fmtTime(s.lastOk) : '—'}</td><td className="mut">{s.error ?? '—'}</td></tr>)}
-      </tbody></table></div> : <p className="mut">Inväntar energikällor…</p>}
+    <section className="card"><div className="energy-section-head"><div><h2>Collector health & source coverage</h2><p className="mut">Fetch execution, configured polling cadence and upstream observation age are shown separately.</p></div></div>
+      <EnergySourceHealth sources={data?.sources ?? []}/>
     </section>
-    <p className="mut energy-footnote">Datakällor: Svenska kraftnät, Statnett, Energi Data Service och Energinet. Frontendens uppdateringsintervall garanterar inte att upstream-källorna publicerar nya mätvärden lika ofta.</p>
+    <p className="mut energy-footnote">Data sources include Svenska kraftnät, Statnett, Energi Data Service, Energinet and Landsnet. Frontend refresh frequency does not guarantee that upstream providers publish new measurements at the same cadence.</p>
   </div>;
 }
