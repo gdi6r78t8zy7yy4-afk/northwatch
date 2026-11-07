@@ -243,6 +243,17 @@ describe('MapPanel – lager', () => {
     expect(byTooltip('800 MW').options.color).toBe('#ff6b6b');
   });
 
+  test('labels use automatic placement so they can move inside the visible map area', () => {
+    renderMap({
+      area: { id: 1 },
+      assets: [point({ name: 'Datacenter Norr', type: 'datacenter' })],
+    });
+    const zone = __leaf.created.find(c => c.kind === 'circleMarker' && c.tooltip?.text === 'SE2');
+    const asset = __leaf.created.find(c => c.kind === 'circleMarker' && c.tooltip?.text === 'Datacenter Norr');
+    expect(zone.tooltip.options).toMatchObject({ permanent: true, direction: 'auto' });
+    expect(asset.tooltip.options).toMatchObject({ sticky: true, direction: 'auto' });
+  });
+
   test('energilager (endast område 1): zonskilda + planerad länk streckad', () => {
     renderMap({ area: { id: 1 } });
     const zones = __leaf.created.filter(c => c.kind === 'circleMarker' && c.tooltip);
@@ -503,7 +514,7 @@ describe('MapPanel – energilagerkontroller', () => {
     expect(screen.getByRole('button',{name:'Liveflöden'})).toHaveAttribute('aria-pressed','true');
     const current = __leaf.created.slice(start);
     expect(current.some(c => c.kind === 'circleMarker')).toBe(false);
-    expect(current.filter(c => c.kind === 'polyline')).toHaveLength(3); // 2 static links + live flow
+    expect(current.filter(c => c.kind === 'polyline')).toHaveLength(6); // dark outline + visible stroke for each of 3 lines
   });
 
   test('HVDC kan döljas oberoende av zoner och liveflöden', () => {
@@ -513,7 +524,7 @@ describe('MapPanel – energilagerkontroller', () => {
     expect(screen.getByRole('button',{name:'HVDC'})).toHaveAttribute('aria-pressed','false');
     const current = __leaf.created.slice(start);
     expect(current.some(c => c.kind === 'circleMarker')).toBe(true);
-    expect(current.filter(c => c.kind === 'polyline')).toHaveLength(1); // live flow only
+    expect(current.filter(c => c.kind === 'polyline')).toHaveLength(2); // dark outline + visible live-flow stroke
   });
 
   test('liveflöden kan döljas utan att påverka statisk topologi', () => {
@@ -522,7 +533,7 @@ describe('MapPanel – energilagerkontroller', () => {
     fireEvent.click(screen.getByRole('button',{name:'Liveflöden'}));
     expect(screen.getByRole('button',{name:'Liveflöden'})).toHaveAttribute('aria-pressed','false');
     const current = __leaf.created.slice(start);
-    expect(current.filter(c => c.kind === 'polyline')).toHaveLength(2); // static HVDC links
+    expect(current.filter(c => c.kind === 'polyline')).toHaveLength(4); // dark outline + visible stroke for 2 static HVDC links
   });
 
   test('energilagerkontroller visas inte för andra områden', () => {
