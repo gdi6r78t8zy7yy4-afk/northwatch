@@ -37,7 +37,7 @@ describe('buildEnergyPriceMovements', () => {
   test('requires two valid, increasing timestamps', () => {
     expect(buildEnergyPriceMovements([{
       country:'SE', source:'svk', indicator:'Dag-ahead-pris SE1', unit:'SEK/MWh',
-      points:[point(10, '2026-11-07T10:00:00Z'), point(20, '2026-11-07T09:00:00Z')],
+      points:[point(10, '2026-11-07T10:00:00Z'), point(20, '2026-11-07T10:00:00Z')],
     }])).toHaveLength(0);
   });
 });
