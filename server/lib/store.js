@@ -4,8 +4,73 @@
 //   event  { t:'e', area, country, source, kind, severity, title, detail, start, end?, geo? }
 //   asset  { t:'a', area, country, source, type, name, id?, geometry, attrs?, updated }
 import { now } from './http.js';
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 export const state = { startedAt: now(), sources: new Map() };
+
+const moduleDir = path.dirname(fileURLToPath(import.meta.url));
+const snapshotPath = () => process.env.NORTHWATCH_STORE_FILE
+  || path.join(moduleDir, '..', 'data', 'store.json');
+let writeQueue = Promise.resolve();
+let persistenceWarning = null;
+
+function serializableSource(s) {
+  return {
+    id: s.id, name: s.name, area: s.area, country: s.country, every: s.every,
+    status: s.status, records: s.records, lastRun: s.lastRun, lastOk: s.lastOk,
+    lastError: s.lastError, error: s.error, ms: s.ms,
+  };
+}
+
+function scheduleSnapshot() {
+  const snapshot = JSON.stringify({
+    version: 1,
+    savedAt: now(),
+    sources: [...state.sources.values()].map(serializableSource),
+  });
+  const target = snapshotPath();
+  writeQueue = writeQueue.then(async () => {
+    await fs.promises.mkdir(path.dirname(target), { recursive: true });
+    const temp = `${target}.${process.pid}.tmp`;
+    await fs.promises.writeFile(temp, snapshot, { mode: 0o600 });
+    await fs.promises.rename(temp, target);
+    persistenceWarning = null;
+  }).catch(error => {
+    persistenceWarning = String(error?.message ?? error);
+    console.error('[store] persistence failed:', persistenceWarning);
+  });
+  return writeQueue;
+}
+
+// Local/VM persistence. The snapshot is written atomically and contains the
+// last successful records plus source health. For Cloud Run use a network DB
+// (e.g. Firestore); the container filesystem is not durable across instances.
+export async function initStore() {
+  try {
+    const raw = await fs.promises.readFile(snapshotPath(), 'utf8');
+    const snapshot = JSON.parse(raw);
+    if (snapshot?.version !== 1 || !Array.isArray(snapshot.sources)) return;
+    for (const saved of snapshot.sources) {
+      const current = state.sources.get(saved.id);
+      if (!current) continue;
+      current.records = Array.isArray(saved.records) ? saved.records : [];
+      current.status = saved.status === 'ok' ? 'stale' : (saved.status ?? 'stale');
+      current.lastRun = saved.lastRun ?? null;
+      current.lastOk = saved.lastOk ?? null;
+      current.lastError = saved.lastError ?? null;
+      current.error = saved.error ?? null;
+      current.ms = saved.ms ?? null;
+    }
+    console.log(`[store] restored ${snapshot.sources.length} source snapshots from disk`);
+  } catch (error) {
+    if (error?.code !== 'ENOENT') {
+      persistenceWarning = String(error?.message ?? error);
+      console.error('[store] unable to restore snapshot:', persistenceWarning);
+    }
+  }
+}
 
 export function registerSource(cfg) {
   const s = {
@@ -30,6 +95,7 @@ export function setResult(id, records, ms) {
   s.lastRun = now();
   s.ms = ms;
   s.error = null;
+  scheduleSnapshot();
 }
 
 export function setError(id, err, ms) {
@@ -39,6 +105,7 @@ export function setError(id, err, ms) {
   s.lastError = now();
   s.lastRun = now();
   s.ms = ms;
+  scheduleSnapshot();
 }
 
 export function setNoKey(id, envName) {
@@ -46,6 +113,7 @@ export function setNoKey(id, envName) {
   s.status = 'no_key';
   s.error = `Saknar ${envName}`;
   s.lastRun = now();
+  scheduleSnapshot();
 }
 
 // 'ok' som ligger längre tillbaka än 3× pollintervallet räknas som 'stale'.
