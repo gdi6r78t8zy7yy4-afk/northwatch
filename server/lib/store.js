@@ -67,6 +67,10 @@ export function setResult(id, records, ms) {
   const source = state.sources.get(id);
   if (!source) throw new Error(`Unknown collector: ${id}`);
   source.records = records;
+  if (source.area === 1) {
+    const measurements = records.filter(record => record.t === 'm' && record.ts && Number.isFinite(Number(record.value)));
+    if (measurements.length) void persistence.saveEnergyMeasurements(measurements);
+  }
   source.status = 'ok';
   source.lastOk = now();
   source.lastRun = source.lastOk;
