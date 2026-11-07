@@ -129,9 +129,10 @@ function GridOperationsExplorer({ series }) {
 }
 
 function MarketSignals({ metrics, comparisons = [], country = 'ALL' }) {
+  const scopedMetrics = country === 'ALL' ? metrics : metrics.filter(row => row.country === country);
   const priceGroups = new Map();
   const now = Date.now();
-  for (const row of metrics.filter(r => /^Dag-ahead-pris /.test(r.indicator) && Number.isFinite(Number(r.value)) && Number.isFinite(Date.parse(r.ts ?? '')))) {
+  for (const row of scopedMetrics.filter(r => /^Dag-ahead-pris /.test(r.indicator) && Number.isFinite(Number(r.value)) && Number.isFinite(Date.parse(r.ts ?? '')))) {
     const key = `${row.indicator}|${row.source}`;
     const previous = priceGroups.get(key);
     const at = Date.parse(row.ts);
@@ -145,7 +146,7 @@ function MarketSignals({ metrics, comparisons = [], country = 'ALL' }) {
   const prices = [...priceGroups.values()].map(item => item.row)
     .sort((a, b) => a.indicator.localeCompare(b.indicator) || a.source.localeCompare(b.source));
   const renewableCountry = country === 'ALL' ? 'DK' : country;
-  const wind = findMetric(metrics, r => r.country === renewableCountry && r.indicator === `Vindproduktion (${renewableCountry})`);
+  const wind = findMetric(scopedMetrics, r => r.country === renewableCountry && r.indicator === `Vindproduktion (${renewableCountry})`);
   const solar = findMetric(metrics, r => r.country === renewableCountry && r.indicator === `Solproduktion (${renewableCountry})`);
   const total = findMetric(metrics, r => r.country === renewableCountry && r.indicator === `Total produktion (${renewableCountry})`);
   const aligned = wind && solar && total && wind.ts === solar.ts && wind.ts === total.ts &&
@@ -161,7 +162,7 @@ function MarketSignals({ metrics, comparisons = [], country = 'ALL' }) {
           <span className="mut">{row.sourceName ?? row.source} · {fmtTime(row.ts)}</span>
         </div>)}</div>
         : <p className="mut">No comparable day-ahead price observations are currently available from connected sources.</p>}
-      <EnergyPriceProfiles metrics={metrics}/>
+      <EnergyPriceProfiles metrics={scopedMetrics}/>
       <p className="mut">Prices are shown as published by each source. Currency and unit are retained; values are not converted. Spot prices exclude VAT, supplier markups and taxes.</p>
       {country === 'ALL' || country === 'SE' ? <p className="mut">Swedish bidding-zone prices: <a href="https://www.elprisetjustnu.se" target="_blank" rel="noreferrer">Elpriset just nu.se</a>.</p> : null}
       <div className="energy-spread-section">
@@ -404,7 +405,7 @@ export default function EnergyDashboard({ country = 'ALL', onCountryChange }) {
       <MarketSignals metrics={metrics} comparisons={data?.marketComparisons ?? []} country={country}/>
     </section>
     <GenerationDemandPanel metrics={metrics} country={country}/>
-    <ReserveMarketPanel metrics={metrics}/>
+    <ReserveMarketPanel metrics={country === 'ALL' ? metrics : metrics.filter(row => row.country === country)}/>
     <section className="card energy-analysis-section"><div className="energy-section-head"><div><h2>Evidence-based observations</h2>
       <div className="mut">Deterministic comparisons of measurements; not incident declarations or forecasts.</div></div></div>
       {analysis?.observations?.length ? <div className="energy-observations">{analysis.observations.map(o =>
