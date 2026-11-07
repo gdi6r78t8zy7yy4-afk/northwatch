@@ -53,6 +53,74 @@ function TrendChart({ series }) {
   </div>;
 }
 
+
+function HistoryExplorer({ series }) {
+  const keys = useMemo(() => series.map(s => [s.country,s.source,s.indicator,s.unit].join('|')), [series]);
+  const [selected, setSelected] = useState(null);
+  useEffect(() => {
+    setSelected(current => current === null ? keys.slice(0, 6) : current.filter(key => keys.includes(key)));
+  }, [keys.join('||')]);
+  const visible = series.filter(s => selected?.includes([s.country,s.source,s.indicator,s.unit].join('|')));
+  const toggle = key => setSelected(current => current.includes(key)
+    ? current.filter(item => item !== key)
+    : current.length < 8 ? [...current, key] : current);
+  return <>
+    <div className="energy-series-picker" aria-label="Choose historical series">
+      {series.map(s => {
+        const key = [s.country,s.source,s.indicator,s.unit].join('|');
+        const active = selected?.includes(key);
+        return <button type="button" key={key} className={'energy-series-chip' + (active ? ' on' : '')}
+          aria-pressed={Boolean(active)} onClick={() => toggle(key)}>
+          <span>{s.country}</span> {s.indicator}
+        </button>;
+      })}
+    </div>
+    <div className="mut energy-series-help">Select up to 8 series. Different units and sources remain separate; values are never combined.</div>
+    {visible.length ? <div className="energy-chart-grid">{visible.map(s =>
+      <TrendChart key={[s.country,s.source,s.indicator,s.unit].join('|')} series={s}/>)}</div>
+      : <p className="mut">Select a series above to display its history.</p>}
+  </>;
+}
+
+function MarketSignals({ metrics }) {
+  const prices = new Map();
+  for (const row of metrics.filter(r => /^Dag-ahead-pris /.test(r.indicator) && Number.isFinite(Number(r.value)))) {
+    const old = prices.get(row.country);
+    if (!old || String(row.ts) > String(old.ts)) prices.set(row.country, row);
+  }
+  const wind = findMetric(metrics, r => r.indicator === 'Vindproduktion (DK)');
+  const solar = findMetric(metrics, r => r.indicator === 'Solproduktion (DK)');
+  const total = findMetric(metrics, r => r.indicator === 'Total produktion (DK)');
+  const aligned = wind && solar && total && wind.ts === solar.ts && wind.ts === total.ts &&
+    wind.unit === solar.unit && wind.unit === total.unit && Number(total.value) > 0;
+  const renewable = aligned ? Number(wind.value) + Number(solar.value) : null;
+  const share = aligned ? renewable / Number(total.value) * 100 : null;
+  return <div className="energy-market-grid">
+    <div className="energy-market-panel">
+      <h3>Day-ahead prices</h3>
+      {prices.size ? <div className="energy-price-grid">{[...prices.values()].sort((a,b)=>a.country.localeCompare(b.country)).map(row =>
+        <div className="energy-price-cell" key={row.country}>
+          <span>{row.country}</span><b>{Number(row.value).toLocaleString('sv-SE',{maximumFractionDigits:2})} <small>{row.unit}</small></b>
+          <span className="mut">{row.sourceName ?? row.source} · {fmtTime(row.ts)}</span>
+        </div>)}</div>
+        : <p className="mut">No comparable day-ahead price observations are currently available from connected sources.</p>}
+      <p className="mut">Prices are shown as published by each source. Currency and unit are retained; values are not converted.</p>
+    </div>
+    <div className="energy-market-panel">
+      <h3>Wind + solar · Denmark</h3>
+      {aligned ? <>
+        <div className="energy-renewable-value">{share.toLocaleString('sv-SE',{maximumFractionDigits:1})}%</div>
+        <div className="energy-renewable-track"><span style={{width:Math.max(0,Math.min(100,share))+'%'}}/></div>
+        <div className="energy-price-grid">
+          <div className="energy-price-cell"><span>Wind</span><b>{Number(wind.value).toLocaleString('sv-SE')} MW</b></div>
+          <div className="energy-price-cell"><span>Solar</span><b>{Number(solar.value).toLocaleString('sv-SE')} MW</b></div>
+        </div>
+        <p className="mut">Share of reported Danish production at {fmtTime(total.ts)}. This is not a full generation-mix breakdown.</p>
+      </> : <p className="mut">Renewable share is unavailable until wind, solar and total production have matching timestamps and units.</p>}
+    </div>
+  </div>;
+}
+
 export default function EnergyDashboard({ country = 'ALL' }) {
   const [data, setData] = useState(null), [assets, setAssets] = useState([]), [geo, setGeo] = useState(null);
   const [error, setError] = useState(null), [updated, setUpdated] = useState(null);
@@ -119,10 +187,13 @@ export default function EnergyDashboard({ country = 'ALL' }) {
           <option value="6h">Last 6 hours</option><option value="24h">Last 24 hours</option>
           <option value="7d">Last 7 days</option><option value="30d">Last 30 days</option>
         </select></div>
-      {history?.series?.length ? <div className="energy-chart-grid">{history.series.slice(0, 8).map(s =>
-        <TrendChart key={s.country + '-' + s.source + '-' + s.indicator + '-' + s.unit} series={s}/>)}</div>
+      {history?.series?.length ? <HistoryExplorer series={history.series}/>
         : <p className="mut">Historical data is accumulating. Charts will populate as new collector measurements are recorded; the system does not backfill invented values.</p>}
       <div className="mut energy-history-meta">{history?.count ?? 0} observations · range {history?.from ? fmtTime(history.from) : '—'} – {history?.to ? fmtTime(history.to) : '—'}</div>
+    </section>
+    <section className="card energy-market-section"><div className="energy-section-head"><div><h2>Market & renewable signals</h2>
+      <div className="mut">Latest source observations; comparisons are limited to values with compatible timestamps and units.</div></div></div>
+      <MarketSignals metrics={metrics}/>
     </section>
     <section className="card energy-analysis-section"><div className="energy-section-head"><div><h2>Evidence-based observations</h2>
       <div className="mut">Deterministic comparisons of measurements; not incident declarations or forecasts.</div></div></div>
