@@ -1,5 +1,5 @@
 import { test, expect, describe, beforeEach, vi } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import React from 'react';
 import EnergyDashboard from './EnergyDashboard.jsx';
 
@@ -26,6 +26,8 @@ const MOCK_OVERVIEW = {
   country: 'ALL',
   metrics: [
     { indicator: 'Svensk nettoexport (SE1–SE4)', value: 1250, unit: 'MW', ts: MOCK_TIMESTAMP, country: 'SE', source: 'svk', sourceName: 'Svenska kraftnät' },
+    { indicator: 'Total produktion (SE)', value: 16000, unit: 'MW', ts: MOCK_TIMESTAMP, country: 'SE', source: 'svk', sourceName: 'Svenska kraftnät' },
+    { indicator: 'Total förbrukning (SE)', value: 14500, unit: 'MW', ts: MOCK_TIMESTAMP, country: 'SE', source: 'svk', sourceName: 'Svenska kraftnät' },
     { indicator: 'Total produktion (DK)', value: 3400, unit: 'MW', ts: MOCK_TIMESTAMP, country: 'DK', source: 'energinet', sourceName: 'Energi Data Service' },
     { indicator: 'Total förbrukning (DK)', value: 3100, unit: 'MW', ts: MOCK_TIMESTAMP, country: 'DK', source: 'energinet', sourceName: 'Energi Data Service' },
     { indicator: 'Vindproduktion (DK)', value: 1800, unit: 'MW', ts: MOCK_TIMESTAMP, country: 'DK', source: 'energinet', sourceName: 'Energi Data Service' },
@@ -84,8 +86,33 @@ describe('EnergyDashboard', () => {
   test('renders energy dashboard and KPI sections with data', async () => {
     render(<EnergyDashboard country="ALL" />);
     expect(await screen.findByText('Nordic Energy Situation')).toBeInTheDocument();
-    expect(screen.getByText('Svensk nettoexport')).toBeInTheDocument();
+    expect(screen.getByText('Production · Sverige')).toBeInTheDocument();
+    expect(screen.getByText('Consumption · Sverige')).toBeInTheDocument();
+    expect(screen.getByText('Day-ahead price · Sverige')).toBeInTheDocument();
+    expect(screen.getByText('Renewable output · Danmark')).toBeInTheDocument();
     expect(screen.getByLabelText('Danmarks produktionsmix')).toBeInTheDocument();
+  });
+
+  test('country selector in the energy heading updates the global country scope', async () => {
+    const onCountryChange = vi.fn();
+    render(<EnergyDashboard country="SE" onCountryChange={onCountryChange} />);
+    const selector = await screen.findByRole('combobox', { name: 'Select energy dashboard country' });
+    expect(selector).toHaveValue('SE');
+    fireEvent.change(selector, { target: { value: 'NO' } });
+    expect(onCountryChange).toHaveBeenCalledWith('NO');
+  });
+
+  test('country selection renders only country-specific generation and KPI measurements', async () => {
+    render(<EnergyDashboard country="SE" />);
+    expect(await screen.findByText('Generation & demand · Sverige')).toBeInTheDocument();
+    expect(screen.getByText('Production · Sverige')).toBeInTheDocument();
+    expect(screen.queryByText('Production · Danmark')).not.toBeInTheDocument();
+    expect(screen.queryByText('Wind + solar · Denmark')).not.toBeInTheDocument();
+    expect(screen.queryByText('Denmark (regional overview)')).not.toBeInTheDocument();
+    expect(fetchEnergyOverview).toHaveBeenCalledWith('SE');
+    expect(fetchEnergyHistory).toHaveBeenCalledWith('SE', '24h');
+    expect(fetchEnergyAnalysis).toHaveBeenCalledWith('SE');
+    expect(fetchAssets).toHaveBeenCalledWith(1, 'SE');
   });
 
   test('renders market comparisons and price spread list without error', async () => {
