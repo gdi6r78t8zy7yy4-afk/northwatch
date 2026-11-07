@@ -192,6 +192,7 @@ asset  { t:'a', area, country, source, type, name, id?, geometry, attrs?, update
 | Svenska kraftnät Data Service (data.svk.se, CKAN datastore) | 1 Energi (SE) | ok – nyckelfri (resurs-id är publika); fysiska gränsflöden 15 min (senaste steget → mätvärde per zonpar + "Svensk nettoexport"-KPI + kartlinjer mellan elspotzoner, DELU ritas ej), aFRR/mFRR-leveransblock, sista FCR-bidmätningen; verifierat live 2026-11-03 |
 | Svenska kraftnät – historiska dataset (data.svk.se) | 1 Energi (SE) | ok – nyckelfri; fyra frusna dataset (FCR-aktiverad energi, FCR-kapacitet, FCR aggregerade volymer, dagstima-priser) med sista värdet var 6:e timme; varje post bär dataens egen tidstämpel så åldern syns i tabellen; verifierat 2026-11-03 |
 | Fingrid Open Data | 1 Energi (FI) | kräver `FINGRID_KEY` + `FINGRID_DATASETS` |
+| Elprisetjustnu.se (API v1) | 1 Energi (SE) | nyckelfritt – day-ahead-priser per 15 min (SE1–SE4), SEK/kWh, dagens + morgondagens publicerade intervall; exkl. moms/skatter/påslag; synlig källhänvisning i dashboarden |
 | ENTSO-E Transparency Platform | 1 Energi (SE/NO/FI) | struktur verifierad; datalagret tomt 2026-11-01 (kollektorn aktiverar sig automatiskt när data finns) |
 | Statnett driftsdata (gränsflöden) | 1 Energi (NO) | ok – verifierad 2026-11-01 |
 | Energi Data Service | 1 Energi (DK) | ok – verifierad 2026-11-01 |
