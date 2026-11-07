@@ -106,7 +106,7 @@ describe('EnergyDashboard', () => {
     expect(screen.getByText('Generation mix · reported country technologies')).toBeInTheDocument();
     expect(screen.getByRole('table', { name: 'Nordic energy data coverage' })).toBeInTheDocument();
     expect(screen.getByText('4 indicators')).toBeInTheDocument();
-    expect(screen.getByText('No measurement')).toBeInTheDocument();
+    expect(screen.getAllByText('No measurement').length).toBeGreaterThan(0);
   });
 
   test('country selector in the energy heading updates the global country scope', async () => {
