@@ -194,7 +194,7 @@ asset  { t:'a', area, country, source, type, name, id?, geometry, attrs?, update
 | Fingrid Open Data | 1 Energi (FI) | kräver `FINGRID_KEY` + `FINGRID_DATASETS` |
 | Elprisetjustnu.se (API v1) | 1 Energi (SE) | nyckelfritt – day-ahead-priser per 15 min (SE1–SE4), SEK/kWh, dagens + morgondagens publicerade intervall; exkl. moms/skatter/påslag; synlig källhänvisning i dashboarden |
 | ENTSO-E Transparency Platform | 1 Energi (SE/NO/FI) | struktur verifierad; datalagret tomt 2026-11-01 (kollektorn aktiverar sig automatiskt när data finns) |
-| Statnett driftsdata (gränsflöden) | 1 Energi (NO) | ok – verifierad 2026-11-01 |
+| Statnett driftsdata | 1 Energi (NO/Nordiskt) | nyckelfritt – fysiska gränsflöden per zon + norsk nationell produktion/förbrukning (MW, timvärden); 1–2 % felmarginal; förbrukning beräknas från produktion och nettoimport/export |
 | Energi Data Service | 1 Energi (DK) | ok – verifierad 2026-11-01 |
 | Trafikverket öppna dataplattform (datacache v2) | 3 Transport (SE) | kräver `TRAFIKVERKET_KEY` – omskriven till datacache-API:t 2026-11-02 (M5); väg, väglag, trafikflöden, vägväder, järnväg, färjor + speedkameror på huvudvägar (kartlager), järnvägskorsningar i drift, aktiva stationmeddelanden och ersättningsbussar för inställda tåg (M7) |
 | Digitraffic vägtrafikmeddelanden | 3 Transport (FI) | ok – v1/messages verifierad 2026-11-01 |
