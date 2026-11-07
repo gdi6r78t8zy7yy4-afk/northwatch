@@ -180,7 +180,9 @@ function GenerationDemandPanel({ metrics }) {
     .sort((a, b) => String(b.ts).localeCompare(String(a.ts)))[0] ?? null;
   const rows = countries.map(country => {
     const generation = latestFor(country, `Total produktion (${country})`);
-    const demand = latestFor(country, `Total förbrukning (${country})`);
+    const demand = [latestFor(country, `Total förbrukning (${country})`),
+      country === 'DK' ? latestFor(country, 'Beräknad förbrukning (DK, SCADA)') : null]
+      .filter(Boolean).sort((a, b) => String(b.ts).localeCompare(String(a.ts)))[0] ?? null;
     const wind = latestFor(country, `Vindproduktion (${country})`);
     const solar = latestFor(country, `Solproduktion (${country})`);
     const combinedRenewables = latestFor(country, `Vind+sol-produktion ${country}`);
@@ -221,6 +223,8 @@ function GenerationDemandPanel({ metrics }) {
         {row.renewableShare != null ? <span className="mut">Wind + solar: {row.renewableShare.toLocaleString('sv-SE', { maximumFractionDigits: 1 })}% of reported production</span>
           : <span className="mut">Renewable share unavailable · requires aligned wind, solar and total production</span>}
       </div>
+      {row.country === 'DK' && row.demand?.indicator === 'Beräknad förbrukning (DK, SCADA)' ?
+        <div className="mut">Consumption is derived from SCADA production plus net exchange; it is approximate, not a settlement measurement.</div> : null}
       <div className="mut energy-generation-time">Latest observation: {fmtTime(row.generation?.ts ?? row.demand?.ts ?? row.renewable?.ts)}</div>
     </article>)}</div> : <p className="mut">No generation, demand or wind/solar production measurements are currently available in this country scope.</p>}
     <p className="mut energy-generation-caveat">A domestic production-demand difference is not a system adequacy assessment. Imports, exports, losses, storage and balancing resources are not included. Missing and non-aligned measurements are left blank; no zeroes or estimates are synthesized.</p>
