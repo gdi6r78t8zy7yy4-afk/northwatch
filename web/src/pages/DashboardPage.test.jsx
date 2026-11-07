@@ -230,8 +230,8 @@ describe('DashboardPage – väderprognos (M8, område 11)', () => {
     expect(fetchForecastMeta).toHaveBeenCalledTimes(1);
     expect(screen.getByText('Väderprognos (SMHI snow1g)')).toBeInTheDocument();
     // Kartan hämtar rutnätet vid cykelns nu-steg (sista – allt är förflutet).
-    expect(fetchForecastGrid).toHaveBeenCalledWith('air_temperature', TIMES[2], 20);
-    expect(fetchForecastGridCoords).toHaveBeenCalledWith(20);
+    await waitFor(() => expect(fetchForecastGrid).toHaveBeenCalledWith('air_temperature', TIMES[2], 20));
+    await waitFor(() => expect(fetchForecastGridCoords).toHaveBeenCalledWith(20));
     // Panelen autovaljerar första inomdomän-staden → punktprognos → 6 grafer.
     await waitFor(() => expect(container.querySelectorAll('.fchart').length).toBe(6));
     expect(fetchForecastPoint).toHaveBeenCalledWith({ name: 'Stockholm' });
