@@ -39,15 +39,15 @@ const readMapSize = () => {
 };
 
 const TYPE_COLORS = {
-  ix: '#7c5cd6',
-  kraftanläggning: '#e0662e',
-  datacenter: '#9b3fd4',
-  flygplats: '#2e86c1',
-  vattenverk: '#14b8a6',
-  fartyg: '#0f8b8d',
-  flowmatning: '#e0a52e',
-  station: '#c2418f',
-  kamera: '#2f9e44',
+  ix: '#b49aff',
+  kraftanläggning: '#ff9d5c',
+  datacenter: '#d28cff',
+  flygplats: '#59b8ff',
+  vattenverk: '#40d9c2',
+  fartyg: '#34c9d0',
+  flowmatning: '#ffd166',
+  station: '#ff79b0',
+  kamera: '#9be564',
 };
 
 const TYPE_LABELS = {
@@ -307,7 +307,7 @@ export default function MapPanel({
       } else if (g?.type === 'LineString') {
         const coords = a.geometry.coordinates.map(([lng, lat]) => [lat, lng]);
         const mw = a.attrs?.mw;
-        const color = a.type === 'flow' ? (mw >= 0 ? '#2e9e5b' : '#d4574a') : '#e08a2e';
+        const color = a.type === 'flow' ? (mw >= 0 ? '#00c58a' : '#ff6b6b') : '#ffb454';
         // Signed flow values reverse the direction of the visible arrow.
         const directed = a.type === 'flow' && Number(mw) < 0 ? [...coords].reverse() : coords;
         const flowLabel = a.type === 'flow'
@@ -450,17 +450,17 @@ export default function MapPanel({
       <div className="maplegend mut">
         <span><i style={{ background: '#4a7fd4' }} />Landsgränser</span>
         {hasEnergy && energyLayers.zones && <span><i className="pt" style={{ background: '#5b6470' }} />Elområden</span>}
-        {hasEnergy && energyLayers.links && <span><i style={{ background: '#e08a2e' }} />HVDC-länk</span>}
-        {hasEnergy && energyLayers.links && <span><i style={{ background: '#9aa5b1' }} />Planerad länk</span>}
-        {hasFlow && energyLayers.flows && <span><i style={{ background: '#2e9e5b' }} />Export</span>}
-        {hasFlow && energyLayers.flows && <span><i style={{ background: '#d4574a' }} />Import/motriktning</span>}
-        {hasIx && <span><i className="pt" style={{ background: '#7c5cd6' }} />Internetutbyte (IX)</span>}
-        {hasOsm && <span><i className="pt" style={{ background: '#e0662e' }} />Anläggning (OSM)</span>}
-        {hasFartyg && <span><i className="pt" style={{ background: '#0f8b8d' }} />Fartyg (AIS)</span>}
-        {hasFlowmatning && <span><i className="pt" style={{ background: '#e0a52e' }} />Flödesmätare (topp 25)</span>}
-        {hasStation && <span><i className="pt" style={{ background: '#c2418f' }} />Järnvägsstation</span>}
-        {hasKamera && <span><i className="pt" style={{ background: '#2f9e44' }} />Speedkamera (huvudvägar)</span>}
-        {hasEvents && <span><i style={{ background: '#d4574a' }} />Trafikhändelse</span>}
+        {hasEnergy && energyLayers.links && <span><i style={{ background: '#ffb454' }} />HVDC-länk</span>}
+        {hasEnergy && energyLayers.links && <span><i style={{ background: '#d5e0eb' }} />Planerad länk</span>}
+        {hasFlow && energyLayers.flows && <span><i style={{ background: '#00c58a' }} />Export</span>}
+        {hasFlow && energyLayers.flows && <span><i style={{ background: '#ff6b6b' }} />Import/motriktning</span>}
+        {hasIx && <span><i className="pt" style={{ background: TYPE_COLORS.ix }} />Internetutbyte (IX)</span>}
+        {hasOsm && <span><i className="pt" style={{ background: TYPE_COLORS.kraftanläggning }} />Anläggning (OSM)</span>}
+        {hasFartyg && <span><i className="pt" style={{ background: TYPE_COLORS.fartyg }} />Fartyg (AIS)</span>}
+        {hasFlowmatning && <span><i className="pt" style={{ background: TYPE_COLORS.flowmatning }} />Flödesmätare (topp 25)</span>}
+        {hasStation && <span><i className="pt" style={{ background: TYPE_COLORS.station }} />Järnvägsstation</span>}
+        {hasKamera && <span><i className="pt" style={{ background: TYPE_COLORS.kamera }} />Speedkamera (huvudvägar)</span>}
+        {hasEvents && <span><i style={{ background: '#ff5b66' }} />Trafikhändelse</span>}
       </div>
       {wx && (
         <div className="wxlegend mut">
