@@ -63,7 +63,6 @@ describe('EnergyPriceProfiles', () => {
 
   test('lets the user expand the visible delivery window to 48 hours', () => {
     render(<EnergyPriceProfiles metrics={[
-      row('SE', 30, '2026-11-07T13:00:00Z'),
       row('SE', 80, '2026-11-08T18:00:00Z'),
     ]} now={now}/>);
     expect(screen.getByText('Current & next 24 hours')).toBeInTheDocument();
