@@ -343,8 +343,13 @@ export default function MapPanel({
     for (const ev of events) {
       if (!ev.geo) continue;
       const feat = { type: 'Feature', properties: { title: ev.title }, geometry: ev.geo };
+      // Dark casing keeps event geometry visible over both light and dark map tiles.
       L.geoJSON(feat, {
-        style: { color: '#07111c', weight: 8, opacity: 0.95 },
+        style: { color: '#07111c', weight: 8, opacity: 0.98 },
+      }).addTo(layer);
+      // Red foreground stroke communicates event status and remains independently selectable.
+      L.geoJSON(feat, {
+        style: { color: '#ff5b66', weight: 4, opacity: 1 },
         onEachFeature: (f, l) => {
           l.bindTooltip(f.properties.title, { sticky: true, direction: 'auto', className: 'map-item-tooltip' });
           l.on('click', () => setSelectedItem({
