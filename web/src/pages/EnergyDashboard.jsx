@@ -109,11 +109,19 @@ function GridOperationsExplorer({ series }) {
 }
 
 function MarketSignals({ metrics }) {
-  const prices = new Map();
-  for (const row of metrics.filter(r => /^Dag-ahead-pris /.test(r.indicator) && Number.isFinite(Number(r.value)))) {
-    const old = prices.get(row.country);
-    if (!old || String(row.ts) > String(old.ts)) prices.set(row.country, row);
+  const priceGroups = new Map();
+  const now = Date.now();
+  for (const row of metrics.filter(r => /^Dag-ahead-pris /.test(r.indicator) && Number.isFinite(Number(r.value)) && Number.isFinite(Date.parse(r.ts ?? '')))) {
+    const key = `${row.indicator}|${row.source}`;
+    const previous = priceGroups.get(key);
+    const at = Date.parse(row.ts);
+    // For day-ahead interval series, show the interval active now. If the
+    // source only has future prices, show the nearest upcoming interval.
+    const rank = at <= now ? now - at : Number.MAX_SAFE_INTEGER + at;
+    if (!previous || rank < previous.rank) priceGroups.set(key, { row, rank });
   }
+  const prices = [...priceGroups.values()].map(item => item.row)
+    .sort((a, b) => a.indicator.localeCompare(b.indicator) || a.source.localeCompare(b.source));
   const wind = findMetric(metrics, r => r.indicator === 'Vindproduktion (DK)');
   const solar = findMetric(metrics, r => r.indicator === 'Solproduktion (DK)');
   const total = findMetric(metrics, r => r.indicator === 'Total produktion (DK)');
@@ -124,13 +132,14 @@ function MarketSignals({ metrics }) {
   return <div className="energy-market-grid">
     <div className="energy-market-panel">
       <h3>Day-ahead prices</h3>
-      {prices.size ? <div className="energy-price-grid">{[...prices.values()].sort((a,b)=>a.country.localeCompare(b.country)).map(row =>
-        <div className="energy-price-cell" key={row.country}>
-          <span>{row.country}</span><b>{Number(row.value).toLocaleString('sv-SE',{maximumFractionDigits:2})} <small>{row.unit}</small></b>
+      {prices.length ? <div className="energy-price-grid">{prices.map(row =>
+        <div className="energy-price-cell" key={row.indicator + '|' + row.source}>
+          <span>{row.indicator.replace(/^Dag-ahead-pris\\s+/, '')}</span><b>{Number(row.value).toLocaleString('sv-SE',{maximumFractionDigits:4})} <small>{row.unit}</small></b>
           <span className="mut">{row.sourceName ?? row.source} · {fmtTime(row.ts)}</span>
         </div>)}</div>
         : <p className="mut">No comparable day-ahead price observations are currently available from connected sources.</p>}
-      <p className="mut">Prices are shown as published by each source. Currency and unit are retained; values are not converted.</p>
+      <p className="mut">Prices are shown as published by each source. Currency and unit are retained; values are not converted. Spot prices exclude VAT, supplier markups and taxes.</p>
+      <p className="mut">Swedish bidding-zone prices: <a href="https://www.elprisetjustnu.se" target="_blank" rel="noreferrer">Elpriset just nu.se</a>.</p>
       <div className="energy-spread-section">
         <h4>Aligned Nordic price spreads</h4>
         {comparisons.length ? <div className="energy-spread-list">{comparisons.slice(0, 6).map(snapshot =>
