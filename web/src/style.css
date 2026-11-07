@@ -320,3 +320,15 @@ tr.detail-row > td { background: var(--mut-bg); padding: 10px 12px; font-size: 1
 .energy-renewable-track { height:9px; border-radius:6px; overflow:hidden; background:var(--mut-bg); margin:8px 0 12px; }
 .energy-renewable-track span { display:block; height:100%; background:#3b9c83; border-radius:6px; }
 @media (max-width:760px) { .energy-market-grid { grid-template-columns:1fr; } }
+
+
+/* Grid operations history explorer */
+.energy-grid-operations-columns { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
+.energy-grid-operations-panel { min-width:0; padding:12px; border:1px solid var(--bd); border-radius:7px; background:#131d28; }
+.energy-grid-operations-panel h3 { margin:0 0 7px; font-size:12px; }
+.energy-grid-operations-panel > .mut { font-size:10px; line-height:1.5; margin:0 0 10px; }
+.energy-grid-operations-panel .energy-series-picker { max-height:120px; overflow:auto; }
+.energy-grid-operations-panel .energy-chart-grid { grid-template-columns:1fr; }
+.energy-grid-operations-panel .energy-chart { min-width:0; }
+.energy-grid-operations-panel .energy-series-chip { max-width:100%; text-align:left; overflow-wrap:anywhere; }
+@media (max-width:850px) { .energy-grid-operations-columns { grid-template-columns:1fr; } }
