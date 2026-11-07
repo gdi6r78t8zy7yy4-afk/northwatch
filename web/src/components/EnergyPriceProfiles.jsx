@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 
 const DAY_AHEAD_PREFIX = /^Dag-ahead-pris\s+/;
 const formatClock = value => new Intl.DateTimeFormat('sv-SE', {
@@ -52,14 +52,25 @@ function PriceProfile({ series }) {
   </article>;
 }
 
+const HORIZONS = [6, 12, 24, 48];
+
 export default function EnergyPriceProfiles({ metrics = [], now = Date.now() }) {
-  const profiles = useMemo(() => buildEnergyPriceProfiles(metrics, { now }), [metrics, now]);
+  const [horizonHours, setHorizonHours] = useState(24);
+  const profiles = useMemo(() => buildEnergyPriceProfiles(metrics, { now, horizonHours }), [metrics, now, horizonHours]);
   return <section className="energy-price-profiles" aria-label="Day-ahead price profiles">
-    <div className="energy-price-profiles-heading"><h4>Current & next 24 hours</h4>
-      <span className="mut">Delivery interval timestamps · UTC · source units retained</span></div>
+    <div className="energy-price-profiles-heading">
+      <div><h4>Current & next {horizonHours} hours</h4>
+        <span className="mut">Delivery interval timestamps · UTC · source units retained</span></div>
+      <label className="energy-price-horizon-control">Time range
+        <select aria-label="Price profile time range" value={horizonHours}
+          onChange={event => setHorizonHours(Number(event.target.value))}>
+          {HORIZONS.map(hours => <option key={hours} value={hours}>{hours} hours</option>)}
+        </select>
+      </label>
+    </div>
     {profiles.length ? <div className="energy-price-profiles-grid">
       {profiles.map(series => <PriceProfile key={series.key} series={series}/>)}
-    </div> : <p className="mut">No current or upcoming day-ahead delivery intervals are available in the next 24 hours.</p>}
+    </div> : <p className="mut">No current or upcoming day-ahead delivery intervals are available in this time range.</p>}
     <p className="mut energy-price-profiles-note">Each bidding-zone series is plotted independently. Different currencies, units and sources are not combined. The line connects published interval values; it is not a forecast beyond the source's published day-ahead schedule.</p>
   </section>;
 }
