@@ -47,6 +47,10 @@ function scheduleSnapshot() {
 // Local/VM persistence. The snapshot is written atomically and contains the
 // last successful records plus source health. For Cloud Run use a network DB
 // (e.g. Firestore); the container filesystem is not durable across instances.
+export async function flushStore() {
+  await writeQueue;
+}
+
 export async function initStore() {
   try {
     const raw = await fs.promises.readFile(snapshotPath(), 'utf8');
