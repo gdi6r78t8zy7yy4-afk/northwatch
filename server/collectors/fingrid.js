@@ -1,20 +1,29 @@
 // Fingrid Open Data – API key (x-api-key), 10 000 requests/24 h,
-// max 1 request/2 s per key. FINGRID_DATASETS can override the default
-// production/consumption pair using "datasetId:Indicator,...".
+// max 1 request/2 s per key. FINGRID_DATASETS can override the defaults
+// using "datasetId:Indicator,...".
 //
-// Verified dataset IDs:
-//   192 – Electricity production in Finland - real-time data (MW, 3 min)
-//   193 – Electricity consumption in Finland - real-time data (MW, 3 min)
-// Both are published by Fingrid and use the same measurement interval.
+// Verified active dataset IDs (all MW, 3 min):
+//   192 – total electricity production
+//   193 – total electricity consumption
+//   181 – wind production (about 2% of capacity estimated)
+//   191 – hydro production
+//   188 – nuclear production
+//   202 – industrial cogeneration (CHP)
+// Component series are additional indicators, not an exhaustive generation
+// mix. Do not add them together to reconstruct total production.
 // API access requires a registered key; it is never exposed to the browser.
 import { jjson, sleep } from '../lib/http.js';
 
 const DEFAULT_DATASETS = [
   [192, 'Total produktion (FI)'],
   [193, 'Total förbrukning (FI)'],
+  [181, 'Vindproduktion (FI)'],
+  [191, 'Vattenkraftproduktion (FI)'],
+  [188, 'Kärnkraftsproduktion (FI)'],
+  [202, 'Industriell kraftvärmeproduktion (FI)'],
 ];
 
-function configuredDatasets(value = process.env.FINGRID_DATASETS) {
+export function configuredDatasets(value = process.env.FINGRID_DATASETS) {
   if (!String(value ?? '').trim()) return DEFAULT_DATASETS;
   return String(value).split(',').map(item => {
     const [rawId, ...labelParts] = item.split(':');
