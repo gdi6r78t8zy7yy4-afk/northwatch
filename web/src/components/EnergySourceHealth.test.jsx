@@ -15,7 +15,7 @@ describe('EnergySourceHealth', () => {
     expect(screen.getByText('12')).toBeInTheDocument();
     expect(screen.getByText('Last attempt')).toBeInTheDocument();
     expect(screen.getByText('Last success')).toBeInTheDocument();
-    expect(screen.getByText('Collector run times describe Northwatch')).toBeInTheDocument();
+    expect(document.querySelector('.energy-source-health-note').textContent).toContain('Collector run times describe Northwatch');
   });
 
   test('summarizes missing credentials and errors without hiding them', () => {
