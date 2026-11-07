@@ -264,7 +264,7 @@ export default function MapPanel({
           weight: a.type === 'flow' ? 1.5 + Math.min(3, Math.abs(mw ?? 0) / 700) : 2,
           opacity: 0.85,
         }).bindTooltip(a.type === 'flow'
-          ? `${a.attrs?.from ?? ''} → ${a.attrs?.to ?? ''} · ${Math.round(mw)} MW` : a.name)
+          ? `${Number(mw) < 0 ? (a.attrs?.to ?? '') : (a.attrs?.from ?? '')} → ${Number(mw) < 0 ? (a.attrs?.from ?? '') : (a.attrs?.to ?? '')} · ${Math.round(Math.abs(mw))} MW` : a.name)
           .addTo(layer);
         if (a.type === 'flow' && directed.length >= 2) {
           const start = map.latLngToLayerPoint(directed[0]);
