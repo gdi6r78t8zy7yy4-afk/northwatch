@@ -87,6 +87,7 @@ export default function MapPanel({
   const [wxParam, setWxParam] = useState(null);
   const [wx, setWx] = useState(null);
   const [wxErr, setWxErr] = useState(null);
+  const [energyLayers, setEnergyLayers] = useState({ zones: true, links: true, flows: true });
 
   // M8: väderprognosrutnätet aktiveras när föräldern skickar meta (område 11).
   const wxOn = !!forecastMeta?.ready;
@@ -222,13 +223,13 @@ export default function MapPanel({
     if (area.id === 1 && staticGeo?.energy?.features) {
       for (const f of staticGeo.energy.features) {
         const p = f.properties;
-        if (p.kind === 'zone') {
+        if (p.kind === 'zone' && energyLayers.zones) {
           const [lng, lat] = f.geometry.coordinates;
           L.circleMarker([lat, lng], {
             radius: 4, color: '#5b6470', weight: 1, fillColor: '#fff', fillOpacity: 0.95,
           }).bindTooltip(p.zone, { permanent: true, direction: 'top', className: 'zone-label' })
             .addTo(layer);
-        } else if (p.kind === 'link') {
+        } else if (p.kind === 'link' && energyLayers.links) {
           const coords = f.geometry.coordinates.map(([lng, lat]) => [lat, lng]);
           const planned = p.status === 'planerad';
           L.polyline(coords, {
@@ -244,6 +245,7 @@ export default function MapPanel({
 
     // Asset: punkter (IX, OSM) och linjer (Statnett/SVK-flöden).
     for (const a of assets) {
+      if (area.id === 1 && a.type === 'flow' && !energyLayers.flows) continue;
       const g = a.geometry;
       if (g?.type === 'Point') {
         const [lng, lat] = g.coordinates;
@@ -290,7 +292,7 @@ export default function MapPanel({
         onEachFeature: (f, l) => l.bindTooltip(f.properties.title),
       }).addTo(layer);
     }
-  }, [area.id, country, assets, staticGeo, events, wx]);
+  }, [area.id, country, assets, staticGeo, events, wx, energyLayers]);
 
   // Kartvalet (M6): bara vid kontextbyte (område/land), när landsgränserna
   // har laddats, eller vid manuell "Återställ vy". 30 s-uppdateringen byter
@@ -342,6 +344,14 @@ export default function MapPanel({
               ))}
             </select>
           )}
+          {hasEnergy && <span className="map-layer-controls" role="group" aria-label="Energilager">
+            <button type="button" aria-pressed={energyLayers.zones} className={energyLayers.zones ? 'on' : ''}
+              onClick={() => setEnergyLayers(v => ({ ...v, zones: !v.zones }))}>Zoner</button>
+            <button type="button" aria-pressed={energyLayers.links} className={energyLayers.links ? 'on' : ''}
+              onClick={() => setEnergyLayers(v => ({ ...v, links: !v.links }))}>HVDC</button>
+            <button type="button" aria-pressed={energyLayers.flows} className={energyLayers.flows ? 'on' : ''}
+              onClick={() => setEnergyLayers(v => ({ ...v, flows: !v.flows }))}>Liveflöden</button>
+          </span>}
           <span className="seg" role="group" aria-label="Kartstorlek">
             {Object.keys(MAP_SIZES).map(s => (
               <button key={s} type="button" className={s === size ? 'on' : ''}
@@ -360,10 +370,11 @@ export default function MapPanel({
       <div ref={divRef} className="mapbox" style={{ height: MAP_SIZES[size] }} />
       <div className="maplegend mut">
         <span><i style={{ background: '#4a7fd4' }} />Landsgränser</span>
-        {hasEnergy && <span><i style={{ background: '#e08a2e' }} />HVDC-länk</span>}
-        {hasEnergy && <span><i style={{ background: '#9aa5b1' }} />Planerad länk</span>}
-        {hasFlow && <span><i style={{ background: '#2e9e5b' }} />Export</span>}
-        {hasFlow && <span><i style={{ background: '#d4574a' }} />Import/motriktning</span>}
+        {hasEnergy && energyLayers.zones && <span><i className="pt" style={{ background: '#5b6470' }} />Elområden</span>}
+        {hasEnergy && energyLayers.links && <span><i style={{ background: '#e08a2e' }} />HVDC-länk</span>}
+        {hasEnergy && energyLayers.links && <span><i style={{ background: '#9aa5b1' }} />Planerad länk</span>}
+        {hasFlow && energyLayers.flows && <span><i style={{ background: '#2e9e5b' }} />Export</span>}
+        {hasFlow && energyLayers.flows && <span><i style={{ background: '#d4574a' }} />Import/motriktning</span>}
         {hasIx && <span><i className="pt" style={{ background: '#7c5cd6' }} />Internetutbyte (IX)</span>}
         {hasOsm && <span><i className="pt" style={{ background: '#e0662e' }} />Anläggning (OSM)</span>}
         {hasFartyg && <span><i className="pt" style={{ background: '#0f8b8d' }} />Fartyg (AIS)</span>}
