@@ -108,24 +108,52 @@ function GenerationMix({ metrics, country = 'DK' }) {
 function TrendChart({ series }) {
   const points = series.points ?? [];
   if (points.length < 2) return <div className="energy-chart-empty">Insufficient history · {points.length} observation(s)</div>;
-  const values = points.map(p => p.value);
+  const values = points.map(p => Number(p.value));
   const min = Math.min(...values), max = Math.max(...values), span = max - min || 1;
-  const path = points.map((p, i) => {
-    const x = 8 + i / (points.length - 1) * 284;
-    const y = 76 - (p.value - min) / span * 62;
-    return (i ? 'L' : 'M') + x.toFixed(1) + ' ' + y.toFixed(1);
-  }).join(' ');
+  const plot = { left: 52, right: 344, top: 18, bottom: 104 };
+  const xFor = index => plot.left + index / (points.length - 1) * (plot.right - plot.left);
+  const yFor = value => plot.bottom - (Number(value) - min) / span * (plot.bottom - plot.top);
+  const path = points.map((point, index) =>
+    (index ? 'L' : 'M') + xFor(index).toFixed(1) + ' ' + yFor(point.value).toFixed(1)
+  ).join(' ');
   const first = points[0], last = points[points.length - 1];
-  const delta = last.value - first.value;
+  const delta = Number(last.value) - Number(first.value);
+  const ticks = [0, 0.5, 1].map(ratio => ({
+    y: plot.bottom - ratio * (plot.bottom - plot.top),
+    value: min + ratio * (max - min),
+  }));
+  const formatValue = value => Number(value).toLocaleString('sv-SE', { maximumFractionDigits: 1 });
   return <div className="energy-chart">
     <div className="energy-chart-meta"><b>{series.indicator}</b><span>{series.country} · {series.source} · {series.unit}</span></div>
-    <svg viewBox="0 0 300 88" role="img" aria-label={series.indicator + ' historical trend'}>
-      <path d="M8 76 H292" stroke="currentColor" opacity=".18" fill="none"/>
+    <svg viewBox="0 0 360 142" role="img"
+      aria-label={series.indicator + ' historical trend, value axis in ' + series.unit + ', time axis in UTC'}>
+      <title>{series.indicator} · {series.country} · {series.unit}</title>
+      <text x="4" y="11" fill="currentColor" fontSize="9">{series.unit}</text>
+      {ticks.map(tick => <g key={tick.y}>
+        <line x1={plot.left} x2={plot.right} y1={tick.y} y2={tick.y}
+          stroke="currentColor" opacity=".18" strokeDasharray="2 3"/>
+        <text x={plot.left - 7} y={tick.y + 3} textAnchor="end" fill="currentColor" opacity=".75" fontSize="9">
+          {formatValue(tick.value)}
+        </text>
+      </g>)}
       <path d={path} stroke="#68a9e8" strokeWidth="2.5" fill="none" strokeLinejoin="round" strokeLinecap="round"/>
-      <circle cx="292" cy={76 - (last.value - min) / span * 62} r="3.5" fill="#68a9e8"/>
+      {points.map((point, index) => <circle key={point.ts ?? index}
+        cx={xFor(index)} cy={yFor(point.value)} r={points.length > 80 ? 1.8 : 2.8}
+        fill="#68a9e8">
+        <title>{fmtTime(point.ts)} · {formatValue(point.value)} {series.unit}</title>
+      </circle>)}
+      <text x={plot.left} y="120" textAnchor="start" fill="currentColor" opacity=".8" fontSize="9">
+        {fmtTime(first.ts)}
+      </text>
+      <text x={plot.right} y="120" textAnchor="end" fill="currentColor" opacity=".8" fontSize="9">
+        {fmtTime(last.ts)}
+      </text>
+      <text x={(plot.left + plot.right) / 2} y="137" textAnchor="middle" fill="currentColor" opacity=".7" fontSize="9">
+        Time (UTC)
+      </text>
     </svg>
-    <div className="energy-chart-values"><span>{first.value.toLocaleString('sv-SE')} {series.unit}</span><b>{last.value.toLocaleString('sv-SE')} {series.unit}</b></div>
-    <div className="mut">Förändring {delta > 0 ? '+' : ''}{delta.toLocaleString('sv-SE')} {series.unit} · {points.length} mätpunkter</div>
+    <div className="energy-chart-values"><span>{formatValue(first.value)} {series.unit}</span><b>{formatValue(last.value)} {series.unit}</b></div>
+    <div className="mut">Förändring {delta > 0 ? '+' : ''}{formatValue(delta)} {series.unit} · {points.length} mätpunkter</div>
   </div>;
 }
 
