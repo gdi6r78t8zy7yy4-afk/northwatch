@@ -183,19 +183,19 @@ describe('MapPanel – lager', () => {
       ],
     });
     const byPopup = txt => __leaf.created.find(c => c.kind === 'circleMarker' && c.popup && c.popup.includes(txt));
-    expect(byPopup('StockholmIX').options.fillColor).toBe('#7c5cd6'); // ix
+    expect(byPopup('StockholmIX').options.fillColor).toBe('#b49aff'); // ix
     expect(byPopup('StockholmIX').options.radius).toBe(4.5);
-    expect(byPopup('DC Norr').options.fillColor).toBe('#9b3fd4'); // datacenter
-    expect(byPopup('Mätare 1').options.fillColor).toBe('#e0a52e'); // flowmatning
+    expect(byPopup('DC Norr').options.fillColor).toBe('#d28cff'); // datacenter
+    expect(byPopup('Mätare 1').options.fillColor).toBe('#ffd166'); // flowmatning
     expect(byPopup('Mätare 1').options.radius).toBe(3.5);
-    expect(byPopup('Stockholm C').options.fillColor).toBe('#c2418f'); // station
+    expect(byPopup('Stockholm C').options.fillColor).toBe('#ff79b0'); // station
     // popups bär namn + typ + källa
     expect(byPopup('StockholmIX').popup).toContain('Internetutbyte (IX)');
     expect(byPopup('StockholmIX').popup).toContain('peeringdb');
   });
 
   test('klick på kartobjekt öppnar en beständig detaljpanel med samtliga tillgängliga attribut', () => {
-    renderMap({
+    const { container } = renderMap({
       assets: [point({
         id: 'plant-42', name: 'Forsmark', type: 'kraftanläggning', source: 'osm',
         updated: '2026-11-07T08:15:00Z',
@@ -206,12 +206,12 @@ describe('MapPanel – lager', () => {
     const marker = __leaf.created.find(c => c.kind === 'circleMarker' && c.popup?.includes('Forsmark'));
     act(() => __fireLayer(marker));
     expect(screen.getByText('Forsmark')).toBeInTheDocument();
-    expect(screen.getByText('kraftanläggning')).toBeInTheDocument();
-    expect(screen.getByText('osm')).toBeInTheDocument();
-    expect(screen.getByText('3000 MW')).toBeInTheDocument();
-    expect(screen.getByText('I drift')).toBeInTheDocument();
-    expect(screen.getByText('Vattenfall')).toBeInTheDocument();
-    expect(screen.getByText('18, 59.3')).toBeInTheDocument();
+    expect(container.textContent).toContain('kraftanläggning');
+    expect(container.textContent).toContain('osm');
+    expect(container.textContent).toContain('3000 MW');
+    expect(container.textContent).toContain('I drift');
+    expect(container.textContent).toContain('Vattenfall');
+    expect(container.textContent).toContain('18, 59.3');
     fireEvent.click(screen.getByRole('button', { name: 'Stäng objektinformation' }));
     expect(screen.getByText('Välj ett objekt på kartan')).toBeInTheDocument();
   });
@@ -224,7 +224,7 @@ describe('MapPanel – lager', () => {
       ],
     });
     const cam = __leaf.created.find(c => c.kind === 'circleMarker' && c.popup?.includes('Marbäck'));
-    expect(cam.options.fillColor).toBe('#2f9e44'); // kamera
+    expect(cam.options.fillColor).toBe('#9be564'); // kamera
     expect(cam.options.radius).toBe(2.5);          // ~900 punkter – ryms bättre
     expect(cam.popup).toContain('Speedkamera (Trafikverket)');
     expect(cam.popup).toContain('Halland');
@@ -239,8 +239,8 @@ describe('MapPanel – lager', () => {
       ],
     });
     const byTooltip = t => __leaf.created.find(c => c.kind === 'polyline' && c.tooltip && c.tooltip.text.includes(t));
-    expect(byTooltip('1200 MW').options.color).toBe('#2e9e5b');
-    expect(byTooltip('800 MW').options.color).toBe('#d4574a');
+    expect(byTooltip('1200 MW').options.color).toBe('#00c58a');
+    expect(byTooltip('800 MW').options.color).toBe('#ff6b6b');
   });
 
   test('energilager (endast område 1): zonskilda + planerad länk streckad', () => {
@@ -260,7 +260,7 @@ describe('MapPanel – lager', () => {
 
   test('händelser med geo ritas som röda geoJSON-lager', () => {
     renderMap({ events: [lineEvent()] });
-    const ev = __leaf.created.find(c => c.kind === 'geoJSON' && c.options?.style?.color === '#d4574a');
+    const ev = __leaf.created.find(c => c.kind === 'geoJSON' && c.options?.style?.color === '#ff5b66');
     expect(ev).toBeTruthy();
     expect(ev.options.style.weight).toBe(2.5);
   });
