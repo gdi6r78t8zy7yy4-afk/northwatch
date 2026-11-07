@@ -257,12 +257,27 @@ export default function MapPanel({
         const coords = a.geometry.coordinates.map(([lng, lat]) => [lat, lng]);
         const mw = a.attrs?.mw;
         const color = a.type === 'flow' ? (mw >= 0 ? '#2e9e5b' : '#d4574a') : '#e08a2e';
-        L.polyline(coords, {
+        // Signed flow values reverse the direction of the visible arrow.
+        const directed = a.type === 'flow' && Number(mw) < 0 ? [...coords].reverse() : coords;
+        L.polyline(directed, {
           color,
-          weight: a.type === 'flow' ? 1 + Math.min(2.5, Math.abs(mw ?? 0) / 700) : 2,
-          opacity: 0.65,
-        }).bindTooltip(a.type === 'flow' ? `${a.name} · ${Math.round(mw)} MW` : a.name)
+          weight: a.type === 'flow' ? 1.5 + Math.min(3, Math.abs(mw ?? 0) / 700) : 2,
+          opacity: 0.85,
+        }).bindTooltip(a.type === 'flow'
+          ? `${Number(mw) < 0 ? (a.attrs?.to ?? '') : (a.attrs?.from ?? '')} → ${Number(mw) < 0 ? (a.attrs?.from ?? '') : (a.attrs?.to ?? '')} · ${Math.round(Math.abs(mw))} MW` : a.name)
           .addTo(layer);
+        if (a.type === 'flow' && directed.length >= 2) {
+          const start = map.latLngToLayerPoint(directed[0]);
+          const finish = map.latLngToLayerPoint(directed[directed.length - 1]);
+          const angle = Math.atan2(finish.y - start.y, finish.x - start.x);
+          const midpoint = [(directed[0][0] + directed[directed.length - 1][0]) / 2,
+            (directed[0][1] + directed[directed.length - 1][1]) / 2];
+          L.marker(midpoint, { interactive: false, keyboard: false,
+            icon: L.divIcon({ className: 'flow-direction-icon',
+              html: `<span style="color:${color};transform:rotate(${angle}rad)">➤</span>`,
+              iconSize: [16, 16], iconAnchor: [8, 8] }),
+          }).addTo(layer);
+        }
       }
     }
 

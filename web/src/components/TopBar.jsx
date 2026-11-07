@@ -10,7 +10,8 @@ export default function TopBar({ areas, gen, backendDown, country, setCountry })
       </Link>
       <nav className="nav">
         <NavLink to="/" end>Översikt</NavLink>
-        {areas.map(a => (
+        <NavLink to="/energy">Energi</NavLink>
+        {areas.filter(a => a.id !== 1).map(a => (
           <NavLink key={a.id} to={`/d/${a.id}`}>{a.id}. {a.short}</NavLink>
         ))}
       </nav>

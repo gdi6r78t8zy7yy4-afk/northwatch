@@ -13,6 +13,8 @@ export const fetchDashboard = (id, country = 'ALL') =>
 export const fetchHealth = () => get('/api/health');
 export const fetchAssets = (area, country = 'ALL') =>
   get(`/api/assets?area=${encodeURIComponent(area)}&country=${encodeURIComponent(country)}`);
+export const fetchEnergyOverview = (country = 'ALL') =>
+  get(`/api/energy/overview?country=${encodeURIComponent(country)}`);
 
 // M3: statiska kartlager (landsgränser + energilager) – hämtas en gång.
 let staticGeoPromise = null;

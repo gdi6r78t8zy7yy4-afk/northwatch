@@ -3,6 +3,7 @@ import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 import TopBar from './components/TopBar.jsx';
 import SummaryPage from './pages/SummaryPage.jsx';
 import DashboardPage from './pages/DashboardPage.jsx';
+import EnergyDashboard from './pages/EnergyDashboard.jsx';
 import { fetchDashboards } from './api.js';
 
 function useLocalStorage(key, initial) {
@@ -47,6 +48,7 @@ export default function App() {
       <main>
         <Routes>
           <Route path="/" element={<SummaryPage areas={areas} backendDown={backendDown} />} />
+          <Route path="/energy" element={<EnergyDashboard country={country} />} />
           <Route path="/d/:id" element={<DashboardPage country={country} />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
