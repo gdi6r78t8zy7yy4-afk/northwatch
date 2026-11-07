@@ -97,10 +97,34 @@ tr.area-row:hover td { background: var(--mut-bg); }
 .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; }
 .row { display: flex; justify-content: space-between; gap: 8px; padding: 2px 0; }
 .gapcard { border-left: 3px solid var(--warn); }
-/* M3: Leaflet-karta (höjd styrs inline av M6-storleken S/M/L) */
+/* M3: Leaflet-karta + fast objektinspektör (höjd styrs av M6-storleken S/M/L). */
+.map-workspace {
+  display: grid; grid-template-columns: minmax(0, 1fr) minmax(250px, 320px);
+  gap: 10px; align-items: stretch; min-width: 0;
+}
 .mapbox {
-  width: 100%; height: 420px; border: 1px solid var(--bd);
+  width: 100%; min-width: 0; height: 420px; border: 1px solid var(--bd);
   border-radius: 8px; background: var(--mut-bg);
+}
+.map-item-inspector {
+  min-width: 0; height: 420px; overflow: auto; border: 1px solid var(--bd);
+  border-radius: 8px; background: #101a25; color: var(--tx); padding: 12px;
+}
+.map-item-inspector-head { display:flex; justify-content:space-between; align-items:flex-start; gap:8px; }
+.map-item-inspector-head span,.map-item-empty > span { color:#8ebbe6; font-size:9px; font-weight:800; letter-spacing:.12em; }
+.map-item-inspector-head h3 { margin:5px 0 0; font-size:14px; line-height:1.35; overflow-wrap:anywhere; }
+.map-item-clear { flex:0 0 auto; width:27px; height:27px; border:1px solid #40546a; border-radius:5px; background:#1b2b3b; color:#eaf3fc; font-size:19px; line-height:1; cursor:pointer; }
+.map-item-type { margin:9px 0 12px; padding-bottom:10px; border-bottom:1px solid #304154; color:#a8bfd4; font-size:10px; line-height:1.5; overflow-wrap:anywhere; }
+.map-item-details { display:grid; gap:0; margin:0; }
+.map-item-details > div { display:grid; grid-template-columns:minmax(82px,.8fr) minmax(0,1.2fr); gap:8px; padding:7px 0; border-bottom:1px solid #263748; }
+.map-item-details dt { color:#91a7bb; font-size:10px; overflow-wrap:anywhere; }
+.map-item-details dd { margin:0; color:#edf4fb; font-size:10px; font-weight:600; overflow-wrap:anywhere; word-break:break-word; }
+.map-item-empty { display:flex; flex-direction:column; gap:9px; padding:12px 3px; }
+.map-item-empty b { font-size:13px; }
+.map-item-empty p { margin:0; color:#9aabba; font-size:11px; line-height:1.6; }
+@media (max-width:900px) {
+  .map-workspace { grid-template-columns:1fr; }
+  .map-item-inspector { height:auto; max-height:300px; }
 }
 /* M6: kartverktyg – storlek S/M/L + vyåterställning i kortrubriken */
 .maptools { display: inline-flex; align-items: center; gap: 8px; }
@@ -126,11 +150,17 @@ tr.area-row:hover td { background: var(--mut-bg); }
   display: inline-block; width: 12px; height: 4px; border-radius: 2px;
 }
 .maplegend i.pt { width: 9px; height: 9px; border-radius: 50%; }
-.zone-label {
-  background: transparent; border: none; box-shadow: none;
-  font-weight: 700; font-size: 11px; color: #3c4654;
-  text-shadow: 0 0 3px #fff, 0 0 3px #fff;
+.zone-label,.map-item-tooltip {
+  background:#101a25; border:1px solid #d5e4f2; border-radius:5px;
+  box-shadow:0 2px 9px rgba(0,0,0,.65); color:#f4f8fc;
+  font-weight:800; font-size:11px; padding:4px 7px; white-space:normal;
+  text-shadow:none; max-width:220px; overflow-wrap:anywhere;
 }
+.zone-label::before,.map-item-tooltip::before { border-top-color:#d5e4f2; }
+.leaflet-tooltip-top.zone-label::before,.leaflet-tooltip-top.map-item-tooltip::before { border-top-color:#d5e4f2; }
+.leaflet-tooltip-bottom.zone-label::before,.leaflet-tooltip-bottom.map-item-tooltip::before { border-bottom-color:#d5e4f2; }
+.leaflet-tooltip-left.zone-label::before,.leaflet-tooltip-left.map-item-tooltip::before { border-left-color:#d5e4f2; }
+.leaflet-tooltip-right.zone-label::before,.leaflet-tooltip-right.map-item-tooltip::before { border-right-color:#d5e4f2; }
 .leaflet-popup-content .pop { font-size: 12.5px; line-height: 1.4; }
 .leaflet-popup-content .poprow {
   display: flex; justify-content: space-between; gap: 14px; margin-top: 2px;
