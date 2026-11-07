@@ -187,7 +187,7 @@ describe('MapPanel – lager', () => {
     expect(byPopup('StockholmIX').options.radius).toBe(7);
     expect(byPopup('DC Norr').options.fillColor).toBe('#d28cff'); // datacenter
     expect(byPopup('Mätare 1').options.fillColor).toBe('#ffd166'); // flowmatning
-    expect(byPopup('Mätare 1').options.radius).toBe(3.5);
+    expect(byPopup('Mätare 1').options.radius).toBe(6);
     expect(byPopup('Stockholm C').options.fillColor).toBe('#ff79b0'); // station
     // popups bär namn + typ + källa
     expect(byPopup('StockholmIX').popup).toContain('Internetutbyte (IX)');
@@ -205,7 +205,7 @@ describe('MapPanel – lager', () => {
     expect(screen.getByText('Välj ett objekt på kartan')).toBeInTheDocument();
     const marker = __leaf.created.find(c => c.kind === 'circleMarker' && c.popup?.includes('Forsmark'));
     act(() => __fireLayer(marker));
-    expect(screen.getByText('Forsmark')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Forsmark' })).toBeInTheDocument();
     expect(container.textContent).toContain('kraftanläggning');
     expect(container.textContent).toContain('osm');
     expect(container.textContent).toContain('3000 MW');
