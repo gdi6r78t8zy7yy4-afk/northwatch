@@ -63,7 +63,15 @@ const GENERATION_COMPONENTS = {
 };
 
 function GenerationMix({ metrics, country = 'DK' }) {
-  const scope = country === 'ALL' ? 'DK' : country;
+  if (country === 'ALL') {
+    return <div className="energy-generation-mix-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 12 }}>
+      {['DK', 'FI', 'IS'].map(code => <article className="energy-generation-country" key={code}>
+        <h3>{COUNTRY_NAMES[code]} · reported components</h3>
+        <GenerationMix metrics={metrics} country={code}/>
+      </article>)}
+    </div>;
+  }
+  const scope = country;
   const definitions = GENERATION_COMPONENTS[scope] ?? [];
   if (!definitions.length) return <p className="mut">No generation-technology breakdown is currently reported for {COUNTRY_NAMES[scope] ?? scope}.</p>;
   const candidates = definitions.map(definition => ({
@@ -470,7 +478,7 @@ export default function EnergyDashboard({ country = 'ALL', onCountryChange }) {
         </article>)}</div> : <p className="mut">No observations can currently be derived from matching, timestamp-aligned measurements.</p>}
       <div className="mut">{analysis?.methodology}</div>
     </section>
-    <div className="energy-lower-grid"><section className="card"><h2>Generation mix · {country === 'ALL' ? 'Denmark (regional overview)' : COUNTRY_NAMES[country]}</h2><GenerationMix metrics={metrics} country={country}/></section>
+    <div className="energy-lower-grid"><section className="card"><h2>Generation mix · {country === 'ALL' ? 'reported country technologies' : COUNTRY_NAMES[country]}</h2><GenerationMix metrics={metrics} country={country}/></section>
       <section className="card"><h2>Cross-border physical flows · Nordic context</h2>
         {data?.flows?.length ? <div className="energy-table-wrap"><table><thead><tr><th>Förbindelse</th><th>MW</th><th>Källa</th><th>Mättid</th></tr></thead><tbody>
           {data.flows.map((f, i) => <tr key={f.source + '-' + f.name + '-' + i}><td><b>{Number(f.attrs?.mw) < 0 ? (f.attrs?.to ?? '—') : (f.attrs?.from ?? '—')} → {Number(f.attrs?.mw) < 0 ? (f.attrs?.from ?? '—') : (f.attrs?.to ?? '—')}</b></td><td className="mono">{Math.abs(Number(f.attrs?.mw)).toLocaleString('sv-SE', { maximumFractionDigits: 1 })}</td><td>{f.sourceName}</td><td>{fmtTime(f.updated)}</td></tr>)}
