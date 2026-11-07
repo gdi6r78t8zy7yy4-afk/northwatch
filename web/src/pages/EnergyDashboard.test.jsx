@@ -101,6 +101,7 @@ describe('EnergyDashboard', () => {
     expect(screen.getByText('Day-ahead price · Sverige')).toBeInTheDocument();
     expect(screen.getByText('Renewable output · Danmark')).toBeInTheDocument();
     expect(screen.getAllByLabelText('Danmarks produktionsmix')).toHaveLength(2);
+    expect(screen.getByText('Renewable output · Danmark')).toBeInTheDocument();
   });
 
   test('country selector in the energy heading updates the global country scope', async () => {
@@ -132,6 +133,9 @@ describe('EnergyDashboard', () => {
     expect(screen.getAllByText(/Hydro: 250 MW/)).toHaveLength(2);
     expect(screen.getAllByText(/Nuclear: 300 MW/)).toHaveLength(2);
     expect(screen.getAllByText(/not an exhaustive generation mix/)).toHaveLength(2);
+    expect(screen.getByText('Reported renewable components · Finland')).toBeInTheDocument();
+    expect(screen.getByText('Wind + hydro (reported)')).toBeInTheDocument();
+    expect(screen.getByText(/partial coverage, not a full renewable share/)).toBeInTheDocument();
   });
 
   test('Iceland shows geothermal, hydro and oil instead of a wind/solar placeholder', async () => {
