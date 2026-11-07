@@ -74,6 +74,40 @@ function popupHtml(a) {
     + `<div class="mut">${TYPE_LABELS[a.type] ?? a.type} · källa: ${esc(a.source)}</div>${rows}</div>`;
 }
 
+function detailValue(value) {
+  if (value == null || value === '') return 'Ej tillgängligt';
+  if (typeof value === 'object') {
+    try { return JSON.stringify(value); } catch { return String(value); }
+  }
+  return String(value);
+}
+
+function itemDetailRows(item) {
+  const rows = [];
+  for (const [key, value] of Object.entries(item ?? {})) {
+    if (['key', 'attrs', 'geometry', 'geo', 'properties'].includes(key)) continue;
+    if (value != null && value !== '') rows.push([key, detailValue(value)]);
+  }
+  for (const [key, value] of Object.entries(item?.properties ?? {})) {
+    if (value != null && value !== '') rows.push([key, detailValue(value)]);
+  }
+  for (const [key, value] of Object.entries(item?.attrs ?? {})) {
+    if (value != null && value !== '') rows.push([key, detailValue(value)]);
+  }
+  const geometry = item?.geometry ?? item?.geo;
+  if (geometry) {
+    rows.push(['Geometrityp', geometry.type ?? 'Okänd']);
+    if (geometry.type === 'Point' && geometry.coordinates) {
+      rows.push(['Koordinater (lon, lat)', geometry.coordinates.join(', ')]);
+    } else if (Array.isArray(geometry.coordinates)) {
+      rows.push(['Geometripunkter', String(geometry.coordinates.length)]);
+      rows.push(['Startkoordinat', detailValue(geometry.coordinates[0])]);
+      rows.push(['Slutkoordinat', detailValue(geometry.coordinates.at(-1))]);
+    }
+  }
+  return rows;
+}
+
 export default function MapPanel({
   area, country, assets = [], staticGeo = null, events = [],
   forecastMeta = null, onMapClick = null,
@@ -88,6 +122,7 @@ export default function MapPanel({
   const [wx, setWx] = useState(null);
   const [wxErr, setWxErr] = useState(null);
   const [energyLayers, setEnergyLayers] = useState({ zones: true, links: true, flows: true });
+  const [selectedItem, setSelectedItem] = useState(null);
 
   // M8: väderprognosrutnätet aktiveras när föräldern skickar meta (område 11).
   const wxOn = !!forecastMeta?.ready;
@@ -226,19 +261,29 @@ export default function MapPanel({
         if (p.kind === 'zone' && energyLayers.zones) {
           const [lng, lat] = f.geometry.coordinates;
           L.circleMarker([lat, lng], {
-            radius: 4, color: '#5b6470', weight: 1, fillColor: '#fff', fillOpacity: 0.95,
-          }).bindTooltip(p.zone, { permanent: true, direction: 'top', className: 'zone-label' })
-            .addTo(layer);
+            radius: 7, color: '#07111c', weight: 2.5, fillColor: '#f6c85f', fillOpacity: 1,
+          }).bindTooltip(p.zone, {
+            permanent: true, direction: 'auto', offset: [0, -12], className: 'zone-label',
+          }).on('click', () => setSelectedItem({
+            key: `zone:${p.zone}`, name: p.zone, type: 'Elområde', source: 'Northwatch / schematisk geodata',
+            properties: p, geometry: f.geometry,
+          })).addTo(layer);
         } else if (p.kind === 'link' && energyLayers.links) {
           const coords = f.geometry.coordinates.map(([lng, lat]) => [lat, lng]);
           const planned = p.status === 'planerad';
+          const link = L.polyline(coords, {
+            color: '#07111c', weight: 8, opacity: 0.9, dashArray: planned ? '8 7' : null,
+          });
+          link.addTo(layer);
           L.polyline(coords, {
-            color: planned ? '#9aa5b1' : '#e08a2e',
-            weight: 1 + Math.min(2, (p.mw ?? 0) / 700),
-            dashArray: planned ? '6 6' : null,
-            opacity: 0.8,
-          }).bindTooltip(`${p.name} · ${p.mw} MW · ${p.status}${p.note ? ` · ${p.note}` : ''}`)
-            .addTo(layer);
+            color: planned ? '#d5e0eb' : '#ffb454',
+            weight: 4, dashArray: planned ? '7 7' : null, opacity: 1,
+          }).bindTooltip(`${p.name} · ${p.mw ?? '—'} MW · ${p.status ?? 'status okänd'}${p.note ? ` · ${p.note}` : ''}`, {
+            sticky: true, direction: 'auto', className: 'map-item-tooltip',
+          }).on('click', () => setSelectedItem({
+            key: `link:${p.name}`, name: p.name ?? 'HVDC-länk', type: 'HVDC-länk',
+            source: 'Northwatch / schematisk geodata', properties: p, geometry: f.geometry,
+          })).addTo(layer);
         }
       }
     }
@@ -250,24 +295,33 @@ export default function MapPanel({
       if (g?.type === 'Point') {
         const [lng, lat] = g.coordinates;
         L.circleMarker([lat, lng], {
-          radius: a.type === 'ix' ? 4.5 : a.type === 'kamera' ? 2.5 : 3.5,
-          color: '#fff', weight: 1,
-          fillColor: TYPE_COLORS[a.type] ?? '#888',
-          fillOpacity: 0.9,
-        }).bindPopup(popupHtml(a), { maxWidth: 280 }).addTo(layer);
+          radius: a.type === 'kamera' ? 4 : a.type === 'ix' ? 7 : 6,
+          color: '#07111c', weight: 2.5,
+          fillColor: TYPE_COLORS[a.type] ?? '#a8b8c8',
+          fillOpacity: 1,
+        }).bindPopup(popupHtml(a), { maxWidth: 280 })
+          .bindTooltip(a.name, { direction: 'auto', sticky: true, offset: [0, -10], className: 'map-item-tooltip' })
+          .on('click', () => setSelectedItem({
+            ...a, key: `asset:${a.id ?? a.name}`, typeLabel: TYPE_LABELS[a.type] ?? a.type,
+          })).addTo(layer);
       } else if (g?.type === 'LineString') {
         const coords = a.geometry.coordinates.map(([lng, lat]) => [lat, lng]);
         const mw = a.attrs?.mw;
         const color = a.type === 'flow' ? (mw >= 0 ? '#2e9e5b' : '#d4574a') : '#e08a2e';
         // Signed flow values reverse the direction of the visible arrow.
         const directed = a.type === 'flow' && Number(mw) < 0 ? [...coords].reverse() : coords;
+        const flowLabel = a.type === 'flow'
+          ? `${Number(mw) < 0 ? (a.attrs?.to ?? '') : (a.attrs?.from ?? '')} → ${Number(mw) < 0 ? (a.attrs?.from ?? '') : (a.attrs?.to ?? '')} · ${Math.round(Math.abs(mw))} MW`
+          : a.name;
+        L.polyline(directed, { color: '#07111c', weight: a.type === 'flow' ? 8 : 6, opacity: 0.95 }).addTo(layer);
         L.polyline(directed, {
-          color,
-          weight: a.type === 'flow' ? 1.5 + Math.min(3, Math.abs(mw ?? 0) / 700) : 2,
-          opacity: 0.85,
-        }).bindTooltip(a.type === 'flow'
-          ? `${Number(mw) < 0 ? (a.attrs?.to ?? '') : (a.attrs?.from ?? '')} → ${Number(mw) < 0 ? (a.attrs?.from ?? '') : (a.attrs?.to ?? '')} · ${Math.round(Math.abs(mw))} MW` : a.name)
-          .addTo(layer);
+          color, weight: a.type === 'flow' ? 4 + Math.min(2, Math.abs(mw ?? 0) / 700) : 3,
+          opacity: 1, lineCap: 'round', lineJoin: 'round',
+        }).bindTooltip(flowLabel, { sticky: true, direction: 'auto', className: 'map-item-tooltip' })
+          .on('click', () => setSelectedItem({
+            ...a, key: `asset:${a.id ?? a.name}`, typeLabel: TYPE_LABELS[a.type] ?? a.type,
+            geometry: a.geometry,
+          })).addTo(layer);
         if (a.type === 'flow' && directed.length >= 2 && typeof map.latLngToLayerPoint === 'function') {
           const start = map.latLngToLayerPoint(directed[0]);
           const finish = map.latLngToLayerPoint(directed[directed.length - 1]);
@@ -276,8 +330,8 @@ export default function MapPanel({
             (directed[0][1] + directed[directed.length - 1][1]) / 2];
           L.marker(midpoint, { interactive: false, keyboard: false,
             icon: L.divIcon({ className: 'flow-direction-icon',
-              html: `<span style="color:${color};transform:rotate(${angle}rad)">➤</span>`,
-              iconSize: [16, 16], iconAnchor: [8, 8] }),
+              html: `<span style="transform:rotate(${angle}rad)">➤</span>`,
+              iconSize: [24, 24], iconAnchor: [12, 12] }),
           }).addTo(layer);
         }
       }
@@ -288,8 +342,14 @@ export default function MapPanel({
       if (!ev.geo) continue;
       const feat = { type: 'Feature', properties: { title: ev.title }, geometry: ev.geo };
       L.geoJSON(feat, {
-        style: { color: '#d4574a', weight: 2.5, opacity: 0.75 },
-        onEachFeature: (f, l) => l.bindTooltip(f.properties.title),
+        style: { color: '#07111c', weight: 8, opacity: 0.95 },
+        onEachFeature: (f, l) => {
+          l.bindTooltip(f.properties.title, { sticky: true, direction: 'auto', className: 'map-item-tooltip' });
+          l.on('click', () => setSelectedItem({
+            key: `event:${ev.id ?? ev.title}`, name: ev.title, type: 'Geografisk händelse',
+            source: ev.source ?? 'Händelseflöde', ...ev,
+          }));
+        },
       }).addTo(layer);
     }
   }, [area.id, country, assets, staticGeo, events, wx, energyLayers]);
@@ -367,7 +427,26 @@ export default function MapPanel({
           </button>
         </span>
       </h2>
-      <div ref={divRef} className="mapbox" style={{ height: MAP_SIZES[size] }} />
+      <div className="map-workspace">
+        <div ref={divRef} className="mapbox" style={{ height: MAP_SIZES[size] }} />
+        <aside className="map-item-inspector" aria-label="Information om valt kartobjekt" aria-live="polite">
+          {selectedItem ? <>
+            <div className="map-item-inspector-head">
+              <div><span>VALT KARTOBJEKT</span><h3>{selectedItem.name ?? selectedItem.title ?? 'Namnlöst objekt'}</h3></div>
+              <button type="button" className="map-item-clear" onClick={() => setSelectedItem(null)} aria-label="Stäng objektinformation">×</button>
+            </div>
+            <div className="map-item-type">{selectedItem.typeLabel ?? selectedItem.type ?? 'Kartobjekt'}{selectedItem.source ? ` · ${selectedItem.source}` : ''}</div>
+            <dl className="map-item-details">
+              {itemDetailRows(selectedItem).map(([key, value], index) => (
+                <div key={`${key}-${index}`}><dt>{key}</dt><dd>{value}</dd></div>
+              ))}
+            </dl>
+          </> : <div className="map-item-empty">
+            <span>OBJEKTINSPEKTÖR</span><b>Välj ett objekt på kartan</b>
+            <p>Klicka på en anläggning, ledning, zon eller händelse för att visa tillgängliga uppgifter här.</p>
+          </div>}
+        </aside>
+      </div>
       <div className="maplegend mut">
         <span><i style={{ background: '#4a7fd4' }} />Landsgränser</span>
         {hasEnergy && energyLayers.zones && <span><i className="pt" style={{ background: '#5b6470' }} />Elområden</span>}
