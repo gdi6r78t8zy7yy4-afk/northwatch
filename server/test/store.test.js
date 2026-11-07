@@ -3,8 +3,6 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
-import { state, registerSource, setResult, initStore, flushStore } from '../lib/store.js';
-
 test('collector records and source health survive a process restart', async () => {
   const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'northwatch-store-'));
   const file = path.join(dir, 'store.json');
@@ -13,6 +11,7 @@ test('collector records and source health survive a process restart', async () =
   process.env.STORE_DRIVER = 'local';
   process.env.NORTHWATCH_STORE_FILE = file;
   try {
+    const { state, registerSource, setResult, initStore, flushStore } = await import('../lib/store.js?local-persistence-test');
     state.sources.clear();
     registerSource({ id: 'test-source', name: 'Test source', area: 1, country: 'SE', every: 60 });
     const records = [{ t: 'm', area: 1, country: 'SE', source: 'test-source', indicator: 'test', value: 42, unit: 'n', ts: '2026-11-07T00:00:00.000Z' }];
