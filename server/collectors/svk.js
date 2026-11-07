@@ -87,8 +87,69 @@ async function qFlows(resourceId) {
   return recs;
 }
 
+// Normalize one published delivery block. Capacity volume and capacity price
+// are kept as separate measurements, with zone and direction in the indicator.
+export function normalizeReserveRows(kind, rows) {
+  if (!Array.isArray(rows) || !rows.length) return [];
+  const ordered = [...rows].filter(r => r?.start_time_utc)
+    .sort((a, b) => String(a.start_time_utc).localeCompare(String(b.start_time_utc)));
+  if (!ordered.length) return [];
+  const cur = ordered[0];
+  const blockRows = ordered.filter(r => r.start_time_utc === cur.start_time_utc);
+  const hour = cur.start_time_utc.slice(11, 16);
+  const ts = `${cur.start_time_utc}Z`;
+  const recs = [];
+  const prefix = kind === 'afrr' ? 'aFRR' : 'mFRR';
+
+  for (const row of blockRows) {
+    const zone = String(row.bidding_zone ?? '').trim();
+    const direction = String(row.reserve_direction ?? '').toLowerCase();
+    const volume = Number(row.volume);
+    if (!zone || !['up', 'down'].includes(direction) || !Number.isFinite(volume)) continue;
+    const detail = `${zone} ${direction}`;
+    recs.push(metric(`${prefix}-kapacitet ${detail}`, volume,
+      row.volume_unit ?? 'MW', ts));
+    const price = Number(row.price);
+    if (row.price != null && Number.isFinite(price)) {
+      recs.push(metric(`${prefix}-kapacitetspris ${detail}`, price,
+        row.price_unit ?? 'EUR/MW', ts));
+    }
+  }
+
+  // Preserve the existing headline indicators for dashboard compatibility.
+  if (kind === 'afrr') {
+    // The previous collector exposed one headline row (the first row in the
+    // earliest block). Keep that compatibility metric, but only for a valid
+    // zone/direction/volume tuple.
+    const row = blockRows[0];
+    const zone = String(row?.bidding_zone ?? '').trim();
+    const direction = String(row?.reserve_direction ?? '').toLowerCase();
+    const volume = Number(row?.volume);
+    if (zone && ['up', 'down'].includes(direction) && Number.isFinite(volume)) {
+      recs.push(metric(
+        `aFRR-leverans ${hour} (${row.bidding_zone} ${row.reserve_direction})`,
+        volume, row.volume_unit ?? 'MW', ts,
+      ));
+    }
+  } else {
+    const byDir = new Map();
+    for (const row of blockRows) {
+      if (!['up', 'down'].includes(String(row.reserve_direction).toLowerCase()) ||
+          !Number.isFinite(Number(row.volume))) continue;
+      const dir = String(row.reserve_direction).toLowerCase();
+      byDir.set(dir, (byDir.get(dir) ?? 0) + Number(row.volume));
+    }
+    for (const dir of ['up', 'down']) {
+      if (byDir.has(dir)) recs.push(metric(`mFRR-leverans ${hour} (${dir})`,
+        Math.round(byDir.get(dir) * 10) / 10, cur.volume_unit ?? 'MW', ts));
+    }
+  }
+  return recs;
+}
+
 // aFRR/mFRR-kapacitetsmarknaden: timvisa leveransblock, ~5 h framåt.
-// KPI: blocket för den igångvarande timmen (tidigaste raden i fönstret).
+// Visar publicerad kapacitet per zon/riktning och pris när källan lämnar pris.
+// Det är kapacitetsmarknadens leveransblock, inte aktiverad energi eller headroom.
 async function qReserve(kind, resourceId) {
   const { records: rows } = await search(resourceId, {
     limit: 500, sort: 'start_time_utc',
@@ -100,31 +161,7 @@ async function qReserve(kind, resourceId) {
     },
   });
   if (!rows.length) throw new Error(`svk ${kind}: inga leveransblock i fönstret`);
-  const cur = rows[0];
-  const hour = cur.start_time_utc.slice(11, 16);
-  const ts = `${cur.start_time_utc}Z`;
-  const unit = cur.volume_unit ?? 'MW';
-  const recs = [];
-  if (kind === 'afrr') {
-    recs.push(metric(
-      `aFRR-leverans ${hour} (${cur.bidding_zone} ${cur.reserve_direction})`,
-      Number(cur.volume), unit, ts,
-    ));
-  } else {
-    // mFRR publiceras per zon × riktning – summera per riktning.
-    const byDir = new Map();
-    for (const r of rows) {
-      if (r.start_time_utc !== cur.start_time_utc) continue;
-      byDir.set(r.reserve_direction, (byDir.get(r.reserve_direction) ?? 0) + Number(r.volume));
-    }
-    for (const dir of ['up', 'down']) {
-      if (byDir.has(dir)) {
-        recs.push(metric(`mFRR-leverans ${hour} (${dir})`,
-          Math.round(byDir.get(dir) * 10) / 10, unit, ts));
-      }
-    }
-  }
-  return recs;
+  return normalizeReserveRows(kind, rows);
 }
 
 // FCR-bidvolym – SVK har avstannat uppdateringen ("Discontinued").

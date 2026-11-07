@@ -27,7 +27,7 @@ const ENV = {
 };
 Object.assign(process.env, ENV);
 
-const { search } = await import('../collectors/svk.js');
+const { search, normalizeReserveRows } = await import('../collectors/svk.js');
 const svk = (await import('../collectors/svk.js')).default;
 const svkHist = (await import('../collectors/svk-hist.js')).default;
 const { zoneCenters } = await import('../lib/geolayers.js');
@@ -199,4 +199,36 @@ test('svk/svk-hist: tomma dataset avkastar fel till källhälsan', async () => {
   await assert.rejects(svk.fetch(), /physical_flows: inga rader/);
   await assert.rejects(svkHist.fetch(), /svk-hist: inga rader/);
   empty = false;
+});
+
+
+test('reserve normalization exposes capacity and price separately per zone and direction', () => {
+  const rows = [
+    { start_time_utc:'2026-11-03T17:00:00', bidding_zone:'SE1', reserve_direction:'up', volume:120.5, volume_unit:'MW', price:2.1, price_unit:'EUR-MW' },
+    { start_time_utc:'2026-11-03T17:00:00', bidding_zone:'SE1', reserve_direction:'down', volume:95, volume_unit:'MW', price:2.4, price_unit:'EUR-MW' },
+    { start_time_utc:'2026-11-03T18:00:00', bidding_zone:'SE2', reserve_direction:'up', volume:110, volume_unit:'MW', price:1.6, price_unit:'EUR-MW' },
+  ];
+  const out = normalizeReserveRows('mfrr', rows);
+  assert.equal(out.length, 6);
+  assert.ok(out.some(r => r.indicator === 'mFRR-kapacitet SE1 up' && r.value === 120.5 && r.unit === 'MW'));
+  assert.ok(out.some(r => r.indicator === 'mFRR-kapacitetspris SE1 up' && r.value === 2.1 && r.unit === 'EUR-MW'));
+  assert.ok(out.some(r => r.indicator === 'mFRR-kapacitet SE1 down' && r.value === 95));
+  assert.ok(!out.some(r => r.indicator.includes('SE2')), 'only the earliest delivery block is selected');
+  assert.ok(out.some(r => r.indicator === 'mFRR-leverans 17:00 (up)' && r.value === 120.5));
+  assert.ok(out.some(r => r.indicator === 'mFRR-leverans 17:00 (down)' && r.value === 95));
+});
+
+test('reserve normalization does not invent missing prices or accept invalid rows', () => {
+  const rows = [
+    { start_time_utc:'2026-11-03T17:00:00', bidding_zone:'SE3', reserve_direction:'up', volume:80, volume_unit:'MW' },
+    { start_time_utc:'2026-11-03T17:00:00', bidding_zone:'SE4', reserve_direction:'sideways', volume:70, volume_unit:'MW', price:3, price_unit:'EUR-MW' },
+    { start_time_utc:'2026-11-03T17:00:00', bidding_zone:'SE2', reserve_direction:'down', volume:'bad', volume_unit:'MW', price:'bad', price_unit:'EUR-MW' },
+  ];
+  const out = normalizeReserveRows('afrr', rows);
+  // Capacity is emitted once; the legacy headline remains for the first
+  // valid row only. Invalid directions and volumes must not create metrics.
+  assert.equal(out.length, 2);
+  assert.ok(out.some(r => r.indicator === 'aFRR-kapacitet SE3 up' && r.value === 80));
+  assert.ok(out.some(r => r.indicator === 'aFRR-leverans 17:00 (SE3 up)' && r.value === 80));
+  assert.ok(!out.some(r => r.indicator.includes('SE4') || r.indicator.includes('SE2')));
 });
