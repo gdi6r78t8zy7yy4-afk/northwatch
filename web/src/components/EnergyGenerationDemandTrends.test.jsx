@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest';
-import { buildEnergyGenerationDemandTrends } from './EnergyGenerationDemandTrends.jsx';
+import { buildEnergyGenerationDemandTrends, filterRenewableGenerationSeries } from './EnergyGenerationDemandTrends.jsx';
 
 const point = (value, ts) => ({ value, ts });
 
@@ -104,5 +104,31 @@ describe('buildEnergyGenerationDemandTrends', () => {
       { country:'SE', source:'svk', indicator:'Nettoflöde SE→FI', unit:'MW',
         points:[point(1, '2026-11-07T08:00:00Z'), point(2, '2026-11-07T09:00:00Z')] },
     ])).toHaveLength(0);
+  });
+});
+
+
+describe('filterRenewableGenerationSeries', () => {
+  test('keeps only source-reported renewable technology series', () => {
+    const renewable = [
+      { indicator: 'Vindproduktion (DK)' },
+      { indicator: 'Solproduktion (DK)' },
+      { indicator: 'Vattenkraftproduktion (FI)' },
+      { indicator: 'Geotermisk produktion (IS)' },
+      { indicator: 'Förnybar produktion (IS)' },
+      { indicator: 'Vind+sol-produktion DK' },
+    ];
+    const unrelated = [
+      { indicator: 'Total produktion (DK)' },
+      { indicator: 'Total förbrukning (DK)' },
+      { indicator: 'Nettoflöde DK→SE' },
+      { indicator: 'Dag-ahead-pris DK1' },
+    ];
+    expect(filterRenewableGenerationSeries([...renewable, ...unrelated])).toEqual(renewable);
+  });
+
+  test('handles missing indicators and empty input safely', () => {
+    expect(filterRenewableGenerationSeries()).toEqual([]);
+    expect(filterRenewableGenerationSeries([{}, { indicator: null }, { indicator: 'Total produktion (SE)' }])).toEqual([]);
   });
 });
