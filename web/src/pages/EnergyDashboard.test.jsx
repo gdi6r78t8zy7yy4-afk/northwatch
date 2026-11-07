@@ -131,7 +131,7 @@ describe('EnergyDashboard', () => {
     expect(screen.getAllByLabelText('Finlands produktionsmix')).toHaveLength(2);
     expect(screen.getAllByText(/Hydro: 250 MW/)).toHaveLength(2);
     expect(screen.getAllByText(/Nuclear: 300 MW/)).toHaveLength(2);
-    expect(screen.getByText(/not an exhaustive generation mix/)).toBeInTheDocument();
+    expect(screen.getAllByText(/not an exhaustive generation mix/)).toHaveLength(2);
   });
 
   test('Iceland shows geothermal, hydro and oil instead of a wind/solar placeholder', async () => {
