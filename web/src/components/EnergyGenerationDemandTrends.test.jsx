@@ -37,6 +37,54 @@ describe('buildEnergyGenerationDemandTrends', () => {
     expect(rows.some(row => row.country === 'IS' && row.kind === 'Consumption')).toBe(false);
   });
 
+  test('tracks renewable technologies separately and calculates only exactly aligned shares', () => {
+    const ts1 = '2026-11-07T08:00:00Z';
+    const ts2 = '2026-11-07T09:00:00Z';
+    const rows = buildEnergyGenerationDemandTrends([
+      { country:'DK', source:'energidataservice', indicator:'Total produktion (DK)', unit:'MW',
+        points:[point(1000, ts1), point(1200, ts2)] },
+      { country:'DK', source:'energidataservice', indicator:'Vindproduktion (DK)', unit:'MW',
+        points:[point(300, ts1), point(420, ts2)] },
+      { country:'DK', source:'energidataservice', indicator:'Solproduktion (DK)', unit:'MW',
+        points:[point(100, ts1), point(180, ts2)] },
+      { country:'FI', source:'fingrid', indicator:'Vattenkraftproduktion (FI)', unit:'MW',
+        points:[point(200, ts1), point(250, ts2)] },
+      { country:'IS', source:'landsnet', indicator:'Geotermisk produktion (IS)', unit:'MW',
+        points:[point(150, ts1), point(160, ts2)] },
+    ]);
+    const wind = rows.find(row => row.technology === 'Wind');
+    const solar = rows.find(row => row.technology === 'Solar');
+    const hydro = rows.find(row => row.technology === 'Hydro');
+    const geothermal = rows.find(row => row.technology === 'Geothermal');
+    expect(wind.renewableShare).toBe(35);
+    expect(solar.renewableShare).toBe(15);
+    expect(hydro.renewableShare).toBeNull();
+    expect(geothermal.renewableShare).toBeNull();
+    expect(rows.filter(row => row.kind === 'Renewable generation')).toHaveLength(4);
+  });
+
+  test('does not calculate renewable shares across different sources, timestamps or units', () => {
+    const ts1 = '2026-11-07T08:00:00Z';
+    const ts2 = '2026-11-07T09:00:00Z';
+    const rows = buildEnergyGenerationDemandTrends([
+      { country:'DK', source:'energidataservice', indicator:'Total produktion (DK)', unit:'MW',
+        points:[point(1000, ts1), point(1200, ts2)] },
+      { country:'DK', source:'other-source', indicator:'Vindproduktion (DK)', unit:'MW',
+        points:[point(300, ts1), point(420, ts2)] },
+      { country:'FI', source:'fingrid', indicator:'Total produktion (FI)', unit:'MW',
+        points:[point(1000, ts1), point(1200, ts2)] },
+      { country:'FI', source:'fingrid', indicator:'Vindproduktion (FI)', unit:'kW',
+        points:[point(300, ts1), point(420, ts2)] },
+      { country:'IS', source:'landsnet', indicator:'Total produktion (IS)', unit:'MW',
+        points:[point(1000, ts1), point(1200, ts2)] },
+      { country:'IS', source:'landsnet', indicator:'Geotermisk produktion (IS)', unit:'MW',
+        points:[point(300, ts1), point(420, ts2)] },
+    ]);
+    expect(rows.find(row => row.country === 'DK' && row.kind === 'Renewable generation').renewableShare).toBeNull();
+    expect(rows.find(row => row.country === 'FI' && row.kind === 'Renewable generation').renewableShare).toBeNull();
+    expect(rows.find(row => row.country === 'IS' && row.kind === 'Renewable generation').renewableShare).toBe(35);
+  });
+
   test('does not divide by zero or treat missing values as zero', () => {
     const rows = buildEnergyGenerationDemandTrends([{
       country:'FI', source:'fingrid', indicator:'Total produktion (FI)', unit:'MW',
