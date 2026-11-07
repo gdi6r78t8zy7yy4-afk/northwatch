@@ -17,6 +17,7 @@ function createLocalPersistence() {
   let warning = null;
   let historyLoaded = false;
   const history = new Map();
+  const pendingHistory = new Set();
   const flush = () => writeQueue;
   async function loadEnergyMeasurements({ from, to } = {}) {
     if (!historyLoaded) {
@@ -35,18 +36,21 @@ function createLocalPersistence() {
     const fresh = [];
     for (const record of records) {
       const id = historyId(record);
-      if (history.has(id)) continue;
-      const item = { id, record };
-      history.set(id, record); fresh.push(JSON.stringify(item));
+      if (history.has(id) || pendingHistory.has(id)) continue;
+      pendingHistory.add(id);
+      fresh.push({ id, record });
     }
     if (!fresh.length) return writeQueue;
     const target = historyPath();
     writeQueue = writeQueue.then(async () => {
       await fs.mkdir(path.dirname(target), { recursive: true });
-      await fs.appendFile(target, fresh.join('\n') + '\n', { mode: 0o600 });
+      await fs.appendFile(target, fresh.map(item => JSON.stringify(item)).join('\n') + '\n', { mode: 0o600 });
+      for (const item of fresh) history.set(item.id, item.record);
     }).catch(error => {
       warning = String(error?.message ?? error);
       console.error('[store] local energy history failed:', warning);
+    }).finally(() => {
+      for (const item of fresh) pendingHistory.delete(item.id);
     });
     return writeQueue;
   }
