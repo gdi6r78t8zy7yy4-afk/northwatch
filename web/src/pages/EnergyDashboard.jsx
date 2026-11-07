@@ -22,7 +22,30 @@ const age = ts => {
 function Kpi({ label, metric, fallback }) {
   return <div className="energy-kpi"><div className="energy-kpi-label">{label}</div>
     <div className="energy-kpi-value">{fmt(metric, 1)} <small>{metric?.unit ?? ''}</small></div>
-    <div className="mut">{metric ? metric.sourceName + ' · ' + age(metric.ts) : fallback}</div></div>;
+    <div className="mut">{metric ? metric.sourceName + ' · ' + age(metric.ts) : fallback}</div>
+    {metric?.coverageNote ? <div className="mut">{metric.coverageNote}</div> : null}</div>;
+}
+function reportedRenewableMetric(metrics, country) {
+  const latest = indicator => metrics
+    .filter(row => row.country === country && row.indicator === indicator &&
+      row.value != null && Number.isFinite(Number(row.value)) && row.ts)
+    .sort((a, b) => String(b.ts).localeCompare(String(a.ts)))[0] ?? null;
+  const alignedSum = (left, right, label, coverageNote = null) => {
+    if (!left || !right || left.ts !== right.ts || left.unit !== right.unit) return null;
+    return { ...left, value: Number(left.value) + Number(right.value),
+      indicator: label, sourceName: left.sourceName ?? left.source, coverageNote };
+  };
+  if (country === 'DK') {
+    return alignedSum(latest('Vindproduktion (DK)'), latest('Solproduktion (DK)'), 'Vind + sol-produktion (DK)')
+      ?? latest('Vind+sol-produktion DK');
+  }
+  if (country === 'FI') {
+    return alignedSum(latest('Vindproduktion (FI)'), latest('Vattenkraftproduktion (FI)'),
+      'Rapporterad vind- och vattenkraft (FI)',
+      'Partial coverage: other renewable technologies may not be included.');
+  }
+  if (country === 'IS') return latest('Förnybar produktion (IS)');
+  return null;
 }
 const GENERATION_COMPONENTS = {
   DK: [{ name: 'Wind', indicator: 'Vindproduktion (DK)' }, { name: 'Solar', indicator: 'Solproduktion (DK)' }],
@@ -240,10 +263,15 @@ function GenerationDemandPanel({ metrics, country = 'ALL' }) {
       .filter(Boolean).sort((a, b) => String(b.ts).localeCompare(String(a.ts)))[0] ?? null;
     const wind = latestFor(country, `Vindproduktion (${country})`);
     const solar = latestFor(country, `Solproduktion (${country})`);
+    const hydro = country === 'FI' ? latestFor(country, 'Vattenkraftproduktion (FI)') : null;
     const combinedRenewables = latestFor(country, `Vind+sol-produktion ${country}`);
     const icelandRenewables = country === 'IS' ? latestFor(country, 'Förnybar produktion (IS)') : null;
     let renewable = icelandRenewables ?? combinedRenewables;
-    if (!icelandRenewables && wind && solar && wind.ts === solar.ts && wind.unit === solar.unit) {
+    if (country === 'FI' && wind && hydro && wind.ts === hydro.ts && wind.unit === hydro.unit) {
+      renewable = { value: Number(wind.value) + Number(hydro.value), unit: wind.unit,
+        ts: wind.ts, sourceName: wind.sourceName ?? wind.source,
+        partial: true };
+    } else if (country === 'DK' && wind && solar && wind.ts === solar.ts && wind.unit === solar.unit) {
       renewable = { value: Number(wind.value) + Number(solar.value), unit: wind.unit,
         ts: wind.ts, sourceName: wind.sourceName ?? wind.source };
     }
@@ -274,13 +302,13 @@ function GenerationDemandPanel({ metrics, country = 'ALL' }) {
       <div className="energy-generation-values">
         <div><span>Production</span><b>{value(row.generation)}</b></div>
         <div><span>Consumption</span><b>{value(row.demand)}</b></div>
-        <div><span>{row.country === 'IS' ? 'Hydro + geothermal' : 'Wind + solar'}</span><b>{value(row.renewable)}</b></div>
+        <div><span>{row.country === 'IS' ? 'Hydro + geothermal' : row.country === 'FI' ? 'Wind + hydro (reported)' : 'Wind + solar'}</span><b>{value(row.renewable)}</b></div>
       </div>
       <div className="energy-generation-assessment">
         {row.aligned ? <span className={row.balance < 0 ? 'energy-balance deficit' : 'energy-balance surplus'}>
           Domestic balance {row.balance > 0 ? '+' : ''}{row.balance.toLocaleString('sv-SE', { maximumFractionDigits: 1 })} {row.generation.unit}
         </span> : <span className="mut">Balance unavailable · timestamps or units do not align</span>}
-        {row.renewableShare != null ? <span className="mut">{row.country === 'IS' ? 'Hydro + geothermal' : 'Wind + solar'}: {row.renewableShare.toLocaleString('sv-SE', { maximumFractionDigits: 1 })}% of reported production</span>
+        {row.renewableShare != null ? <span className="mut">{row.country === 'IS' ? 'Hydro + geothermal' : row.country === 'FI' ? 'Reported wind + hydro components' : 'Wind + solar'}: {row.renewableShare.toLocaleString('sv-SE', { maximumFractionDigits: 1 })}% of reported production{row.renewable?.partial ? ' · partial coverage, not a full renewable share' : ''}</span>
           : <span className="mut">Renewable share unavailable · requires aligned renewable and total production</span>}
       </div>
       {row.country === 'IS' ? <div className="mut">Landsnet reports geothermal, hydro and oil generation in its transmission-system snapshot. It does not provide consumption here; generation connected only to distribution networks may not be represented.</div> : null}
@@ -365,13 +393,16 @@ export default function EnergyDashboard({ country = 'ALL', onCountryChange }) {
     const consumption = latest(r => /^Total förbrukning \([A-Z]{2}\)$/.test(r.indicator) ||
       (r.country === 'DK' && r.indicator === 'Beräknad förbrukning (DK, SCADA)'));
     const price = latest(r => /^Dag-ahead-pris /.test(r.indicator));
-    const renewable = latest(r => /^(Vindproduktion|Solproduktion|Förnybar produktion) \(/.test(r.indicator));
+    const renewable = (scope ? [scope] : ['SE', 'NO', 'DK', 'FI', 'IS'])
+      .map(code => reportedRenewableMetric(metrics, code))
+      .filter(Boolean)
+      .sort((a, b) => String(b.ts).localeCompare(String(a.ts)))[0] ?? null;
     const labelCountry = metric => metric ? COUNTRY_NAMES[metric.country] ?? metric.country : '';
     return [
       { label: production ? `Production · ${labelCountry(production)}` : 'Production', metric: production, fallback: 'No production measurement in this country scope' },
       { label: consumption ? `Consumption · ${labelCountry(consumption)}` : 'Consumption', metric: consumption, fallback: 'No consumption measurement in this country scope' },
       { label: price ? `Day-ahead price · ${labelCountry(price)}` : 'Day-ahead price', metric: price, fallback: 'No day-ahead price in this country scope' },
-      { label: renewable ? `Renewable output · ${labelCountry(renewable)}` : 'Renewable output', metric: renewable, fallback: 'No renewable measurement in this country scope' },
+      { label: renewable ? `${renewable.coverageNote ? 'Reported renewable components' : 'Renewable output'} · ${labelCountry(renewable)}` : 'Renewable output', metric: renewable, fallback: 'No aligned renewable measurement in this country scope' },
       { label: 'Sources reporting', value: data?.coverage?.reportingSources ?? 0, unit: '', detail: `${data?.coverage?.sourceCount ?? 0} configured sources in scope` },
     ];
   }, [metrics, country, data?.coverage]);

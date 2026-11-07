@@ -132,6 +132,9 @@ describe('EnergyDashboard', () => {
     expect(screen.getAllByText(/Hydro: 250 MW/)).toHaveLength(2);
     expect(screen.getAllByText(/Nuclear: 300 MW/)).toHaveLength(2);
     expect(screen.getAllByText(/not an exhaustive generation mix/)).toHaveLength(2);
+    expect(screen.getByText('Reported renewable components · Finland')).toBeInTheDocument();
+    expect(screen.getByText('Wind + hydro (reported)')).toBeInTheDocument();
+    expect(screen.getByText(/partial coverage, not a full renewable share/)).toBeInTheDocument();
   });
 
   test('Iceland shows geothermal, hydro and oil instead of a wind/solar placeholder', async () => {
