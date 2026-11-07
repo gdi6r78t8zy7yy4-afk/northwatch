@@ -6,6 +6,10 @@ import StatusPill from '../components/StatusPill.jsx';
 import MapPanel from '../components/MapPanel.jsx';
 import WeatherForecastPanel from '../components/WeatherForecastPanel.jsx';
 import { MetricsTable, EventsTable } from '../components/RecordsTables.jsx';
+import CyberNvdPanel from '../components/CyberNvdPanel.jsx';
+import CyberKevPanel from '../components/CyberKevPanel.jsx';
+import CyberOsvPanel from '../components/CyberOsvPanel.jsx';
+import CyberPrioritizedPanel from '../components/CyberPrioritizedPanel.jsx';
 
 export default function DashboardPage({ country }) {
   const { id } = useParams();
@@ -131,16 +135,29 @@ export default function DashboardPage({ country }) {
         />
       )}
 
-      <div className="grid">
-        <div className="card" style={{ gridColumn: '1 / -1' }}>
-          <h2>Indikatorer <span className="tag">{records.filter(r => r.t === 'm').length} st</span></h2>
-          <MetricsTable records={records} />
+      {area.id === 5 ? (
+        // M9: cyber (område 5) – de fyra widgeterna ersätter de generiska
+        // indikator-/händelse-tabellerna (de innehåller en superset av
+        // analysen). Varje panel hämtar sin egen /api/cyber/*-endpoint
+        // (120 s-polling); övriga 11 områden är oförändrade.
+        <div className="cyber-grid">
+          <CyberNvdPanel />
+          <CyberKevPanel />
+          <CyberOsvPanel />
+          <CyberPrioritizedPanel />
         </div>
-        <div className="card" style={{ gridColumn: '1 / -1' }}>
-          <h2>Händelser och larm <span className="tag">{records.filter(r => r.t === 'e').length} st</span></h2>
-          <EventsTable records={records} />
+      ) : (
+        <div className="grid">
+          <div className="card" style={{ gridColumn: '1 / -1' }}>
+            <h2>Indikatorer <span className="tag">{records.filter(r => r.t === 'm').length} st</span></h2>
+            <MetricsTable records={records} />
+          </div>
+          <div className="card" style={{ gridColumn: '1 / -1' }}>
+            <h2>Händelser och larm <span className="tag">{records.filter(r => r.t === 'e').length} st</span></h2>
+            <EventsTable records={records} />
+          </div>
         </div>
-      </div>
+      )}
 
       <div className="card">
         <h2>Källor för området</h2>

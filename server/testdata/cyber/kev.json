@@ -1,0 +1,112 @@
+{
+  "title": "Known Exploited Vulnerabilities Catalog",
+  "dateReleased": "2026-11-04T20:00:05.774Z",
+  "count": 8,
+  "cnaName": "CISA",
+  "vulnerabilities": [
+    {
+      "cveID": "CVE-2026-111357",
+      "vendorProject": "Ivanti",
+      "product": "Connect Secure",
+      "vulnerabilityName": "Authentication Bypass",
+      "dateAdded": "2026-10-30",
+      "dueDate": "2026-11-13",
+      "requiredAction": "Apply updates per vendor instructions.",
+      "knownRansomwareCampaignUse": "Known",
+      "cwes": ["CWE-287"],
+      "notes": "Exploitation of this vulnerability may result in full network compromise.",
+      "shortDescription": "An authentication bypass vulnerability in Ivanti Connect Secure."
+    },
+    {
+      "cveID": "CVE-2026-119977",
+      "vendorProject": "WordPress",
+      "product": "WordPress Core",
+      "vulnerabilityName": "Stored XSS",
+      "dateAdded": "2026-11-03",
+      "dueDate": "2026-11-17",
+      "requiredAction": "Update to the latest released version.",
+      "knownRansomwareCampaignUse": "Unknown",
+      "cwes": ["CWE-79"],
+      "notes": "",
+      "shortDescription": "A stored cross-site scripting vulnerability in WordPress Core."
+    },
+    {
+      "cveID": "CVE-2026-19868",
+      "vendorProject": "Fortinet",
+      "product": "FortiOS",
+      "vulnerabilityName": "Heap Overflow",
+      "dateAdded": "2026-11-05",
+      "dueDate": "2026-11-19",
+      "requiredAction": "Apply the vendor-provided fix.",
+      "knownRansomwareCampaignUse": "Unknown",
+      "cwes": ["CWE-122"],
+      "notes": "CISA is aware that this vulnerability is being actively exploited.",
+      "shortDescription": "A heap-based buffer overflow in FortiOS web components."
+    },
+    {
+      "cveID": "CVE-2026-00421",
+      "vendorProject": "ExampleSoft",
+      "product": "Widget",
+      "vulnerabilityName": "RCE via config",
+      "dateAdded": "2026-09-05",
+      "dueDate": "2026-09-19",
+      "requiredAction": "Upgrade Widget to version 4.2.1 or later.",
+      "knownRansomwareCampaignUse": "Known",
+      "cwes": ["CWE-94", "CWE-78"],
+      "notes": "",
+      "shortDescription": "Remote code execution via a crafted config file."
+    },
+    {
+      "cveID": "CVE-2026-00102",
+      "vendorProject": "OpenCore",
+      "product": "Gateway",
+      "vulnerabilityName": "SQL Injection",
+      "dateAdded": "2026-10-18",
+      "dueDate": "2026-11-01",
+      "requiredAction": "Apply updates per vendor instructions.",
+      "knownRansomwareCampaignUse": "Unknown",
+      "cwes": ["CWE-89"],
+      "notes": "",
+      "shortDescription": "SQL injection in the gateway admin interface."
+    },
+    {
+      "cveID": "CVE-2026-00077",
+      "vendorProject": "Acme",
+      "product": "Server",
+      "vulnerabilityName": "Path Traversal",
+      "dateAdded": "2026-08-20",
+      "dueDate": "2026-09-03",
+      "requiredAction": "Upgrade to the latest release.",
+      "knownRansomwareCampaignUse": "Unknown",
+      "cwes": ["CWE-22"],
+      "notes": "",
+      "shortDescription": "Path traversal allowing arbitrary file read."
+    },
+    {
+      "cveID": "CVE-2026-00010",
+      "vendorProject": "NordicOS",
+      "product": "Kernel Module",
+      "vulnerabilityName": "Privilege Escalation",
+      "dateAdded": "2026-10-25",
+      "dueDate": "2026-11-08",
+      "requiredAction": "Apply the kernel module patch.",
+      "knownRansomwareCampaignUse": "Unknown",
+      "cwes": ["CWE-269"],
+      "notes": "",
+      "shortDescription": "Local privilege escalation in a kernel module."
+    },
+    {
+      "cveID": "CVE-2026-00005",
+      "vendorProject": "BuildIt",
+      "product": "Toolchain",
+      "vulnerabilityName": "Use After Free",
+      "dateAdded": "2026-07-14",
+      "dueDate": "2026-07-28",
+      "requiredAction": "Update the toolchain.",
+      "knownRansomwareCampaignUse": "Unknown",
+      "cwes": ["CWE-416"],
+      "notes": "",
+      "shortDescription": "Use after free in the toolchain linker."
+    }
+  ]
+}

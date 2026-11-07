@@ -1,0 +1,62 @@
+{
+  "resultsPerPage": 1,
+  "startIndex": 0,
+  "totalResults": 1,
+  "vulnerabilities": [
+    {
+      "cve": {
+        "dataVersion": "2026.1.203",
+        "type": "CVE",
+        "id": "CVE-2026-9999",
+        "sourceIdentifier": "cve@mitre.org",
+        "published": "2026-10-28T19:15:09.123",
+        "lastModified": "2026-10-29T04:59:59.456",
+        "vulnStatus": "Analyzed",
+        "descriptions": [
+          { "lang": "en", "value": "A prototype pollution vulnerability in ExampleSoft Widget allows an attacker to modify the behavior of the application by injecting a crafted payload through the config endpoint." },
+          { "lang": "es", "value": "Vulnerabilidad de prototype pollution en ExampleSoft Widget." }
+        ],
+        "metrics": {
+          "cvssMetricV31": [
+            {
+              "source": "nvd@nist.gov",
+              "type": "Primary",
+              "cvssData": {
+                "version": "3.1",
+                "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H",
+                "baseScore": 9.1,
+                "baseSeverity": "CRITICAL"
+              },
+              "exploitabilityScore": 3.9,
+              "impactScore": 5.9
+            },
+            {
+              "source": "security@example.com",
+              "type": "Secondary",
+              "cvssData": {
+                "version": "3.1",
+                "vectorString": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:H",
+                "baseScore": 8.1,
+                "baseSeverity": "HIGH"
+              }
+            }
+          ]
+        },
+        "weaknesses": [
+          {
+            "source": "nvd@nist.gov",
+            "type": "Primary",
+            "description": [
+              { "lang": "en", "value": "CWE-1321" }
+            ]
+          }
+        ],
+        "references": [
+          { "url": "https://example.com/advisory-1", "tags": ["Vendor Advisory"] },
+          { "url": "https://example.com/advisory-2", "tags": ["Exploit"] },
+          { "url": "https://example.com/advisory-3" }
+        ]
+      }
+    }
+  ]
+}

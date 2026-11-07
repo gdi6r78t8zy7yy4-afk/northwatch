@@ -11,6 +11,7 @@ vi.mock('../api.js');
 import {
   fetchDashboard, fetchAssets, fetchStaticGeo,
   fetchForecastMeta, fetchForecastPoint, fetchForecastGrid, fetchForecastGridCoords,
+  fetchCyberNvd, fetchCyberKev, fetchCyberOsv, fetchCyberPrioritized,
 } from '../api.js';
 
 const now = Date.now();
@@ -52,6 +53,10 @@ beforeEach(() => {
   vi.mocked(fetchForecastPoint).mockReset();
   vi.mocked(fetchForecastGrid).mockReset();
   vi.mocked(fetchForecastGridCoords).mockReset();
+  vi.mocked(fetchCyberNvd).mockReset();
+  vi.mocked(fetchCyberKev).mockReset();
+  vi.mocked(fetchCyberOsv).mockReset();
+  vi.mocked(fetchCyberPrioritized).mockReset();
 });
 
 describe('DashboardPage', () => {
@@ -251,5 +256,62 @@ describe('DashboardPage – väderprognos (M8, område 11)', () => {
     expect(fetchForecastPoint).not.toHaveBeenCalled();
     expect(fetchForecastGrid).not.toHaveBeenCalled();
     expect(fetchForecastGridCoords).not.toHaveBeenCalled();
+  });
+});
+
+// M9: cyber (område 5) – de fyra widgeterna ersätter de generiska
+// indikator-/händelse-tabellerna; övriga områden hämtar aldrig /api/cyber/*.
+// Renderingsdetaljer för varje panel täcks i cyberPanels.test.jsx – här
+// verifieras kopplingen (vilka paneler som sätts in var).
+describe('DashboardPage – cyber (M9, område 5)', () => {
+  const rejectCyber = () => {
+    for (const fn of [fetchCyberNvd, fetchCyberKev, fetchCyberOsv, fetchCyberPrioritized]) {
+      vi.mocked(fn).mockRejectedValue(new Error('test: ingen källa'));
+    }
+  };
+
+  test('område 5: fyra cyberpaneler, ingen generell tabell, ett anrop per källa', async () => {
+    vi.mocked(fetchDashboard).mockResolvedValue(PAYLOAD(AREA_NOGEO));
+    vi.mocked(fetchAssets).mockResolvedValue({ assets: [] });
+    vi.mocked(fetchStaticGeo).mockResolvedValue(null);
+    rejectCyber();
+    const { container } = renderPage(5);
+
+    expect(await screen.findByText('5. Cybersäkerhet')).toBeInTheDocument();
+    // Alla fyra panelramarna sätts in (och pratar med rätt endpoint vardera).
+    expect(screen.getByText('NVD – nya sårbarheter (senaste 30 d)')).toBeInTheDocument();
+    expect(screen.getByText('CISA KEV – kända exploaterade sårbarheter')).toBeInTheDocument();
+    expect(screen.getByText('OSV.dev – paketutbud och rapporter')).toBeInTheDocument();
+    expect(screen.getByText('Prioriterade exploaterade sårbarheter (KEV × NVD)')).toBeInTheDocument();
+    expect(container.querySelector('.cyber-grid')).not.toBeNull();
+    expect(fetchCyberNvd).toHaveBeenCalledTimes(1);
+    expect(fetchCyberKev).toHaveBeenCalledTimes(1);
+    expect(fetchCyberOsv).toHaveBeenCalledTimes(1);
+    expect(fetchCyberPrioritized).toHaveBeenCalledTimes(1);
+    // De generiska tabellerna ersätts av widgeterna.
+    expect(screen.queryByText('Indikatorer')).not.toBeInTheDocument();
+    expect(screen.queryByText('Händelser och larm')).not.toBeInTheDocument();
+    // Källkartan och luckorna finns kvar under widgeterna.
+    expect(screen.getByText('Källor för området')).toBeInTheDocument();
+    expect(screen.getByText('Kända luckor (enligt API-katalogen)')).toBeInTheDocument();
+  });
+
+  test('annat område: inga cyberpaneler, inga /api/cyber-frågor', async () => {
+    vi.mocked(fetchDashboard).mockResolvedValue(PAYLOAD(AREA_GEO));
+    vi.mocked(fetchAssets).mockResolvedValue({ assets: [] });
+    vi.mocked(fetchStaticGeo).mockResolvedValue(null);
+    renderPage(3);
+
+    expect(await screen.findByText('3. Transport och logistik')).toBeInTheDocument();
+    expect(screen.queryByText('NVD – nya sårbarheter (senaste 30 d)')).not.toBeInTheDocument();
+    expect(screen.queryByText('CISA KEV – kända exploaterade sårbarheter')).not.toBeInTheDocument();
+    expect(screen.queryByText('OSV.dev – paketutbud och rapporter')).not.toBeInTheDocument();
+    expect(screen.queryByText('Prioriterade exploaterade sårbarheter (KEV × NVD)')).not.toBeInTheDocument();
+    expect(fetchCyberNvd).not.toHaveBeenCalled();
+    expect(fetchCyberKev).not.toHaveBeenCalled();
+    expect(fetchCyberOsv).not.toHaveBeenCalled();
+    expect(fetchCyberPrioritized).not.toHaveBeenCalled();
+    expect(screen.getByText('Indikatorer')).toBeInTheDocument();
+    expect(screen.getByText('Händelser och larm')).toBeInTheDocument();
   });
 });

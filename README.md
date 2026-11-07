@@ -64,6 +64,8 @@ server/                 backend – ett enda JS-beroende: fast-xml-parser (ENTSO
   lib/scheduler.js      pollar varje källa med sitt intervall (staggerad uppstart)
   lib/jsonstat.js       json-stat 2.0-parser (SCB v2 + SSB v2, M4)
   lib/forecast.js       SMHI snow1g-prognos: cykelretention (12) + /api/forecast (M8)
+  lib/cyber.js          cyberdatslager: NVD (veckosubfönster, TTL 15 min) + KEV-katalogen
+                        + OSV.dev-watchlist + /api/cyber/* (M9, område 5)
   lib/geolayers.js      statiska kartlager, zonmittpunkter, OSM/Overpass-utdrag (veckocache)
   assets/*.geojson      landsgränser (Natural Earth) + energilager (HVDC, zonankar)
   cache/                OSM-veckocache + SMHI-prognoscyklar på disk (gitignorerad)
@@ -99,8 +101,20 @@ asset  { t:'a', area, country, source, type, name, id?, geometry, attrs?, update
   (404 utanför domänen, 503 innan första cykeln)
 - `GET /api/forecast/grid?parameter=&time=&downsample=` – rutnätsvärden för kartan
 - `GET /api/forecast/grid-coords?downsample=` – koordinatindex för rutnätet
+- `GET /api/cyber/nvd?window=7|14|30&severity=&q=&sort=newest|score&limit=` – publicerade
+  CVE ur det delade 30-dagarsfönstret (M9, område 5); `dbTotal` (databastotalen) finns bara
+  när `NVD_API_KEY` är satt, `capped=true` när NVD:s pagineringsspärr klipper fönstret
+- `GET /api/cyber/kev?q=&ransomware=&sort=added|due&limit=` – CISA KEV-katalogen,
+  nyast först, med 90-dagars-/ransomware-/frist-KPI:er och 12-månaders-histogram
+- `GET /api/cyber/osv?ecosystem=` – OSV.dev-rapporter mot det övervakade paketutbudet
+  (`OSV_WATCH_PACKAGES`), fönstret 180 d, per paket status/totalt/nya 90 d/recenta rapporter
+- `GET /api/cyber/prioritized` – de senaste 15 KEV-tillägg med CVSS från NVD
+  (30-dagarscachet först, sedan enskild `?cveId=`-slagning; icke-CVE-poster markeras
+  ej upplösta)
+- `GET /api/cyber/overview` – sammanfattning av de tre cacherna (triggar aldrig
+  källhämtning)
 
-## Källor (34 st)
+## Källor (35 st)
 
 | Källa | Område | Status |
 |-------|--------|--------|
@@ -109,8 +123,9 @@ asset  { t:'a', area, country, source, type, name, id?, geometry, attrs?, update
 | SMHI väderprognos (snow1g) | 11 Miljö/Väder (Nordiskt) | ok – nyckelfri; timvisa cyklar (~15 min efter timslaget), de 12 senaste speglade på disk; 11 katalogstäder (5 SE, 3 NO, 1 FI, 1 DK, 1 IS utanför domänen) + valfri plats (klick) + rutnät i ~50 km-avstånd (ds20); härledda väderhändelser; verifierat live 2026-11-05 |
 | MET Norway Weather API | 11 Miljö/Väder (NO) | ok – kräver `CONTACT` i .env |
 | DMI climate data (station 06180) | 11 Miljö/Väder (DK) | ok – verifierad 2026-11-01 |
-| CISA KEV | 5 Cyber (Nordiskt) | ok |
-| NIST NVD CVE API 2.0 | 5 Cyber (Nordiskt) | ok |
+| CISA KEV | 5 Cyber (Nordiskt) | ok – hela katalogen (~1 800 posteringar, JSON-bakåten hos katalogsidan); prioriteringsunderlag, ej incidentdetektion; M9-widget `/api/cyber/kev` |
+| NIST NVD CVE API 2.0 | 5 Cyber (Nordiskt) | ok – delat 30-dagarspubliceringsfönster hämtat som 7-dagars-subfönster (nyast först; ~13 500 rader, pagineringsspärrar vissa veckor → `capped`); `NVD_API_KEY` höjer rate-limiten och lägger till databastotalen; M9-widget `/api/cyber/nvd`; verifierat live 2026-11-06 |
+| OSV.dev (Open Source Vulnerabilities) | 5 Cyber (Nordiskt) | ok – nyckelfri; `POST /v1/query` per paket mot ett kurerat utbud på 26 paket relevant för kritisk infrastruktur (`OSV_WATCH_PACKAGES` "Ecosystem:Paket;…" för att överskriva, Maven delas på första kolon); 180-dagsfönster, nya 90 d som KPI; M9-widget `/api/cyber/osv`; verifierat live 2026-11-06 |
 | FIRST EPSS | 5 Cyber (Nordiskt) | ok – nyckelfri, daglig |
 | MITRE ATT&CK (Enterprise) | 5 Cyber (Nordiskt) | ok – veckovis, ETag-cache |
 | Svenska kraftnät Data Service (data.svk.se, CKAN datastore) | 1 Energi (SE) | ok – nyckelfri (resurs-id är publika); fysiska gränsflöden 15 min (senaste steget → mätvärde per zonpar + "Svensk nettoexport"-KPI + kartlinjer mellan elspotzoner, DELU ritas ej), aFRR/mFRR-leveransblock, sista FCR-bidmätningen; verifierat live 2026-11-03 |
@@ -340,7 +355,10 @@ TRAFIKVERKET_STATIONS=  # M5 – valfria följda järnvägsstationer (LocationSi
                         #   standard Cst,G,Mc,U,Lu,Ör,Vå (OBS: 'Stl' = Ställdalen)
 TRAFIKVERKET_SSE=…     # M5 – 1 = SSE-ström (valfritt; default polling)
 ENTSO_E_TOKEN=…      # M2 – Transparency Platform
-NVD_API_KEY=…        # valfri
+NVD_API_KEY=…        # valfri – höjer NVD:s rate-limit (5→50 anrop/30 s), kortar
+                      #   sidfördröjningen och exponerar databastotalen på /api/cyber/nvd (M9)
+OSV_WATCH_PACKAGES=… # M9 – OSV.dev-watchlist "Ecosystem:Paket;…" (26 kurerade paket
+                      #   som standard; Maven delas på första kolon, t.ex. "Maven:log4j:log4j-core")
 NVE_API_KEY=…        # M4 – NVE HydAPI, gratis: https://hydapi.nve.no (header X-API-Key)
 NVE_STATIONS=…       # M4 – valfri fast stationslista "6.10.0,..." (annars hämtas
                      #   NVE_STATION_LIMIT första aktiva stationerna, standard 5)
@@ -416,6 +434,25 @@ SMHI_FCST_CACHE_DIR=…   # M8 – diskcache (standard server/cache/smhi-forecas
   live-fixtures + webbtest för alla nya moduler (totalt 14 filer, 138 webb-
   tester). Se "Väderprognos (M8, område 11)".
 
+- **M9 (klart 2026-11-06):** cybersäkerhetsdashboardet (område 5) – nytt delat
+  cyberdatslager (`lib/cyber.js`, samma mönster som `lib/forecast.js`: inminnescache
+  + TTL + in-flight-dedupe) bakom fem nya endpointar: `/api/cyber/nvd` (publicerade
+  CVE, 30-dagarsfönster hämtat som 7-dagars-subfönster nyast först – NVD returnerar
+  pubDate-fönster äldst först så en enda paginering passerar aldrig de senaste
+  dagarna; `capped`-flagga när pagineringsspärrar klipper), `/api/cyber/kev` (hela
+  KEV-katalogen med 90-dagars-/ransomware-/frist-KPI:er och 12-månaders-histogram),
+  `/api/cyber/osv` (OSV.dev, ny källa: `POST /v1/query` per paket mot 26 kurerade
+  paket för kritisk infrastruktur, 180-dagarsfönster, paketvisa fel tolereras),
+  `/api/cyber/prioritized` (de senaste 15 KEV-tillägg enriched med CVSS från NVD –
+  30-dagarscachet först, sedan enskild `?cveId=`-slagning med 24 h-cache) och
+  `/api/cyber/overview` (snittar bara cacherna). Område 5:s generiska
+  indikator-/händelse-tabeller ersätts av fyra interaktiva widgetar (120 s-polling,
+  sökning, filter, expanderade rader) – övriga 11 områden oförändrade. Kollektorerna
+  `nvd`/`kev` flyttades på det delade lagret och `osv` tillkom som 35:e källan.
+  Servertester mot live-fixtures (server/test/cyber.test.js, 36 st) + webbtest för
+  panelerna och kopplingen (cyberPanels.test.jsx, DashboardPage). Allt verifierat
+  live 2026-11-06.
+
 ## Datakällor och villkor
 
 - OSM-data: ODbL – tillståndskravl gäller (M3).
@@ -433,5 +470,14 @@ SMHI_FCST_CACHE_DIR=…   # M8 – diskcache (standard server/cache/smhi-forecas
 - Trafikverket datacache (M5): licenserad API-nyckel skickas i XML-bodyn
   (`<LOGIN authenticationkey='…'/>`), `Referer`-header sätts per anrop; rate-limit
   `100;w=1` (100 anrop/60 s) respekteras av pollningsintervallen (~7 frågor/minut).
+- NIST NVD (M9): rate-limit 5 anrop/30 s utan API-nyckel, 50 med (gratis nyckel på
+  nvd.nist.gov). Datslagret håller sidfördröjning (7 s/2 s) och en sidbudget per
+  7-dagars-subfönster; fönstret cachas i minnet 15 min. `capped=true` signalerar att
+  pagineringsspärren klippde ett subfönster (talen är då en undervarning).
+- OSV.dev (M9): nyckelfritt. `POST /v1/query` per paket med 400 ms-fördröjning
+  (26 paket ≈ 15 s/cykel) och ett retry-försök vid tomt svar; watchlisten
+  (`OSV_WATCH_PACKAGES`) uppdateras var 6:e timme.
+- CISA KEV (M9): publikt JSON, ingen nyckel. Hela katalogen cachas i minnet 6 timmar
+  (används för prioritering, ej incidentdetektion).
 - Övrigt enligt respektive källas villkor – se API-katalogen
   (`nordic_critical_infrastructure_api_catalog_utokad.xlsx`).

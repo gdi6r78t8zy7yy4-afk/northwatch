@@ -14,6 +14,7 @@ import { AREAS, COUNTRIES } from './areas.js';
 import { now } from './lib/http.js';
 import { staticGeo } from './lib/geolayers.js';
 import { apiForecastMeta, apiForecastPoint, apiForecastGrid, apiForecastGridCoords } from './lib/forecast.js';
+import { apiCyberNvd, apiCyberKev, apiCyberOsv, apiCyberPrioritized, apiCyberOverview } from './lib/cyber.js';
 
 for (const c of COLLECTORS) registerSource(c);
 startScheduler(COLLECTORS);
@@ -120,11 +121,18 @@ const routes = {
 
 // M8: SMHI-prognosapi:t – asynkront (påfrågan kan utlösa SMHI-hämtning
 // på plats, t.ex. griddatavärden eller anpassade platser).
+// M9: cyber (område 5) – NVD/KEV/OSV med inminnescache (TTL); första
+// anropet efter start kan alltså ta ~10–30 s medan datat hämtas.
 const asyncRoutes = {
   '/api/forecast/meta': u => apiForecastMeta(u),
   '/api/forecast/point': u => apiForecastPoint(u),
   '/api/forecast/grid': u => apiForecastGrid(u),
   '/api/forecast/grid-coords': u => apiForecastGridCoords(u),
+  '/api/cyber/nvd': u => apiCyberNvd(u),
+  '/api/cyber/kev': u => apiCyberKev(u),
+  '/api/cyber/osv': u => apiCyberOsv(u),
+  '/api/cyber/prioritized': u => apiCyberPrioritized(u),
+  '/api/cyber/overview': u => apiCyberOverview(u),
 };
 
 function sendJson(res, obj) {

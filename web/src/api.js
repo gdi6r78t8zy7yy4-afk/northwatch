@@ -43,3 +43,28 @@ export const fetchForecastGrid = (parameter, time, downsample) =>
   getRaw(`/api/forecast/grid?parameter=${parameter}&time=${encodeURIComponent(time)}&downsample=${downsample ?? ''}`);
 export const fetchForecastGridCoords = downsample =>
   getRaw(`/api/forecast/grid-coords?downsample=${downsample ?? ''}`);
+
+// M9: cyber (område 5) – NVD/KEV/OSV via backend /api/cyber/* (backenden
+// pratar med källorna, TTL-cachad). getRaw behåller statuskod: 502 betyder
+// att källhämtningen misslyckades, 200 + body.error att gamlat data servas.
+export const fetchCyberNvd = ({ window: win = 7, severity = '', q = '', sort = 'newest', limit = 50 } = {}) => {
+  const p = new URLSearchParams();
+  p.set('window', win);
+  if (severity) p.set('severity', severity);
+  if (q) p.set('q', q);
+  p.set('sort', sort);
+  p.set('limit', limit);
+  return getRaw(`/api/cyber/nvd?${p}`);
+};
+export const fetchCyberKev = ({ q = '', ransomware = false, sort = 'added', limit = 100 } = {}) => {
+  const p = new URLSearchParams();
+  if (q) p.set('q', q);
+  if (ransomware) p.set('ransomware', '1');
+  p.set('sort', sort);
+  p.set('limit', limit);
+  return getRaw(`/api/cyber/kev?${p}`);
+};
+export const fetchCyberOsv = ({ ecosystem = '' } = {}) =>
+  getRaw(`/api/cyber/osv?ecosystem=${encodeURIComponent(ecosystem)}`);
+export const fetchCyberPrioritized = () => getRaw('/api/cyber/prioritized');
+export const fetchCyberOverview = () => getRaw('/api/cyber/overview');

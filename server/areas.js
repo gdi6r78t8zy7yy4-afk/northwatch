@@ -23,7 +23,7 @@ export const AREAS = [
     gaps: 'Nästan bara portaler; dricksvatten/avlopp saknas. NO: vattenstånd via NVE HydAPI (kräver NVE_API_KEY)' },
   { id: 5, slug: 'cyber', name: 'Cybersäkerhet och digitala hot', short: 'Cyber', geo: false,
     scope: 'CERT-varningar, sårbarheter, hotaktörer, skadlig kod, ransomware, KEV, incidenter',
-    gaps: 'Nationella CERT:ar utan bekräftat API/RSS; inget ransomware-/hotaktörsflöde' },
+    gaps: 'Nationella CERT:ar utan bekräftat API/RSS; inget hotaktörsflöde; OSV-täckningen begränsad till övervakat paketutbud (OSV_WATCH_PACKAGES)' },
   { id: 6, slug: 'halsa', name: 'Hälso- och sjukvård', short: 'Hälsa', geo: false,
     scope: 'Sjukhus, vårdkapacitet, smittskydd, läkemedelsförsörjning, beredskapsvarningar',
     gaps: 'Inget bekräftat API; läkemedel och vårdkapacitet saknas' },
