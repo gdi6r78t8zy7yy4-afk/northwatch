@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 
-const DAY_AHEAD_PREFIX = /^Dag-ahead-pris\\s+/;
+const DAY_AHEAD_PREFIX = /^Dag-ahead-pris\s+/;
 const formatClock = value => new Intl.DateTimeFormat('sv-SE', {
   hour:'2-digit', minute:'2-digit', timeZone:'UTC',
 }).format(new Date(value));
