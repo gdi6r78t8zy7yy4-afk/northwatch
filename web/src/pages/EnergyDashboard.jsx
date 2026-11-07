@@ -75,20 +75,14 @@ function HistoryExplorer({ series }) {
     return active.includes(key) ? active.filter(item => item !== key)
       : active.length < 8 ? [...active, key] : active;
   });
-  const selectVisible = () => setSelected(current => {
-    const next = [...(current ?? keys.slice(0, 6))];
-    for (const item of filtered) {
-      const key = [item.country,item.source,item.indicator,item.unit].join('|');
-      if (!next.includes(key) && next.length < 8) next.push(key);
-    }
-    return next;
-  });
+  const selectVisible = () => setSelected(filtered.slice(0, 8).map(item =>
+    [item.country,item.source,item.indicator,item.unit].join('|')));
   return <>
     <div className="energy-series-controls">
       <input type="search" aria-label="Filter historical series" placeholder="Filter by country, technology, indicator or source…"
         value={search} onChange={event => setSearch(event.target.value)}/>
       <span className="mut">{filtered.length} of {series.length} series</span>
-      <button type="button" onClick={selectVisible} disabled={!filtered.length || selected?.length >= 8 && filtered.every(item => selected.includes([item.country,item.source,item.indicator,item.unit].join('|')))}>Select visible</button>
+      <button type="button" onClick={selectVisible} disabled={!filtered.length}>Select visible</button>
       <button type="button" onClick={() => setSelected([])} disabled={!selected?.length}>Clear selection</button>
     </div>
     <div className="energy-series-picker" aria-label="Choose historical series">
