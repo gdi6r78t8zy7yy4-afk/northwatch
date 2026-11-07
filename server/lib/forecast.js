@@ -161,6 +161,9 @@ function allowAdhocRequest(clientKey) {
     for (const [key, value] of adhocRequests) {
       if (nowMs - value.startedAt >= ADHOC_RATE_WINDOW_MS) adhocRequests.delete(key);
     }
+    while (adhocRequests.size > 10_000) {
+      adhocRequests.delete(adhocRequests.keys().next().value);
+    }
   }
   bucket.count += 1;
   return bucket.count <= ADHOC_RATE_LIMIT;
