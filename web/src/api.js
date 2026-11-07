@@ -15,6 +15,10 @@ export const fetchAssets = (area, country = 'ALL') =>
   get(`/api/assets?area=${encodeURIComponent(area)}&country=${encodeURIComponent(country)}`);
 export const fetchEnergyOverview = (country = 'ALL') =>
   get(`/api/energy/overview?country=${encodeURIComponent(country)}`);
+export const fetchEnergyHistory = (country = 'ALL', range = '24h') =>
+  get(`/api/energy/history?country=${encodeURIComponent(country)}&range=${encodeURIComponent(range)}`);
+export const fetchEnergyAnalysis = (country = 'ALL') =>
+  get(`/api/energy/analysis?country=${encodeURIComponent(country)}`);
 
 // M3: statiska kartlager (landsgränser + energilager) – hämtas en gång.
 let staticGeoPromise = null;
