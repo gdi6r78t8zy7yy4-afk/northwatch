@@ -30,27 +30,48 @@ export function buildEnergyPriceProfiles(metrics, { now = Date.now(), horizonHou
     String(a.country).localeCompare(String(b.country)) || a.label.localeCompare(b.label));
 }
 
+function formatAxisTime(value) {
+  return new Intl.DateTimeFormat('sv-SE', {
+    day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit', timeZone:'UTC',
+  }).format(new Date(value));
+}
+
 function PriceProfile({ series }) {
   const points = series.points;
   const values = points.map(point => point.value);
   const min = Math.min(...values), max = Math.max(...values);
-  const span = max - min || Math.max(Math.abs(max) * 0.1, 1);
-  const x = at => 12 + (at - points[0].at) / Math.max(1, points.at(-1).at - points[0].at) * 276;
-  const y = value => 70 - (value - min) / span * 54;
+  const rawSpan = max - min;
+  const span = rawSpan || Math.max(Math.abs(max) * 0.1, 1);
+  const low = min - span * 0.08, high = max + span * 0.08;
+  const plot = { left:48, right:350, top:12, bottom:136 };
+  const x = at => plot.left + (at - points[0].at) / Math.max(1, points.at(-1).at - points[0].at) * (plot.right - plot.left);
+  const y = value => plot.bottom - (value - low) / (high - low) * (plot.bottom - plot.top);
   const path = points.map((point,index) => (index ? 'L' : 'M') + x(point.at).toFixed(1) + ' ' + y(point.value).toFixed(1)).join(' ');
-  const low = Math.min(...values), high = Math.max(...values);
+  const yTicks = [0, 1, 2, 3].map(index => low + (high - low) * index / 3);
+  const xTickIndices = [...new Set([0, Math.floor((points.length - 1) / 2), points.length - 1])];
   const analysis = analyzeEnergyPriceProfile(series);
   const formatDelta = value => (value > 0 ? '+' : '') + value.toLocaleString('sv-SE', { maximumFractionDigits:2 });
+  const formatValue = value => value.toLocaleString('sv-SE', { maximumFractionDigits:2 });
   return <article className="energy-price-profile">
     <div className="energy-price-profile-head"><b>{series.country} · {series.label}</b><span>{series.source}</span></div>
-    <svg viewBox="0 0 300 88" role="img" aria-label={series.country + ' ' + series.label + ' day-ahead price profile'}>
-      <path d="M12 70 H288 M12 43 H288 M12 16 H288" stroke="currentColor" opacity=".14" fill="none"/>
+    <svg viewBox="0 0 380 178" role="img"
+      aria-label={series.country + ' ' + series.label + ' day-ahead price profile. X-axis: date and time UTC. Y-axis: price in ' + series.unit}>
+      {yTicks.map((tick,index) => <g key={index}>
+        <line x1={plot.left} x2={plot.right} y1={y(tick)} y2={y(tick)} stroke="currentColor" opacity=".16"/>
+        <text x={plot.left - 7} y={y(tick) + 3} textAnchor="end" className="energy-price-axis-tick">{formatValue(tick)}</text>
+      </g>)}
+      <path d={`M${plot.left} ${plot.bottom} H${plot.right}`} stroke="currentColor" opacity=".45" fill="none"/>
       {points.length > 1 ? <path d={path} stroke="#68a9e8" strokeWidth="2.2" fill="none" strokeLinejoin="round" strokeLinecap="round"/> : null}
-      {points.map((point,index) => <circle key={point.ts} cx={x(point.at)} cy={y(point.value)} r="3" fill="#68a9e8">
-        <title>{formatClock(point.at)} · {point.value.toLocaleString('sv-SE')} {series.unit}</title>
+      {points.map(point => <circle key={point.ts} cx={x(point.at)} cy={y(point.value)} r="3" fill="#68a9e8">
+        <title>{formatAxisTime(point.at)} UTC · {formatValue(point.value)} {series.unit}</title>
       </circle>)}
+      {xTickIndices.map(index => <text key={index} x={x(points[index].at)} y="151"
+        textAnchor={index === 0 ? 'start' : index === points.length - 1 ? 'end' : 'middle'}
+        className="energy-price-axis-tick">{formatAxisTime(points[index].at)}</text>)}
+      <text x={(plot.left + plot.right) / 2} y="172" textAnchor="middle" className="energy-price-axis-title">Date / time (UTC)</text>
+      <text transform="translate(10 74) rotate(-90)" textAnchor="middle" className="energy-price-axis-title">Price ({series.unit})</text>
     </svg>
-    <div className="energy-price-profile-range"><span>{formatClock(points[0].at)}</span><b>{low.toLocaleString('sv-SE',{maximumFractionDigits:2})} – {high.toLocaleString('sv-SE',{maximumFractionDigits:2})} {series.unit}</b><span>{formatClock(points.at(-1).at)}</span></div>
+    <div className="energy-price-profile-range"><span>{formatClock(points[0].at)}</span><b>{formatValue(Math.min(...values))} – {formatValue(Math.max(...values))} {series.unit}</b><span>{formatClock(points.at(-1).at)}</span></div>
     <div className="mut">{points.length} delivery interval{points.length === 1 ? '' : 's'} · {series.source}</div>
     <div className="energy-price-profile-analysis" aria-label="Price movement analysis">
       {analysis.netChange === null
