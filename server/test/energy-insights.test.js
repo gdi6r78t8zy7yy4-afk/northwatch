@@ -77,3 +77,18 @@ test('range parser only accepts supported time windows', () => {
   assert.equal(parseEnergyRange('7d', 0).range, '7d');
   assert.equal(parseEnergyRange('invalid', 0).range, '24h');
 });
+
+test('domestic production-demand analysis is country-generic and requires exact alignment', () => {
+  const rows = [
+    { t:'m', country:'NO', indicator:'Total produktion (NO)', value:18000, unit:'MW', ts:'2026-11-07T10:00:00Z', source:'statnett' },
+    { t:'m', country:'NO', indicator:'Total förbrukning (NO)', value:19000, unit:'MW', ts:'2026-11-07T10:00:00Z', source:'statnett' },
+    { t:'m', country:'FI', indicator:'Total produktion (FI)', value:9000, unit:'MW', ts:'2026-11-07T10:00:00Z', source:'fingrid' },
+    { t:'m', country:'FI', indicator:'Total förbrukning (FI)', value:8500, unit:'MW', ts:'2026-11-07T09:45:00Z', source:'fingrid' },
+  ];
+  const balances = buildEnergyAnalysis(rows).observations.filter(o => o.category === 'balance');
+  assert.equal(balances.length, 1);
+  assert.equal(balances[0].country, 'NO');
+  assert.equal(balances[0].id, 'no-domestic-balance');
+  assert.match(balances[0].title, /below demand/);
+  assert.equal(balances[0].evidence[0].value - balances[0].evidence[1].value, -1000);
+});
