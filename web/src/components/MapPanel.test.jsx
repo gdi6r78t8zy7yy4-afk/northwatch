@@ -184,7 +184,7 @@ describe('MapPanel – lager', () => {
     });
     const byPopup = txt => __leaf.created.find(c => c.kind === 'circleMarker' && c.popup && c.popup.includes(txt));
     expect(byPopup('StockholmIX').options.fillColor).toBe('#b49aff'); // ix
-    expect(byPopup('StockholmIX').options.radius).toBe(4.5);
+    expect(byPopup('StockholmIX').options.radius).toBe(7);
     expect(byPopup('DC Norr').options.fillColor).toBe('#d28cff'); // datacenter
     expect(byPopup('Mätare 1').options.fillColor).toBe('#ffd166'); // flowmatning
     expect(byPopup('Mätare 1').options.radius).toBe(3.5);
@@ -225,7 +225,7 @@ describe('MapPanel – lager', () => {
     });
     const cam = __leaf.created.find(c => c.kind === 'circleMarker' && c.popup?.includes('Marbäck'));
     expect(cam.options.fillColor).toBe('#9be564'); // kamera
-    expect(cam.options.radius).toBe(2.5);          // ~900 punkter – ryms bättre
+    expect(cam.options.radius).toBe(4);          // ~900 punkter – ryms bättre
     expect(cam.popup).toContain('Speedkamera (Trafikverket)');
     expect(cam.popup).toContain('Halland');
     expect(screen.getByText('Speedkamera (huvudvägar)')).toBeInTheDocument();
@@ -259,7 +259,7 @@ describe('MapPanel – lager', () => {
     const zones = __leaf.created.filter(c => c.kind === 'circleMarker' && c.tooltip);
     expect(zones.map(z => z.tooltip.text)).toContain('SE2');
     const planned = __leaf.created.find(c => c.kind === 'polyline' && c.tooltip?.text?.includes('Hvdc planerad'));
-    expect(planned.options.dashArray).toBe('6 6');
+    expect(planned.options.dashArray).toBe('7 7');
     const done = __leaf.created.find(c => c.kind === 'polyline' && c.tooltip?.text?.includes('Hvdc SE–NO'));
     expect(done.options.dashArray).toBeNull();
   });
@@ -273,7 +273,7 @@ describe('MapPanel – lager', () => {
     renderMap({ events: [lineEvent()] });
     const ev = __leaf.created.find(c => c.kind === 'geoJSON' && c.options?.style?.color === '#ff5b66');
     expect(ev).toBeTruthy();
-    expect(ev.options.style.weight).toBe(2.5);
+    expect(ev.options.style.weight).toBe(4);
   });
 
   test('valda land framhävs i gränslagret; alla länder = jämn markering', () => {
