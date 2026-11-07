@@ -3,6 +3,7 @@ import { COUNTRY_NAMES, fmtTime } from '../status.js';
 import StatusPill from '../components/StatusPill.jsx';
 import EnergySourceHealth from '../components/EnergySourceHealth.jsx';
 import EnergyPriceProfiles from '../components/EnergyPriceProfiles.jsx';
+import EnergyPriceMovementAnalysis from '../components/EnergyPriceMovementAnalysis.jsx';
 import MapPanel from '../components/MapPanel.jsx';
 import { fetchEnergyOverview, fetchEnergyHistory, fetchEnergyAnalysis, fetchAssets, fetchStaticGeo } from '../api.js';
 import { formatObservationAge } from '../lib/metricFreshness.js';
@@ -347,6 +348,9 @@ export default function EnergyDashboard({ country = 'ALL' }) {
       {history?.series?.length ? <HistoryExplorer series={history.series}/>
         : <p className="mut">Historical data is accumulating. Charts will populate as new collector measurements are recorded; the system does not backfill invented values.</p>}
       <div className="mut energy-history-meta">{history?.count ?? 0} observations · range {history?.from ? fmtTime(history.from) : '—'} – {history?.to ? fmtTime(history.to) : '—'}</div>
+    </section>
+    <section className="card energy-market-section">
+      <EnergyPriceMovementAnalysis series={history?.series ?? []}/>
     </section>
     {history?.series?.length ? <GridOperationsExplorer series={history.series}/> : null}
     <section className="card energy-market-section"><div className="energy-section-head"><div><h2>Market & renewable signals</h2>
