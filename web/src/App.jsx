@@ -48,7 +48,7 @@ export default function App() {
       <main>
         <Routes>
           <Route path="/" element={<SummaryPage areas={areas} backendDown={backendDown} />} />
-          <Route path="/energy" element={<EnergyDashboard country={country} />} />
+          <Route path="/energy" element={<EnergyDashboard country={country} onCountryChange={setCountry} />} />
           <Route path="/d/:id" element={<DashboardPage country={country} />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
