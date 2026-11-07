@@ -41,6 +41,10 @@ export const __fireLeaf = (type, arg) => {
   if (cb) cb(arg);
 };
 
+export const __fireLayer = (entry, type = 'click', arg = {}) => {
+  entry.handlers?.[type]?.(arg);
+};
+
 // Alla getBounds-anrop ger giltiga bounds – tillräckligt för att komponenten
 // ska ta sin fitBounds-väg i tests.
 const bounds = {
@@ -53,6 +57,7 @@ function layer(entry) {
   return {
     bindPopup(html) { entry.popup = html; return this; },
     bindTooltip(text, options) { entry.tooltip = { text, options: options ?? {} }; return this; },
+    on(type, callback) { entry.handlers ??= {}; entry.handlers[type] = callback; return this; },
     addTo() { return this; },
     setStyle() { return this; },
     getBounds: () => bounds,
