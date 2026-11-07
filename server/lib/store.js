@@ -23,6 +23,10 @@ function persistSource(id) {
   return persistence.saveSource(serializableSource(source));
 }
 
+export async function loadEnergyMeasurements(range) {
+  return persistence.loadEnergyMeasurements(range);
+}
+
 export async function flushStore() {
   await persistence.flush();
 }
