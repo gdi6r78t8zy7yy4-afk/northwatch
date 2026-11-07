@@ -47,6 +47,32 @@ test('analysis only compares generation and demand with matching timestamp and u
   assert.equal(buildEnergyAnalysis([{ ...rows[1], ts:'2026-11-07T09:15:00Z' }]).observations.length, 0);
 });
 
+
+test('historical baseline flags a material deviation but does not invent an incident', () => {
+  const history = Array.from({ length: 12 }, (_, i) => ({
+    t:'m', country:'SE', source:'svk', indicator:'Load', unit:'MW',
+    value:1000 + (i % 2), ts:new Date(Date.parse('2026-11-06T00:00:00Z') + i * 3600_000).toISOString(),
+  }));
+  history.push({ ...history.at(-1), value:1600, ts:'2026-11-07T00:00:00Z' });
+  const result = buildEnergyAnalysis([], '2026-11-07T00:01:00Z', history);
+  const observation = result.observations.find(o => o.category === 'anomaly');
+  assert.ok(observation);
+  assert.equal(observation.confidence, 'medium');
+  assert.match(observation.caveat, /not evidence of an outage/);
+  assert.equal(observation.evidence.length, 3);
+});
+
+test('price spread requires identical timestamps and units', () => {
+  const rows = [
+    { t:'m', country:'SE', source:'entsoe', indicator:'Dag-ahead-pris SE', value:40, unit:'EUR/MWh', ts:'2026-11-07T10:00:00Z' },
+    { t:'m', country:'FI', source:'entsoe', indicator:'Dag-ahead-pris FI', value:80, unit:'EUR/MWh', ts:'2026-11-07T10:00:00Z' },
+  ];
+  const result = buildEnergyAnalysis(rows);
+  assert.ok(result.observations.some(o => o.id === 'nordic-day-ahead-price-spread'));
+  const mismatched = buildEnergyAnalysis([{ ...rows[0] }, { ...rows[1], ts:'2026-11-07T10:15:00Z' }]);
+  assert.ok(!mismatched.observations.some(o => o.id === 'nordic-day-ahead-price-spread'));
+});
+
 test('range parser only accepts supported time windows', () => {
   assert.equal(parseEnergyRange('7d', 0).range, '7d');
   assert.equal(parseEnergyRange('invalid', 0).range, '24h');
