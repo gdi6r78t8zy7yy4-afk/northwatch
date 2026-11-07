@@ -70,7 +70,8 @@ Firestore API. Sätt `STORE_DRIVER=firestore` och `GOOGLE_CLOUD_PROJECT` i
 Cloud Run-miljön. Ingen service-account-nyckel ska checkas in eller exponeras
 i frontend. För lokal emulatorutveckling kan `FIRESTORE_EMULATOR_HOST` anges. Lägg användarens sparade dashboard-layoutar och personliga inställningar
 i separata användarägda dokument, skyddade med Firebase Authentication och
-Firestore Security Rules. Admin SDK-anrop från servern styrs dessutom av Cloud IAM.
+Firestore Security Rules. Serverns REST-anrop autentiseras och auktoriseras via
+Cloud IAM och Cloud Runs service account.
 
 Adaptern lagrar för närvarande hela källans normaliserade poster i chunkade
 snapshotdokument (max cirka 450 kB per chunk) och återställer dem till Northwatchs
