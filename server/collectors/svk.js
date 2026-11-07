@@ -118,11 +118,17 @@ export function normalizeReserveRows(kind, rows) {
 
   // Preserve the existing headline indicators for dashboard compatibility.
   if (kind === 'afrr') {
-    for (const row of blockRows) {
-      if (row.volume == null || !Number.isFinite(Number(row.volume))) continue;
+    // The previous collector exposed one headline row (the first row in the
+    // earliest block). Keep that compatibility metric, but only for a valid
+    // zone/direction/volume tuple.
+    const row = blockRows[0];
+    const zone = String(row?.bidding_zone ?? '').trim();
+    const direction = String(row?.reserve_direction ?? '').toLowerCase();
+    const volume = Number(row?.volume);
+    if (zone && ['up', 'down'].includes(direction) && Number.isFinite(volume)) {
       recs.push(metric(
         `aFRR-leverans ${hour} (${row.bidding_zone} ${row.reserve_direction})`,
-        Number(row.volume), row.volume_unit ?? 'MW', ts,
+        volume, row.volume_unit ?? 'MW', ts,
       ));
     }
   } else {
