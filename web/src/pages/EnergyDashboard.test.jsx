@@ -104,6 +104,9 @@ describe('EnergyDashboard', () => {
     expect(screen.getByLabelText('Finlands produktionsmix')).toBeInTheDocument();
     expect(screen.getByLabelText('Islands produktionsmix')).toBeInTheDocument();
     expect(screen.getByText('Generation mix · reported country technologies')).toBeInTheDocument();
+    expect(screen.getByRole('table', { name: 'Nordic energy data coverage' })).toBeInTheDocument();
+    expect(screen.getByText('4 indicators')).toBeInTheDocument();
+    expect(screen.getByText('No measurement')).toBeInTheDocument();
   });
 
   test('country selector in the energy heading updates the global country scope', async () => {
