@@ -23,6 +23,10 @@ function persistSource(id) {
   return persistence.saveSource(serializableSource(source));
 }
 
+export async function loadEnergyMeasurements(range) {
+  return persistence.loadEnergyMeasurements(range);
+}
+
 export async function flushStore() {
   await persistence.flush();
 }
@@ -63,6 +67,10 @@ export function setResult(id, records, ms) {
   const source = state.sources.get(id);
   if (!source) throw new Error(`Unknown collector: ${id}`);
   source.records = records;
+  if (source.area === 1) {
+    const measurements = records.filter(record => record.t === 'm' && record.ts && record.value !== null && record.value !== undefined && record.value !== '' && Number.isFinite(Number(record.value)));
+    if (measurements.length) void persistence.saveEnergyMeasurements(measurements);
+  }
   source.status = 'ok';
   source.lastOk = now();
   source.lastRun = source.lastOk;

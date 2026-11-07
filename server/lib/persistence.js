@@ -2,26 +2,57 @@ import fs from 'node:fs/promises';
 import fsSync from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { randomUUID } from 'node:crypto';
+import { randomUUID, createHash } from 'node:crypto';
 
 const moduleDir = path.dirname(fileURLToPath(import.meta.url));
 const sourcePath = () => process.env.NORTHWATCH_STORE_FILE || path.join(moduleDir, '..', 'data', 'store.json');
+const historyPath = () => process.env.NORTHWATCH_ENERGY_HISTORY_FILE || path.join(moduleDir, '..', 'data', 'energy-history.jsonl');
+const historyId = record => createHash('sha256')
+  .update([record.source, record.indicator, record.ts].join('|')).digest('hex').slice(0, 40);
+const utcDay = value => new Date(value).toISOString().slice(0, 10);
 
 function createLocalPersistence() {
   let sources = new Map();
   let writeQueue = Promise.resolve();
   let warning = null;
+  let historyLoaded = false;
+  const history = new Map();
+  const pendingHistory = new Set();
   const flush = () => writeQueue;
-  async function loadSources() {
-    try {
-      const snapshot = JSON.parse(await fs.readFile(sourcePath(), 'utf8'));
-      if (snapshot?.version === 1 && Array.isArray(snapshot.sources)) {
-        sources = new Map(snapshot.sources.map(source => [source.id, source]));
-      }
-    } catch (error) {
-      if (error?.code !== 'ENOENT') throw error;
+  async function loadEnergyMeasurements({ from, to } = {}) {
+    if (!historyLoaded) {
+      try {
+        const raw = await fs.readFile(historyPath(), 'utf8');
+        for (const line of raw.split('\n')) {
+          if (!line.trim()) continue;
+          try { const item = JSON.parse(line); if (item?.id && item.record) history.set(item.id, item.record); } catch { /* ignore a partial final line */ }
+        }
+      } catch (error) { if (error?.code !== 'ENOENT') throw error; }
+      historyLoaded = true;
     }
-    return [...sources.values()];
+    return [...history.values()].filter(r => (!from || r.ts >= from) && (!to || r.ts <= to));
+  }
+  function saveEnergyMeasurements(records) {
+    const fresh = [];
+    for (const record of records) {
+      const id = historyId(record);
+      if (history.has(id) || pendingHistory.has(id)) continue;
+      pendingHistory.add(id);
+      fresh.push({ id, record });
+    }
+    if (!fresh.length) return writeQueue;
+    const target = historyPath();
+    writeQueue = writeQueue.then(async () => {
+      await fs.mkdir(path.dirname(target), { recursive: true });
+      await fs.appendFile(target, fresh.map(item => JSON.stringify(item)).join('\n') + '\n', { mode: 0o600 });
+      for (const item of fresh) history.set(item.id, item.record);
+    }).catch(error => {
+      warning = String(error?.message ?? error);
+      console.error('[store] local energy history failed:', warning);
+    }).finally(() => {
+      for (const item of fresh) pendingHistory.delete(item.id);
+    });
+    return writeQueue;
   }
   function saveSource(source) {
     sources.set(source.id, source);
@@ -39,13 +70,14 @@ function createLocalPersistence() {
     });
     return writeQueue;
   }
-  return { loadSources, saveSource, flush, get warning() { return warning; }, driver: 'local' };
+  return { loadSources, saveSource, loadEnergyMeasurements, saveEnergyMeasurements, flush, get warning() { return warning; }, driver: 'local' };
 }
 
 function createFirestorePersistence() {
   const projectId = process.env.GOOGLE_CLOUD_PROJECT || process.env.GCLOUD_PROJECT || process.env.FIREBASE_PROJECT_ID;
   const databaseId = process.env.FIRESTORE_DATABASE_ID || '(default)';
   const collection = process.env.FIRESTORE_COLLECTION || 'northwatch_sources';
+  const historyCollection = process.env.FIRESTORE_ENERGY_HISTORY_COLLECTION || 'northwatch_energy_history';
   const emulator = process.env.FIRESTORE_EMULATOR_HOST;
   if (!projectId) throw new Error('GOOGLE_CLOUD_PROJECT (or FIREBASE_PROJECT_ID) is required for STORE_DRIVER=firestore');
   const base = emulator
@@ -142,6 +174,29 @@ function createFirestorePersistence() {
     }
     return result;
   }
+  async function loadEnergyMeasurements({ from, to } = {}) {
+    const start = new Date(from || Date.now() - 24 * 3600 * 1000);
+    const end = new Date(to || Date.now());
+    const days = [];
+    for (let d = new Date(Date.UTC(start.getUTCFullYear(), start.getUTCMonth(), start.getUTCDate()));
+      d <= end; d.setUTCDate(d.getUTCDate() + 1)) days.push(d.toISOString().slice(0, 10));
+    const records = [];
+    for (const day of days) {
+      const docs = await listDocuments(`${historyCollection}/${day}/measurements`);
+      for (const doc of docs) {
+        const record = readPayload(doc);
+        if (record && (!from || record.ts >= from) && (!to || record.ts <= to)) records.push(record);
+      }
+    }
+    return records;
+  }
+  async function saveEnergyMeasurements(records) {
+    for (const record of records) {
+      const day = utcDay(record.ts);
+      const id = historyId(record);
+      await request('PATCH', `${historyCollection}/${day}/measurements/${id}`, fieldPayload(record));
+    }
+  }
   async function saveSource(source) {
     const snapshotId = randomUUID();
     const records = Array.isArray(source.records) ? source.records : [];
@@ -183,7 +238,7 @@ function createFirestorePersistence() {
     });
     return writeQueue;
   }
-  return { loadSources, saveSource: queueSave, flush: () => writeQueue, get warning() { return warning; }, driver: 'firestore' };
+  return { loadSources, saveSource: queueSave, loadEnergyMeasurements, saveEnergyMeasurements: records => { writeQueue = writeQueue.then(() => saveEnergyMeasurements(records)).catch(error => { warning = String(error?.message ?? error); console.error('[store] Firestore energy history failed:', error); }); return writeQueue; }, flush: () => writeQueue, get warning() { return warning; }, driver: 'firestore' };
 }
 
 export function createPersistence() {

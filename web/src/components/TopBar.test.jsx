@@ -27,7 +27,7 @@ describe('TopBar', () => {
   test('visar översikten och en länk per område', () => {
     renderTop();
     expect(screen.getByRole('link', { name: 'Översikt' })).toHaveAttribute('href', '/');
-    expect(screen.getByRole('link', { name: '1. Energi' })).toHaveAttribute('href', '/d/1');
+    expect(screen.getByRole('link', { name: 'Energi' })).toHaveAttribute('href', '/energy');
     expect(screen.getByRole('link', { name: '2. Digital infrastruktur' })).toHaveAttribute('href', '/d/2');
   });
 

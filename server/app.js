@@ -7,7 +7,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { COLLECTORS } from './collectors/index.js';
-import { registerSource, initStore } from './lib/store.js';
+import { registerSource, initStore, loadEnergyMeasurements } from './lib/store.js';
 import { startScheduler } from './lib/scheduler.js';
 import { state, healthList, areaSources, areaStatus, cellStatus, sourceStatus } from './lib/store.js';
 import { AREAS, COUNTRIES } from './areas.js';
@@ -16,6 +16,7 @@ import { staticGeo } from './lib/geolayers.js';
 import { apiForecastMeta, apiForecastPoint, apiForecastGrid, apiForecastGridCoords } from './lib/forecast.js';
 import { apiCyberNvd, apiCyberKev, apiCyberOsv, apiCyberPrioritized, apiCyberOverview } from './lib/cyber.js';
 import { buildEnergyOverview } from './lib/energy.js';
+import { parseEnergyRange, buildEnergyHistory, buildEnergyAnalysis } from './lib/energy-insights.js';
 
 for (const c of COLLECTORS) registerSource(c);
 // Restore the last snapshot before the first collector run, so the dashboard
@@ -133,6 +134,23 @@ const routes = {
 // M9: cyber (område 5) – NVD/KEV/OSV med inminnescache (TTL); första
 // anropet efter start kan alltså ta ~10–30 s medan datat hämtas.
 const asyncRoutes = {
+  '/api/energy/history': async u => {
+    const { range, from, to } = parseEnergyRange(u.searchParams.get('range') || '24h');
+    const records = await loadEnergyMeasurements({ from, to });
+    const result = buildEnergyHistory(records, {
+      range, country: u.searchParams.get('country') || 'ALL',
+      indicator: u.searchParams.get('indicator') || null,
+    });
+    return { status: 200, body: { ...result, from, to } };
+  },
+  '/api/energy/analysis': async u => {
+    const country = (u.searchParams.get('country') || 'ALL').toUpperCase();
+    const metrics = [...state.sources.values()].filter(s => s.area === 1)
+      .flatMap(s => s.records ?? []).filter(r => r.t === 'm' &&
+        (country === 'ALL' || r.country === country || r.country === 'NORDIC'));
+    return { status: 200, body: buildEnergyAnalysis(metrics, now()) };
+  },
+
   '/api/forecast/meta': u => apiForecastMeta(u),
   '/api/forecast/point': (u, q) => apiForecastPoint(u, q.socket.remoteAddress ?? 'unknown-client'),
   '/api/forecast/grid': u => apiForecastGrid(u),

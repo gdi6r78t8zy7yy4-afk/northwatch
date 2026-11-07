@@ -1,0 +1,28 @@
+name: Northwatch CI
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install backend dependencies
+        run: npm install --ignore-scripts
+      - name: Install frontend dependencies
+        run: npm --prefix web install --ignore-scripts
+      - name: Build frontend
+        run: npm run build
+      - name: Test frontend
+        run: npm --prefix web test
+      - name: Test backend
+        run: node --test server/test/*.test.js
+      - name: Check backend syntax
+        run: npm run lint

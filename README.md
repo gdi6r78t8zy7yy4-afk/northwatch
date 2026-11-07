@@ -39,8 +39,12 @@ node --test "server/test/*.test.js"   # 38 tester
 ## Persistens och driftsättning
 
 Backendens normaliserade collector-poster och källhälsa använder ett
-utbytbart persistenslager. Lokalt är `STORE_DRIVER=local` standard och data
-skrivs atomiskt till `server/data/store.json` (eller `NORTHWATCH_STORE_FILE`).
+utbytbart persistenslager. Lokalt är `STORE_DRIVER=local` standard och källsnapshots
+skrivs atomiskt till `server/data/store.json` (eller `NORTHWATCH_STORE_FILE`). Energi-mätvärden
+appendas separat till `server/data/energy-history.jsonl` (eller `NORTHWATCH_ENERGY_HISTORY_FILE`),
+med deduplicering per källa/indikator/mättid. Firestore använder underkollektionen
+`northwatch_energy_history/{UTC-dag}/measurements/{measurementId}`; samlingsnamnet kan
+ändras med `FIRESTORE_ENERGY_HISTORY_COLLECTION`.
 För Cloud Run väljer du `STORE_DRIVER=firestore`; Firestore-adaptern sparar
 källmetadata och chunkade snapshots av poster. Vid uppstart återställs senaste
 snapshot innan schemaläggaren startar. Källor som tidigare var `ok` markeras
@@ -108,7 +112,9 @@ server/                 backend – ett enda JS-beroende: fast-xml-parser (ENTSO
   areas.js              de 12 dashboardområdena (namn, scope, luckor, geo-flagga)
   lib/env.js            läser .env
   lib/http.js           fetch-hjälp (User-Agent med kontakt, timeout)
-  lib/store.js          normaliserade poster + källhälsa, atomisk disk-snapshot
+  lib/store.js          normaliserade poster + källhälsa, snapshots + energihistorik
+  lib/energy.js         normaliserad energiöversikt
+  lib/energy-insights.js historikserier + deterministiska energiobservationer
   lib/scheduler.js      pollar varje källa med sitt intervall (staggerad uppstart)
   lib/jsonstat.js       json-stat 2.0-parser (SCB v2 + SSB v2, M4)
   lib/forecast.js       SMHI snow1g-prognos: cykelretention (12) + /api/forecast (M8)
@@ -143,6 +149,13 @@ asset  { t:'a', area, country, source, type, name, id?, geometry, attrs?, update
   flygplatser, vattenverk, IX-positioner, zonflöden, AIS-fartyg); `NORDIC` ingår alltid i country-filtret
 - `GET /api/geo/static` – statiska kartlager (landsgränser + energilager), ändras sällan
 - `GET /api/health` – källhälsa
+- `GET /api/energy/overview?country=ALL|SE|NO|DK|FI|IS` – senaste energimätningar,
+  gränsflöden och källstatus
+- `GET /api/energy/history?range=6h|24h|7d|30d&country=&indicator=` – historiska
+  mätserier grupperade per land/källa/indikator/enhet; historiken börjar byggas från
+  driftsättning av den här versionen och backfylls inte med syntetiska värden
+- `GET /api/energy/analysis?country=` – deterministiska observationer när mätvärden
+  kan jämföras med matchande tidsstämpel/enhet; varje observation visar evidens och caveat
 - `GET /api/forecast/meta` – aktuell prognoscykel: tider, katalogpunkter, rutnätsparametrar
   (M8, område 11)
 - `GET /api/forecast/point?point=<namn>` eller `?lat=&lon=` – full tidsserie för en punkt
