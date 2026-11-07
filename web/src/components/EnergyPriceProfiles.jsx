@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 
 const DAY_AHEAD_PREFIX = /^Dag-ahead-pris\\s+/;
 const formatClock = value => new Intl.DateTimeFormat('sv-SE', {
-  hour:'2-digit', minute:'2-digit', timeZone:'Europe/Stockholm',
+  hour:'2-digit', minute:'2-digit', timeZone:'UTC',
 }).format(new Date(value));
 
 export function buildEnergyPriceProfiles(metrics, { now = Date.now(), horizonHours = 24, pastMinutes = 120 } = {}) {
@@ -56,7 +56,7 @@ export default function EnergyPriceProfiles({ metrics = [], now = Date.now() }) 
   const profiles = useMemo(() => buildEnergyPriceProfiles(metrics, { now }), [metrics, now]);
   return <section className="energy-price-profiles" aria-label="Day-ahead price profiles">
     <div className="energy-price-profiles-heading"><h4>Current & next 24 hours</h4>
-      <span className="mut">Delivery interval timestamps · source units retained</span></div>
+      <span className="mut">Delivery interval timestamps · UTC · source units retained</span></div>
     {profiles.length ? <div className="energy-price-profiles-grid">
       {profiles.map(series => <PriceProfile key={series.key} series={series}/>)}
     </div> : <p className="mut">No current or upcoming day-ahead delivery intervals are available in the next 24 hours.</p>}
