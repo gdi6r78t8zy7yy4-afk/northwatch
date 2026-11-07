@@ -134,7 +134,7 @@ function MarketSignals({ metrics }) {
       <h3>Day-ahead prices</h3>
       {prices.length ? <div className="energy-price-grid">{prices.map(row =>
         <div className="energy-price-cell" key={row.indicator + '|' + row.source}>
-          <span>{row.indicator.replace(/^Dag-ahead-pris\\s+/, '')}</span><b>{Number(row.value).toLocaleString('sv-SE',{maximumFractionDigits:4})} <small>{row.unit}</small></b>
+          <span>{row.indicator.replace(/^Dag-ahead-pris\s+/, '')}</span><b>{Number(row.value).toLocaleString('sv-SE',{maximumFractionDigits:4})} <small>{row.unit}</small></b>
           <span className="mut">{row.sourceName ?? row.source} · {fmtTime(row.ts)}</span>
         </div>)}</div>
         : <p className="mut">No comparable day-ahead price observations are currently available from connected sources.</p>}
