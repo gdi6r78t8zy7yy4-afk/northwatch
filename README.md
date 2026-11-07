@@ -36,6 +36,42 @@ Backendtester (offline – live-verifierade fixtures i `server/testdata/`):
 node --test "server/test/*.test.js"   # 38 tester
 ```
 
+## Persistens och driftsättning
+
+Backendens normaliserade collector-poster och källhälsa skrivs atomiskt till
+`server/data/store.json` (eller `NORTHWATCH_STORE_FILE`) och återställs innan
+schemaläggaren startar. Efter omstart visas därmed senast kända data direkt;
+källor som tidigare var `ok` markeras `stale` tills en ny lyckad hämtning sker.
+Katalogen `server/data/` är gitignorerad.
+
+**Viktigt för containerdrift:** filsnapshoten är avsedd för lokal utveckling eller
+en VM med beständig disk. Cloud Run-instansers lokala filsystem är inte en
+beständig databas och kan försvinna när instanser byts ut eller skalar till noll.
+För Google AI Studio/Cloud Run ska lagret därför kopplas till Cloud Firestore
+(eller Cloud SQL for PostgreSQL) via nätverksanslutning. Se avsnittet
+"Google AI Studio – beständig datalagring" nedan. SMHI-prognosens separata
+filcache har samma begränsning i Cloud Run.
+
+### Google AI Studio – beständig datalagring
+
+I AI Studio Build mode: välj **Settings → Integrations → Firebase Firestore & Auth**
+(eller be AI Studio-agenten att lägga till Firestore). Välj rätt Google Cloud/Firebase-
+projekt och databasregion redan från början – regionen kan inte ändras i efterhand.
+Använd Firestore som backendens persistenslager, inte webbläsarens localStorage
+och inte Cloud Run-containerns lokala filer.
+
+För Northwatch bör servern lagra normaliserade poster per källa och återläsa dem
+vid uppstart. Använd server-side Firebase Admin SDK / Application Default Credentials
+i Cloud Run; exponera aldrig service-account-nycklar eller skrivbehörighet i
+frontend. Lägg användarens sparade dashboard-layoutar och personliga inställningar
+i separata användarägda dokument, skyddade med Firebase Authentication och
+Firestore Security Rules. Admin SDK-anrop från servern styrs dessutom av Cloud IAM.
+
+Välj Firestore för normaliserade händelser, mätvärden, tillgångar och användarlayoutar.
+Om datamängderna växer till stora historiska tidsserier eller avancerad SQL-analys,
+överväg Cloud SQL for PostgreSQL i stället. Lägg till TTL/retention för historiska
+poster och index för `source`, `area`, `country`, `ts` och `start`.
+
 ## Områden (enligt API-katalogen)
 
 | # | Område | # | Område |
@@ -60,7 +96,7 @@ server/                 backend – ett enda JS-beroende: fast-xml-parser (ENTSO
   areas.js              de 12 dashboardområdena (namn, scope, luckor, geo-flagga)
   lib/env.js            läser .env
   lib/http.js           fetch-hjälp (User-Agent med kontakt, timeout)
-  lib/store.js          minneslager: normaliserade poster + källhälsa
+  lib/store.js          normaliserade poster + källhälsa, atomisk disk-snapshot
   lib/scheduler.js      pollar varje källa med sitt intervall (staggerad uppstart)
   lib/jsonstat.js       json-stat 2.0-parser (SCB v2 + SSB v2, M4)
   lib/forecast.js       SMHI snow1g-prognos: cykelretention (12) + /api/forecast (M8)
