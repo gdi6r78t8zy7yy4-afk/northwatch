@@ -31,6 +31,7 @@ import entsoe from './entsoe.js';
 import statnett from './statnett.js';
 import energidataservice from './energidataservice.js';
 import energinetLive from './energinet-live.js';
+import landsnet from './landsnet.js';
 import peeringdb from './peeringdb.js';
 import eurostat from './eurostat.js';
 import noaa from './noaa.js';
@@ -69,6 +70,7 @@ export const COLLECTORS = [
   statnett,
   energidataservice,
   energinetLive,
+  landsnet,
   trafikverket,
   digitraffic,
   peeringdb,
