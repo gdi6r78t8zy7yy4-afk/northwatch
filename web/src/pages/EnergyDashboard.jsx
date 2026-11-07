@@ -24,18 +24,54 @@ function Kpi({ label, metric, fallback }) {
     <div className="energy-kpi-value">{fmt(metric, 1)} <small>{metric?.unit ?? ''}</small></div>
     <div className="mut">{metric ? metric.sourceName + ' · ' + age(metric.ts) : fallback}</div></div>;
 }
+const GENERATION_COMPONENTS = {
+  DK: [{ name: 'Wind', indicator: 'Vindproduktion (DK)' }, { name: 'Solar', indicator: 'Solproduktion (DK)' }],
+  FI: [
+    { name: 'Wind', indicator: 'Vindproduktion (FI)' },
+    { name: 'Hydro', indicator: 'Vattenkraftproduktion (FI)' },
+    { name: 'Nuclear', indicator: 'Kärnkraftsproduktion (FI)' },
+    { name: 'Industrial CHP', indicator: 'Industriell kraftvärmeproduktion (FI)' },
+  ],
+  IS: [
+    { name: 'Geothermal', indicator: 'Geotermisk produktion (IS)' },
+    { name: 'Hydro', indicator: 'Vattenkraftproduktion (IS)' },
+    { name: 'Oil', indicator: 'Oljeproduktion (IS)' },
+  ],
+};
+
 function GenerationMix({ metrics, country = 'DK' }) {
   const scope = country === 'ALL' ? 'DK' : country;
-  const wind = findMetric(metrics, r => r.country === scope && r.indicator === `Vindproduktion (${scope})`);
-  const solar = findMetric(metrics, r => r.country === scope && r.indicator === `Solproduktion (${scope})`);
-  const total = findMetric(metrics, r => r.country === scope && r.indicator === `Total produktion (${scope})`);
-  if (!wind || !solar || !total || wind.ts !== solar.ts || wind.ts !== total.ts || wind.unit !== solar.unit || wind.unit !== total.unit) return <p className="mut">Ofullständig produktionsmix för {COUNTRY_NAMES[scope] ?? scope}. Vind, sol och total produktion måste finnas med samma mättid och enhet.</p>;
-  const parts = [{ name: 'Vind', value: Number(wind.value) }, { name: 'Sol', value: Number(solar.value) },
-    { name: 'Övrigt', value: Math.max(0, Number(total.value) - Number(wind.value) - Number(solar.value)) }];
-  const sum = parts.reduce((a, p) => a + p.value, 0);
-  return <><div className="energy-mixbar" aria-label={`${COUNTRY_NAMES[scope] ?? scope}s produktionsmix`}>{parts.map(p => <span key={p.name} style={{ width: (sum ? p.value / sum * 100 : 0) + '%' }} title={p.name + ': ' + p.value + ' MW'} />)}</div>
-    <div className="energy-legend">{parts.map(p => <span key={p.name}>{p.name}: {Math.round(p.value).toLocaleString('sv-SE')} MW</span>)}</div>
-    <p className="mut">Övrigt är total produktion minus rapporterad vind och sol; det är inte en fullständig bränslespecifikation.</p></>;
+  const definitions = GENERATION_COMPONENTS[scope] ?? [];
+  if (!definitions.length) return <p className="mut">No generation-technology breakdown is currently reported for {COUNTRY_NAMES[scope] ?? scope}.</p>;
+  const candidates = definitions.map(definition => ({
+    ...definition,
+    metric: findMetric(metrics, row => row.country === scope && row.indicator === definition.indicator),
+  })).filter(item => item.metric);
+  const groups = new Map();
+  for (const item of candidates) {
+    const key = `${item.metric.ts}|${item.metric.unit}`;
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key).push(item);
+  }
+  const aligned = [...groups.values()].sort((a, b) =>
+    b.length - a.length || String(b[0]?.metric.ts).localeCompare(String(a[0]?.metric.ts)))[0] ?? [];
+  if (aligned.length < 2) return <p className="mut">Fewer than two aligned generation-technology measurements are available for {COUNTRY_NAMES[scope] ?? scope}. Components are not combined across timestamps or units.</p>;
+  const parts = aligned.map(item => ({ name: item.name, value: Number(item.metric.value) }));
+  const total = findMetric(metrics, row => row.country === scope && row.indicator === `Total produktion (${scope})`);
+  const isAlignedTotal = total && total.ts === aligned[0].metric.ts && total.unit === aligned[0].metric.unit;
+  if (scope === 'DK' && isAlignedTotal) {
+    const reported = parts.reduce((sum, part) => sum + part.value, 0);
+    if (Number(total.value) >= reported) parts.push({ name: 'Other (unallocated)', value: Number(total.value) - reported });
+  }
+  const sum = parts.reduce((acc, part) => acc + Math.max(0, part.value), 0);
+  return <>
+    <div className="energy-mixbar" aria-label={`${COUNTRY_NAMES[scope] ?? scope}s produktionsmix`}>{parts.map(part =>
+      <span key={part.name} style={{ width: (sum ? Math.max(0, part.value) / sum * 100 : 0) + '%' }} title={part.name + ': ' + part.value + ' MW'} />)}</div>
+    <div className="energy-legend">{parts.map(part => <span key={part.name}>{part.name}: {Math.round(part.value).toLocaleString('sv-SE')} MW</span>)}</div>
+    <p className="mut">{scope === 'FI' ? 'Fingrid technology indicators are reported components, not an exhaustive generation mix; they must not be summed as total production.' :
+      scope === 'IS' ? 'Landsnet reports geothermal, hydro and oil components. No consumption is inferred from these generation values.' :
+      'Other is the difference between total production and reported wind + solar; it is not a detailed fuel breakdown.'}</p>
+  </>;
 }
 function TrendChart({ series }) {
   const points = series.points ?? [];
@@ -146,13 +182,6 @@ function MarketSignals({ metrics, comparisons = [], country = 'ALL' }) {
   const prices = [...priceGroups.values()].map(item => item.row)
     .sort((a, b) => a.indicator.localeCompare(b.indicator) || a.source.localeCompare(b.source));
   const renewableCountry = country === 'ALL' ? 'DK' : country;
-  const wind = findMetric(scopedMetrics, r => r.country === renewableCountry && r.indicator === `Vindproduktion (${renewableCountry})`);
-  const solar = findMetric(metrics, r => r.country === renewableCountry && r.indicator === `Solproduktion (${renewableCountry})`);
-  const total = findMetric(metrics, r => r.country === renewableCountry && r.indicator === `Total produktion (${renewableCountry})`);
-  const aligned = wind && solar && total && wind.ts === solar.ts && wind.ts === total.ts &&
-    wind.unit === solar.unit && wind.unit === total.unit && Number(total.value) > 0;
-  const renewable = aligned ? Number(wind.value) + Number(solar.value) : null;
-  const share = aligned ? renewable / Number(total.value) * 100 : null;
   return <div className="energy-market-grid">
     <div className="energy-market-panel">
       <h3>Day-ahead prices</h3>
@@ -190,16 +219,8 @@ function MarketSignals({ metrics, comparisons = [], country = 'ALL' }) {
       </div>
     </div>
     <div className="energy-market-panel">
-      <h3>{renewableCountry === 'IS' ? 'Renewable generation · Iceland' : `Wind + solar · ${COUNTRY_NAMES[renewableCountry] ?? renewableCountry}`}</h3>
-      {aligned ? <>
-        <div className="energy-renewable-value">{share.toLocaleString('sv-SE',{maximumFractionDigits:1})}%</div>
-        <div className="energy-renewable-track"><span style={{width:Math.max(0,Math.min(100,share))+'%'}}/></div>
-        <div className="energy-price-grid">
-          <div className="energy-price-cell"><span>Wind</span><b>{Number(wind.value).toLocaleString('sv-SE')} MW</b></div>
-          <div className="energy-price-cell"><span>Solar</span><b>{Number(solar.value).toLocaleString('sv-SE')} MW</b></div>
-        </div>
-        <p className="mut">Share of reported {COUNTRY_NAMES[renewableCountry] ?? renewableCountry} production at {fmtTime(total.ts)}. This is not a full generation-mix breakdown.</p>
-      </> : <p className="mut">Renewable share is unavailable until wind, solar and total production have matching timestamps and units.</p>}
+      <h3>Reported generation technologies · {COUNTRY_NAMES[renewableCountry] ?? renewableCountry}</h3>
+      <GenerationMix metrics={scopedMetrics} country={renewableCountry}/>
     </div>
   </div>;
 }

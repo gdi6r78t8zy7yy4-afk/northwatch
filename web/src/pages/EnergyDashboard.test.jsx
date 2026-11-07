@@ -32,6 +32,16 @@ const MOCK_OVERVIEW = {
     { indicator: 'Total förbrukning (DK)', value: 3100, unit: 'MW', ts: MOCK_TIMESTAMP, country: 'DK', source: 'energinet', sourceName: 'Energi Data Service' },
     { indicator: 'Vindproduktion (DK)', value: 1800, unit: 'MW', ts: MOCK_TIMESTAMP, country: 'DK', source: 'energinet', sourceName: 'Energi Data Service' },
     { indicator: 'Solproduktion (DK)', value: 400, unit: 'MW', ts: MOCK_TIMESTAMP, country: 'DK', source: 'energinet', sourceName: 'Energi Data Service' },
+    { indicator: 'Vindproduktion (FI)', value: 100, unit: 'MW', ts: MOCK_TIMESTAMP, country: 'FI', source: 'fingrid', sourceName: 'Fingrid' },
+    { indicator: 'Vattenkraftproduktion (FI)', value: 250, unit: 'MW', ts: MOCK_TIMESTAMP, country: 'FI', source: 'fingrid', sourceName: 'Fingrid' },
+    { indicator: 'Kärnkraftsproduktion (FI)', value: 300, unit: 'MW', ts: MOCK_TIMESTAMP, country: 'FI', source: 'fingrid', sourceName: 'Fingrid' },
+    { indicator: 'Industriell kraftvärmeproduktion (FI)', value: 50, unit: 'MW', ts: MOCK_TIMESTAMP, country: 'FI', source: 'fingrid', sourceName: 'Fingrid' },
+    { indicator: 'Total produktion (FI)', value: 900, unit: 'MW', ts: MOCK_TIMESTAMP, country: 'FI', source: 'fingrid', sourceName: 'Fingrid' },
+    { indicator: 'Geotermisk produktion (IS)', value: 200, unit: 'MW', ts: MOCK_TIMESTAMP, country: 'IS', source: 'landsnet', sourceName: 'Landsnet' },
+    { indicator: 'Vattenkraftproduktion (IS)', value: 300, unit: 'MW', ts: MOCK_TIMESTAMP, country: 'IS', source: 'landsnet', sourceName: 'Landsnet' },
+    { indicator: 'Oljeproduktion (IS)', value: 10, unit: 'MW', ts: MOCK_TIMESTAMP, country: 'IS', source: 'landsnet', sourceName: 'Landsnet' },
+    { indicator: 'Förnybar produktion (IS)', value: 500, unit: 'MW', ts: MOCK_TIMESTAMP, country: 'IS', source: 'landsnet', sourceName: 'Landsnet' },
+    { indicator: 'Total produktion (IS)', value: 510, unit: 'MW', ts: MOCK_TIMESTAMP, country: 'IS', source: 'landsnet', sourceName: 'Landsnet' },
     { indicator: 'CO2-intensitet (DK)', value: 45, unit: 'g/kWh', ts: MOCK_TIMESTAMP, country: 'DK', source: 'energinet', sourceName: 'Energi Data Service' },
     { indicator: 'Dag-ahead-pris SE3', value: 24.5, unit: 'EUR/MWh', ts: MOCK_TIMESTAMP, country: 'SE', source: 'svk', sourceName: 'Svenska kraftnät' },
     { indicator: 'Dag-ahead-pris DK1', value: 29.8, unit: 'EUR/MWh', ts: MOCK_TIMESTAMP, country: 'DK', source: 'energinet', sourceName: 'Energi Data Service' },
@@ -90,7 +100,7 @@ describe('EnergyDashboard', () => {
     expect(screen.getByText('Consumption · Sverige')).toBeInTheDocument();
     expect(screen.getByText('Day-ahead price · Sverige')).toBeInTheDocument();
     expect(screen.getByText('Renewable output · Danmark')).toBeInTheDocument();
-    expect(screen.getByLabelText('Danmarks produktionsmix')).toBeInTheDocument();
+    expect(screen.getAllByLabelText('Danmarks produktionsmix')).toHaveLength(2);
   });
 
   test('country selector in the energy heading updates the global country scope', async () => {
@@ -113,6 +123,24 @@ describe('EnergyDashboard', () => {
     expect(fetchEnergyHistory).toHaveBeenCalledWith('SE', '24h');
     expect(fetchEnergyAnalysis).toHaveBeenCalledWith('SE');
     expect(fetchAssets).toHaveBeenCalledWith(1, 'SE');
+  });
+
+  test('Finland shows its reported wind, hydro, nuclear and CHP components', async () => {
+    render(<EnergyDashboard country="FI" />);
+    expect(await screen.findByText('Reported generation technologies · Finland')).toBeInTheDocument();
+    expect(screen.getAllByLabelText('Finlands produktionsmix')).toHaveLength(2);
+    expect(screen.getAllByText(/Hydro: 250 MW/)).toHaveLength(2);
+    expect(screen.getAllByText(/Nuclear: 300 MW/)).toHaveLength(2);
+    expect(screen.getAllByText(/not an exhaustive generation mix/)).toHaveLength(2);
+  });
+
+  test('Iceland shows geothermal, hydro and oil instead of a wind/solar placeholder', async () => {
+    render(<EnergyDashboard country="IS" />);
+    expect(await screen.findByText('Reported generation technologies · Island')).toBeInTheDocument();
+    expect(screen.getAllByLabelText('Islands produktionsmix')).toHaveLength(2);
+    expect(screen.getAllByText(/Geothermal: 200 MW/)).toHaveLength(2);
+    expect(screen.getAllByText(/Hydro: 300 MW/)).toHaveLength(2);
+    expect(screen.getAllByText(/Oil: 10 MW/)).toHaveLength(2);
   });
 
   test('renders market comparisons and price spread list without error', async () => {
