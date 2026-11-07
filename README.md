@@ -195,7 +195,7 @@ asset  { t:'a', area, country, source, type, name, id?, geometry, attrs?, update
 | Elprisetjustnu.se (API v1) | 1 Energi (SE) | nyckelfritt – day-ahead-priser per 15 min (SE1–SE4), SEK/kWh, dagens + morgondagens publicerade intervall; exkl. moms/skatter/påslag; synlig källhänvisning i dashboarden |
 | ENTSO-E Transparency Platform | 1 Energi (SE/NO/FI) | struktur verifierad; datalagret tomt 2026-11-01 (kollektorn aktiverar sig automatiskt när data finns) |
 | Statnett driftsdata | 1 Energi (NO/Nordiskt) | nyckelfritt – fysiska gränsflöden per zon + norsk nationell produktion/förbrukning (MW, timvärden); 1–2 % felmarginal; förbrukning beräknas från produktion och nettoimport/export |
-| Energi Data Service | 1 Energi (DK) | ok – verifierad 2026-11-01 |
+| Energi Data Service | 1 Energi (DK) | ok – produktion/förbrukning/nettoflöde/CO₂ per 15 min; kompletteras av Energinet PowerSystemRightNow (1 min, SCADA-baserat, approximativt) |
 | Trafikverket öppna dataplattform (datacache v2) | 3 Transport (SE) | kräver `TRAFIKVERKET_KEY` – omskriven till datacache-API:t 2026-11-02 (M5); väg, väglag, trafikflöden, vägväder, järnväg, färjor + speedkameror på huvudvägar (kartlager), järnvägskorsningar i drift, aktiva stationmeddelanden och ersättningsbussar för inställda tåg (M7) |
 | Digitraffic vägtrafikmeddelanden | 3 Transport (FI) | ok – v1/messages verifierad 2026-11-01 |
 | PeeringDB (IX) | 2 Digital infrastruktur (Nordiskt) | ok – verifierad 2026-11-01 |
