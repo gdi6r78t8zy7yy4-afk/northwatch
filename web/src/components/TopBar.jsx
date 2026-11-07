@@ -18,9 +18,9 @@ export default function TopBar({ areas, gen, backendDown, country, setCountry })
       <div className="topright">
         {backendDown && <span className="pill st-err">Backend ej nåbar</span>}
         {gen && <span>uppdaterad {fmtTime(gen)}</span>}
-        <label>
-          Område:{' '}
-          <select value={country} onChange={e => setCountry(e.target.value)}>
+        <label className="topbar-country-selector">
+          LAND
+          <select aria-label="Global country selection" value={country} onChange={e => setCountry(e.target.value)}>
             <option value="ALL">Alla länder</option>
             {Object.entries(COUNTRY_NAMES)
               .filter(([k]) => !['NORDIC', 'ALL'].includes(k))
