@@ -24,15 +24,16 @@ function Kpi({ label, metric, fallback }) {
     <div className="energy-kpi-value">{fmt(metric, 1)} <small>{metric?.unit ?? ''}</small></div>
     <div className="mut">{metric ? metric.sourceName + ' · ' + age(metric.ts) : fallback}</div></div>;
 }
-function GenerationMix({ metrics }) {
-  const wind = findMetric(metrics, r => r.indicator === 'Vindproduktion (DK)');
-  const solar = findMetric(metrics, r => r.indicator === 'Solproduktion (DK)');
-  const total = findMetric(metrics, r => r.indicator === 'Total produktion (DK)');
-  if (!wind || !solar || !total || wind.ts !== solar.ts || wind.ts !== total.ts) return <p className="mut">Ofullständig produktionsmix. Vind, sol och total produktion måste finnas för samma uppdatering innan mixen visas.</p>;
+function GenerationMix({ metrics, country = 'DK' }) {
+  const scope = country === 'ALL' ? 'DK' : country;
+  const wind = findMetric(metrics, r => r.country === scope && r.indicator === `Vindproduktion (${scope})`);
+  const solar = findMetric(metrics, r => r.country === scope && r.indicator === `Solproduktion (${scope})`);
+  const total = findMetric(metrics, r => r.country === scope && r.indicator === `Total produktion (${scope})`);
+  if (!wind || !solar || !total || wind.ts !== solar.ts || wind.ts !== total.ts || wind.unit !== solar.unit || wind.unit !== total.unit) return <p className="mut">Ofullständig produktionsmix för {COUNTRY_NAMES[scope] ?? scope}. Vind, sol och total produktion måste finnas med samma mättid och enhet.</p>;
   const parts = [{ name: 'Vind', value: Number(wind.value) }, { name: 'Sol', value: Number(solar.value) },
     { name: 'Övrigt', value: Math.max(0, Number(total.value) - Number(wind.value) - Number(solar.value)) }];
   const sum = parts.reduce((a, p) => a + p.value, 0);
-  return <><div className="energy-mixbar" aria-label="Danmarks produktionsmix">{parts.map(p => <span key={p.name} style={{ width: (sum ? p.value / sum * 100 : 0) + '%' }} title={p.name + ': ' + p.value + ' MW'} />)}</div>
+  return <><div className="energy-mixbar" aria-label={`${COUNTRY_NAMES[scope] ?? scope}s produktionsmix`}>{parts.map(p => <span key={p.name} style={{ width: (sum ? p.value / sum * 100 : 0) + '%' }} title={p.name + ': ' + p.value + ' MW'} />)}</div>
     <div className="energy-legend">{parts.map(p => <span key={p.name}>{p.name}: {Math.round(p.value).toLocaleString('sv-SE')} MW</span>)}</div>
     <p className="mut">Övrigt är total produktion minus rapporterad vind och sol; det är inte en fullständig bränslespecifikation.</p></>;
 }
@@ -127,7 +128,7 @@ function GridOperationsExplorer({ series }) {
   </section>;
 }
 
-function MarketSignals({ metrics, comparisons = [] }) {
+function MarketSignals({ metrics, comparisons = [], country = 'ALL' }) {
   const priceGroups = new Map();
   const now = Date.now();
   for (const row of metrics.filter(r => /^Dag-ahead-pris /.test(r.indicator) && Number.isFinite(Number(r.value)) && Number.isFinite(Date.parse(r.ts ?? '')))) {
@@ -139,12 +140,14 @@ function MarketSignals({ metrics, comparisons = [] }) {
     const rank = at <= now ? now - at : Number.MAX_SAFE_INTEGER + at;
     if (!previous || rank < previous.rank) priceGroups.set(key, { row, rank });
   }
-  const spreadMovements = buildEnergyPriceSpreadMovements(comparisons);
+  const regionalComparisons = country === 'ALL' ? comparisons : [];
+  const spreadMovements = buildEnergyPriceSpreadMovements(regionalComparisons);
   const prices = [...priceGroups.values()].map(item => item.row)
     .sort((a, b) => a.indicator.localeCompare(b.indicator) || a.source.localeCompare(b.source));
-  const wind = findMetric(metrics, r => r.indicator === 'Vindproduktion (DK)');
-  const solar = findMetric(metrics, r => r.indicator === 'Solproduktion (DK)');
-  const total = findMetric(metrics, r => r.indicator === 'Total produktion (DK)');
+  const renewableCountry = country === 'ALL' ? 'DK' : country;
+  const wind = findMetric(metrics, r => r.country === renewableCountry && r.indicator === `Vindproduktion (${renewableCountry})`);
+  const solar = findMetric(metrics, r => r.country === renewableCountry && r.indicator === `Solproduktion (${renewableCountry})`);
+  const total = findMetric(metrics, r => r.country === renewableCountry && r.indicator === `Total produktion (${renewableCountry})`);
   const aligned = wind && solar && total && wind.ts === solar.ts && wind.ts === total.ts &&
     wind.unit === solar.unit && wind.unit === total.unit && Number(total.value) > 0;
   const renewable = aligned ? Number(wind.value) + Number(solar.value) : null;
@@ -163,7 +166,7 @@ function MarketSignals({ metrics, comparisons = [] }) {
       <p className="mut">Swedish bidding-zone prices: <a href="https://www.elprisetjustnu.se" target="_blank" rel="noreferrer">Elpriset just nu.se</a>.</p>
       <div className="energy-spread-section">
         <h4>Aligned Nordic price spreads</h4>
-        {comparisons.length ? <div className="energy-spread-list">{comparisons.slice(0, 6).map(snapshot =>
+        {regionalComparisons.length ? <div className="energy-spread-list">{regionalComparisons.slice(0, 6).map(snapshot =>
           <article className="energy-spread-row" key={snapshot.asOf + snapshot.unit}>
             <div className="energy-spread-heading"><b>{snapshot.spread.toLocaleString('sv-SE',{maximumFractionDigits:2})} {snapshot.unit}</b><span>{snapshot.countryCount} bidding zones · {fmtTime(snapshot.asOf)}</span></div>
             <div className="energy-spread-track" role="img" aria-label={`Lowest ${snapshot.low.country} ${snapshot.low.value}; highest ${snapshot.high.country} ${snapshot.high.value}`}>
@@ -186,7 +189,7 @@ function MarketSignals({ metrics, comparisons = [] }) {
       </div>
     </div>
     <div className="energy-market-panel">
-      <h3>Wind + solar · Denmark</h3>
+      <h3>{renewableCountry === 'IS' ? 'Renewable generation · Iceland' : `Wind + solar · ${COUNTRY_NAMES[renewableCountry] ?? renewableCountry}`}</h3>
       {aligned ? <>
         <div className="energy-renewable-value">{share.toLocaleString('sv-SE',{maximumFractionDigits:1})}%</div>
         <div className="energy-renewable-track"><span style={{width:Math.max(0,Math.min(100,share))+'%'}}/></div>
@@ -194,7 +197,7 @@ function MarketSignals({ metrics, comparisons = [] }) {
           <div className="energy-price-cell"><span>Wind</span><b>{Number(wind.value).toLocaleString('sv-SE')} MW</b></div>
           <div className="energy-price-cell"><span>Solar</span><b>{Number(solar.value).toLocaleString('sv-SE')} MW</b></div>
         </div>
-        <p className="mut">Share of reported Danish production at {fmtTime(total.ts)}. This is not a full generation-mix breakdown.</p>
+        <p className="mut">Share of reported {COUNTRY_NAMES[renewableCountry] ?? renewableCountry} production at {fmtTime(total.ts)}. This is not a full generation-mix breakdown.</p>
       </> : <p className="mut">Renewable share is unavailable until wind, solar and total production have matching timestamps and units.</p>}
     </div>
   </div>;
@@ -202,8 +205,8 @@ function MarketSignals({ metrics, comparisons = [] }) {
 
 
 
-function GenerationDemandPanel({ metrics }) {
-  const countries = ['SE', 'NO', 'DK', 'FI', 'IS'];
+function GenerationDemandPanel({ metrics, country = 'ALL' }) {
+  const countries = country === 'ALL' ? ['SE', 'NO', 'DK', 'FI', 'IS'] : [country];
   const latestFor = (country, indicator) => metrics
     .filter(r => r.country === country && r.indicator === indicator &&
       r.value != null && Number.isFinite(Number(r.value)) && r.ts)
@@ -239,9 +242,9 @@ function GenerationDemandPanel({ metrics }) {
     ? Number(metric.value).toLocaleString('sv-SE', { maximumFractionDigits: 1 }) + ' ' + metric.unit
     : '—';
   return <section className="card energy-generation-section">
-    <div className="energy-section-head"><div><h2>Generation & demand · Nordic comparison</h2>
-      <div className="mut">Country-level production and consumption, using the latest source observations available for each country.</div></div>
-      <span className="tag">{rows.length} countries with data</span>
+    <div className="energy-section-head"><div><h2>{country === 'ALL' ? 'Generation & demand · Nordic comparison' : `Generation & demand · ${COUNTRY_NAMES[country] ?? country}`}</h2>
+      <div className="mut">{country === 'ALL' ? 'Country-level production and consumption, using the latest source observations available for each country.' : `Only source measurements belonging to ${COUNTRY_NAMES[country] ?? country} are shown. Missing indicators remain unavailable; no other country is substituted.`}</div></div>
+      <span className="tag">{country === 'ALL' ? `${rows.length} countries with data` : `${rows.length ? 'Country data available' : 'No country data'}`}</span>
     </div>
     {rows.length ? <div className="energy-generation-grid">{rows.map(row => <article className="energy-generation-country" key={row.country}>
       <div className="energy-generation-country-head"><b>{COUNTRY_NAMES[row.country] ?? row.country}</b>
@@ -304,7 +307,7 @@ function ReserveMarketPanel({ metrics }) {
   </section>;
 }
 
-export default function EnergyDashboard({ country = 'ALL' }) {
+export default function EnergyDashboard({ country = 'ALL', onCountryChange }) {
   const [data, setData] = useState(null), [assets, setAssets] = useState([]), [geo, setGeo] = useState(null);
   const [error, setError] = useState(null), [updated, setUpdated] = useState(null);
   const [historyRange, setHistoryRange] = useState('24h'), [history, setHistory] = useState(null), [analysis, setAnalysis] = useState(null);
@@ -330,31 +333,39 @@ export default function EnergyDashboard({ country = 'ALL' }) {
   useEffect(() => { let stopped = false; fetchStaticGeo().then(r => { if (!stopped) setGeo(r); }).catch(() => {}); return () => { stopped = true; }; }, []);
   const metrics = data?.metrics ?? [];
   const renewableHistory = useMemo(() => filterRenewableGenerationSeries(history?.series ?? []), [history?.series]);
-  const kpi = useMemo(() => ({
-    export: findMetric(metrics, r => r.indicator === 'Svensk nettoexport (SE1–SE4)'),
-    generation: findMetric(metrics, r => r.indicator === 'Total produktion (DK)'),
-    demand: findMetric(metrics, r => r.indicator === 'Total förbrukning (DK)'),
-    co2: findMetric(metrics, r => r.indicator === 'CO2-intensitet (DK)'),
-    mfrr: findMetric(metrics, r => r.indicator.startsWith('Mfrr-efterfrågan DK1+DK2')),
-  }), [metrics]);
+  const kpi = useMemo(() => {
+    const scope = country === 'ALL' ? null : country;
+    const scoped = scope ? metrics.filter(r => r.country === scope) : metrics.filter(r => r.country !== 'NORDIC');
+    const latest = test => scoped.filter(r => test(r) && r.value != null && Number.isFinite(Number(r.value)) && r.ts)
+      .sort((a, b) => String(b.ts).localeCompare(String(a.ts)))[0] ?? null;
+    const production = latest(r => /^Total produktion \\([A-Z]{2}\\)$/.test(r.indicator));
+    const consumption = latest(r => /^Total förbrukning \\([A-Z]{2}\\)$/.test(r.indicator) ||
+      (r.country === 'DK' && r.indicator === 'Beräknad förbrukning (DK, SCADA)'));
+    const price = latest(r => /^Dag-ahead-pris /.test(r.indicator));
+    const renewable = latest(r => /^(Vindproduktion|Solproduktion|Förnybar produktion) \\(/.test(r.indicator));
+    const labelCountry = metric => metric ? COUNTRY_NAMES[metric.country] ?? metric.country : '';
+    return [
+      { label: production ? `Production · ${labelCountry(production)}` : 'Production', metric: production, fallback: 'No production measurement in this country scope' },
+      { label: consumption ? `Consumption · ${labelCountry(consumption)}` : 'Consumption', metric: consumption, fallback: 'No consumption measurement in this country scope' },
+      { label: price ? `Day-ahead price · ${labelCountry(price)}` : 'Day-ahead price', metric: price, fallback: 'No day-ahead price in this country scope' },
+      { label: renewable ? `Renewable output · ${labelCountry(renewable)}` : 'Renewable output', metric: renewable, fallback: 'No renewable measurement in this country scope' },
+      { label: 'Sources reporting', value: data?.coverage?.reportingSources ?? 0, unit: '', detail: `${data?.coverage?.sourceCount ?? 0} configured sources in scope` },
+    ];
+  }, [metrics, country, data?.coverage]);
   const status = !data?.sources?.length ? 'none' : data.sources.some(s => s.status === 'error') ? 'error'
     : data.sources.some(s => s.status === 'no_key') ? 'no_key' : data.sources.some(s => s.status === 'stale') ? 'stale' : 'ok';
   return <div className="energy-page">
     <header className="energy-heading"><div><div className="energy-eyebrow">NORTHWATCH / OPERATIONAL ENERGY</div>
       <h1>Nordic Energy Situation <StatusPill status={status} /></h1>
       <p className="mut">Elförsörjning, gränsflöden, balans och källornas aktualitet · {country === 'ALL' ? 'Alla länder' : COUNTRY_NAMES[country]}</p></div>
-      <div className="energy-updated"><span className="dot" /> Uppdateras var 60:e sekund<br/><span className="mut">Senast hämtad: {updated ? fmtTime(updated) : '—'}</span></div></header>
+      <div className="energy-heading-actions"><label className="energy-country-control"><span>VALT LAND</span><select aria-label="Select energy dashboard country" value={country} onChange={event => onCountryChange?.(event.target.value)}><option value="ALL">Alla länder</option>{Object.entries(COUNTRY_NAMES).filter(([code]) => ['SE','NO','DK','FI','IS'].includes(code)).map(([code,name]) => <option key={code} value={code}>{name}</option>)}</select></label><div className="energy-updated"><span className="dot" /> Uppdateras var 60:e sekund<br/><span className="mut">Senast hämtad: {updated ? fmtTime(updated) : '—'}</span></div></div></header>
     {error && <div className="card"><StatusPill status="error"/> <span className="mut">Kunde inte uppdatera energivyn: {error}. Visar senast hämtade data om sådan finns.</span></div>}
-    <div className="energy-kpis">
-      <Kpi label="Svensk nettoexport" metric={kpi.export} fallback="Ingen aktuell SVK-mätning"/>
-      <Kpi label="Produktion · Danmark" metric={kpi.generation} fallback="Ej täckt i valt urval"/>
-      <Kpi label="Förbrukning · Danmark" metric={kpi.demand} fallback="Ej täckt i valt urval"/>
-      <Kpi label="CO₂-intensitet · Danmark" metric={kpi.co2} fallback="Ej täckt i valt urval"/>
-      <Kpi label="mFRR-behov · Danmark" metric={kpi.mfrr} fallback="Ingen aktuell mFRR-mätning"/>
-    </div>
+    <div className="energy-kpis">{kpi.map(item => item.metric !== undefined
+      ? <Kpi key={item.label} label={item.label} metric={item.metric} fallback={item.fallback}/>
+      : <div className="energy-kpi" key={item.label}><div className="energy-kpi-label">{item.label}</div><div className="energy-kpi-value">{item.value}</div><div className="mut">{item.detail}</div></div>)}</div>
     <div className="energy-main-grid">
       <section className="card energy-map-card"><div className="energy-section-head"><div><h2>Nordic grid · live observations</h2>
-        <div className="mut">Zonankare och vissa länkar är schematiska approximationer, inte verifierad fysisk nätgeometri.</div></div><span className="tag">{data?.coverage?.flowCount ?? 0} flödeslänkar</span></div>
+        <div className="mut">Regionalt nordiskt nätperspektiv visas även när ett enskilt land är valt. Zonankare och vissa länkar är schematiska approximationer, inte verifierad fysisk nätgeometri.</div></div><span className="tag">{data?.coverage?.flowCount ?? 0} flödeslänkar</span></div>
         <MapPanel area={ENERGY_AREA} country={country} assets={assets} staticGeo={geo} events={[]}/></section>
       <section className="card energy-assessment"><h2>Operational assessment</h2>
         <div className="energy-assessment-row"><span className="mut">Källor i urvalet</span><b>{data?.coverage?.sourceCount ?? '—'}</b></div>
@@ -389,9 +400,9 @@ export default function EnergyDashboard({ country = 'ALL' }) {
     {history?.series?.length ? <GridOperationsExplorer series={history.series}/> : null}
     <section className="card energy-market-section"><div className="energy-section-head"><div><h2>Market & renewable signals</h2>
       <div className="mut">Latest source observations; comparisons are limited to values with compatible timestamps and units.</div></div></div>
-      <MarketSignals metrics={metrics} comparisons={data?.marketComparisons ?? []}/>
+      <MarketSignals metrics={metrics} comparisons={data?.marketComparisons ?? []} country={country}/>
     </section>
-    <GenerationDemandPanel metrics={metrics}/>
+    <GenerationDemandPanel metrics={metrics} country={country}/>
     <ReserveMarketPanel metrics={metrics}/>
     <section className="card energy-analysis-section"><div className="energy-section-head"><div><h2>Evidence-based observations</h2>
       <div className="mut">Deterministic comparisons of measurements; not incident declarations or forecasts.</div></div></div>
@@ -405,8 +416,8 @@ export default function EnergyDashboard({ country = 'ALL' }) {
         </article>)}</div> : <p className="mut">No observations can currently be derived from matching, timestamp-aligned measurements.</p>}
       <div className="mut">{analysis?.methodology}</div>
     </section>
-    <div className="energy-lower-grid"><section className="card"><h2>Generation mix · Denmark</h2><GenerationMix metrics={metrics}/></section>
-      <section className="card"><h2>Cross-border physical flows</h2>
+    <div className="energy-lower-grid"><section className="card"><h2>Generation mix · {country === 'ALL' ? 'Denmark (regional overview)' : COUNTRY_NAMES[country]}</h2><GenerationMix metrics={metrics} country={country}/></section>
+      <section className="card"><h2>Cross-border physical flows · Nordic context</h2>
         {data?.flows?.length ? <div className="energy-table-wrap"><table><thead><tr><th>Förbindelse</th><th>MW</th><th>Källa</th><th>Mättid</th></tr></thead><tbody>
           {data.flows.map((f, i) => <tr key={f.source + '-' + f.name + '-' + i}><td><b>{Number(f.attrs?.mw) < 0 ? (f.attrs?.to ?? '—') : (f.attrs?.from ?? '—')} → {Number(f.attrs?.mw) < 0 ? (f.attrs?.from ?? '—') : (f.attrs?.to ?? '—')}</b></td><td className="mono">{Math.abs(Number(f.attrs?.mw)).toLocaleString('sv-SE', { maximumFractionDigits: 1 })}</td><td>{f.sourceName}</td><td>{fmtTime(f.updated)}</td></tr>)}
         </tbody></table></div> : <p className="mut">Inga flödeslänkar tillgängliga i valt urval just nu.</p>}
