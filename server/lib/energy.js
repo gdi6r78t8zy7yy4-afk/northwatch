@@ -1,5 +1,47 @@
 // Read-only aggregation for the dedicated energy dashboard.
 // Missing measurements remain missing; this layer never synthesizes zeroes.
+
+export function buildEnergyMarketComparisons(metrics) {
+  const groups = new Map();
+  for (const row of metrics) {
+    if (!/^Dag-ahead-pris\s+/.test(row.indicator ?? '') || row.value == null) continue;
+    const value = Number(row.value);
+    const at = Date.parse(row.ts ?? '');
+    const unit = String(row.unit ?? '').trim();
+    const country = String(row.country ?? '').toUpperCase();
+    if (!Number.isFinite(value) || !Number.isFinite(at) || !unit || !/^[A-Z]{2}$/.test(country)) continue;
+    const key = `${at}| ${unit}`;
+    if (!groups.has(key)) groups.set(key, { at, unit, observations: new Map() });
+    const group = groups.get(key);
+    // A country contributes at most once to a comparison snapshot.
+    // Keep the first record; overview metrics are already sorted newest-first.
+    if (!group.observations.has(country)) {
+      group.observations.set(country, {
+        country, value, unit, ts: row.ts,
+        source: row.source, sourceName: row.sourceName ?? row.source,
+      });
+    }
+  }
+
+  return [...groups.values()]
+    .filter(group => group.observations.size >= 2)
+    .map(group => {
+      const observations = [...group.observations.values()].sort((a, b) => a.country.localeCompare(b.country));
+      const ordered = [...observations].sort((a, b) => a.value - b.value);
+      const low = ordered[0], high = ordered[ordered.length - 1];
+      return {
+        asOf: new Date(group.at).toISOString(),
+        unit: group.unit,
+        countryCount: observations.length,
+        low: { country: low.country, value: low.value },
+        high: { country: high.country, value: high.value },
+        spread: high.value - low.value,
+        observations,
+      };
+    })
+    .sort((a, b) => b.asOf.localeCompare(a.asOf));
+}
+
 export function buildEnergyOverview(sources, { country = 'ALL', generatedAt = new Date().toISOString() } = {}) {
   const selected = String(country || 'ALL').toUpperCase();
   const relevant = sources.filter(s => s.area === 1 && (selected === 'ALL' || s.country === selected || s.country === 'NORDIC'));
@@ -10,6 +52,7 @@ export function buildEnergyOverview(sources, { country = 'ALL', generatedAt = ne
   metrics.sort((a, b) => String(b.ts ?? '').localeCompare(String(a.ts ?? '')));
   flows.sort((a, b) => String(b.updated ?? '').localeCompare(String(a.updated ?? '')));
   const sourceHealth = relevant.map(s => ({ id: s.id, name: s.name, country: s.country, status: s.status, every: s.every, lastOk: s.lastOk, lastError: s.lastError, error: s.error, records: (s.records ?? []).length }));
-  return { generatedAt, country: selected, metrics, flows, sources: sourceHealth,
+  return { generatedAt, country: selected, metrics, flows, marketComparisons: buildEnergyMarketComparisons(metrics),
+    sources: sourceHealth,
     coverage: { sourceCount: relevant.length, reportingSources: relevant.filter(s => s.status === 'ok' || s.status === 'stale').length, metricCount: metrics.length, flowCount: flows.length, countries: [...new Set(relevant.map(s => s.country))].sort() } };
 }
