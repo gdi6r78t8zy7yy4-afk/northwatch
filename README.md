@@ -38,11 +38,13 @@ node --test "server/test/*.test.js"   # 38 tester
 
 ## Persistens och driftsättning
 
-Backendens normaliserade collector-poster och källhälsa skrivs atomiskt till
-`server/data/store.json` (eller `NORTHWATCH_STORE_FILE`) och återställs innan
-schemaläggaren startar. Efter omstart visas därmed senast kända data direkt;
-källor som tidigare var `ok` markeras `stale` tills en ny lyckad hämtning sker.
-Katalogen `server/data/` är gitignorerad.
+Backendens normaliserade collector-poster och källhälsa använder ett
+utbytbart persistenslager. Lokalt är `STORE_DRIVER=local` standard och data
+skrivs atomiskt till `server/data/store.json` (eller `NORTHWATCH_STORE_FILE`).
+För Cloud Run väljer du `STORE_DRIVER=firestore`; Firestore-adaptern sparar
+källmetadata och chunkade snapshots av poster. Vid uppstart återställs senaste
+snapshot innan schemaläggaren startar. Källor som tidigare var `ok` markeras
+`stale` tills en ny lyckad hämtning sker.
 
 **Viktigt för containerdrift:** filsnapshoten är avsedd för lokal utveckling eller
 en VM med beständig disk. Cloud Run-instansers lokala filsystem är inte en
@@ -61,12 +63,21 @@ Använd Firestore som backendens persistenslager, inte webbläsarens localStorag
 och inte Cloud Run-containerns lokala filer.
 
 För Northwatch bör servern lagra normaliserade poster per källa och återläsa dem
-vid uppstart. Använd server-side Firebase Admin SDK / Application Default Credentials
-i Cloud Run; exponera aldrig service-account-nycklar eller skrivbehörighet i
-frontend. Lägg användarens sparade dashboard-layoutar och personliga inställningar
+vid uppstart. Northwatchs Firestore-adapter använder Firestore REST API från backend och
+Cloud Run Application Default Credentials via metadata-servern. Ge Cloud Run-
+servicens service account rollen `roles/datastore.user` och aktivera
+Firestore API. Sätt `STORE_DRIVER=firestore` och `GOOGLE_CLOUD_PROJECT` i
+Cloud Run-miljön. Ingen service-account-nyckel ska checkas in eller exponeras
+i frontend. För lokal emulatorutveckling kan `FIRESTORE_EMULATOR_HOST` anges. Lägg användarens sparade dashboard-layoutar och personliga inställningar
 i separata användarägda dokument, skyddade med Firebase Authentication och
 Firestore Security Rules. Admin SDK-anrop från servern styrs dessutom av Cloud IAM.
 
+Adaptern lagrar för närvarande hela källans normaliserade poster i chunkade
+snapshotdokument (max cirka 450 kB per chunk) och återställer dem till Northwatchs
+befintliga in-memory read model. Det bevarar nuvarande API-kontrakt men innebär
+att filtrering fortfarande görs i backendminnet; det är inte ännu ett
+direktfrågebart event store. Användarprofiler och användarlayoutar bör lagras
+separat med Firebase Authentication och lämpliga Security Rules.
 Välj Firestore för normaliserade händelser, mätvärden, tillgångar och användarlayoutar.
 Om datamängderna växer till stora historiska tidsserier eller avancerad SQL-analys,
 överväg Cloud SQL for PostgreSQL i stället. Lägg till TTL/retention för historiska
