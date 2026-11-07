@@ -130,15 +130,26 @@ function TrendChart({ series }) {
 }
 
 
-function HistoryExplorer({ series }) {
-  const keys = useMemo(() => series.map(s => [s.country,s.source,s.indicator,s.unit].join('|')), [series]);
+function HistoryExplorer({ series, country = 'ALL' }) {
+  // Keep the chart selector scoped to the active dashboard country. The API
+  // is country-aware, but filtering here also prevents stale/mixed responses
+  // from leaking another country's series into the visible chart choices.
+  const scopedSeries = useMemo(() => country === 'ALL' ? series
+    : series.filter(item => item.country === country), [series, country]);
+  const keys = useMemo(() => scopedSeries.map(s => [s.country,s.source,s.indicator,s.unit].join('|')), [scopedSeries]);
   const [selected, setSelected] = useState(null);
   const [search, setSearch] = useState('');
   useEffect(() => {
-    setSelected(current => current === null ? keys.slice(0, 6) : current.filter(key => keys.includes(key)));
+    setSelected(current => {
+      if (current === null) return keys.slice(0, 6);
+      const retained = current.filter(key => keys.includes(key));
+      // When the country changes, none of the previous country's keys may
+      // remain. Select the new scope's first series instead of showing blank.
+      return retained.length ? retained : keys.slice(0, 6);
+    });
   }, [keys.join('||')]);
-  const filtered = useMemo(() => filterEnergyHistorySeries(series, search), [series, search]);
-  const visible = series.filter(s => selected?.includes([s.country,s.source,s.indicator,s.unit].join('|')));
+  const filtered = useMemo(() => filterEnergyHistorySeries(scopedSeries, search), [scopedSeries, search]);
+  const visible = scopedSeries.filter(s => selected?.includes([s.country,s.source,s.indicator,s.unit].join('|')));
   const toggle = key => setSelected(current => {
     const active = current ?? keys.slice(0, 6);
     return active.includes(key) ? active.filter(item => item !== key)
@@ -150,7 +161,7 @@ function HistoryExplorer({ series }) {
     <div className="energy-series-controls">
       <input type="search" aria-label="Filter historical series" placeholder="Filter by country, technology, indicator or source…"
         value={search} onChange={event => setSearch(event.target.value)}/>
-      <span className="mut">{filtered.length} of {series.length} series</span>
+      <span className="mut">{filtered.length} of {scopedSeries.length} series</span>
       <button type="button" onClick={selectVisible} disabled={!filtered.length}>Select visible</button>
       <button type="button" onClick={() => setSelected([])} disabled={!selected?.length}>Clear selection</button>
     </div>
@@ -446,7 +457,7 @@ export default function EnergyDashboard({ country = 'ALL', onCountryChange }) {
           <option value="6h">Last 6 hours</option><option value="24h">Last 24 hours</option>
           <option value="7d">Last 7 days</option><option value="30d">Last 30 days</option>
         </select></div>
-      {history?.series?.length ? <HistoryExplorer series={history.series}/>
+      {history?.series?.length ? <HistoryExplorer series={history.series} country={country}/>
         : <p className="mut">Historical data is accumulating. Charts will populate as new collector measurements are recorded; the system does not backfill invented values.</p>}
       <div className="mut energy-history-meta">{history?.count ?? 0} observations · range {history?.from ? fmtTime(history.from) : '—'} – {history?.to ? fmtTime(history.to) : '—'}</div>
     </section>
@@ -455,7 +466,7 @@ export default function EnergyDashboard({ country = 'ALL', onCountryChange }) {
       <div className="energy-section-head"><div><h2>Renewable generation history</h2>
         <div className="mut">Selectable source-reported renewable technology time series. Each country, source, indicator and unit remains independent.</div></div>
         <span className="tag">{renewableHistory.length} series</span></div>
-      {renewableHistory.length ? <HistoryExplorer series={renewableHistory}/>
+      {renewableHistory.length ? <HistoryExplorer series={renewableHistory} country={country}/>
         : <p className="mut">No renewable generation history with two or more recorded observations is available in this time window. No values are estimated or backfilled.</p>}
     </section>
     <section className="card energy-market-section">
