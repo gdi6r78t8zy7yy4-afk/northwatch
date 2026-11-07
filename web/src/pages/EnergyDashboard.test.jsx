@@ -86,7 +86,10 @@ describe('EnergyDashboard', () => {
   test('renders energy dashboard and KPI sections with data', async () => {
     render(<EnergyDashboard country="ALL" />);
     expect(await screen.findByText('Nordic Energy Situation')).toBeInTheDocument();
-    expect(screen.getByText('Svensk nettoexport')).toBeInTheDocument();
+    expect(screen.getByText('Production · Sverige')).toBeInTheDocument();
+    expect(screen.getByText('Consumption · Sverige')).toBeInTheDocument();
+    expect(screen.getByText('Day-ahead price · Sverige')).toBeInTheDocument();
+    expect(screen.getByText('Renewable output · Danmark')).toBeInTheDocument();
     expect(screen.getByLabelText('Danmarks produktionsmix')).toBeInTheDocument();
   });
 
