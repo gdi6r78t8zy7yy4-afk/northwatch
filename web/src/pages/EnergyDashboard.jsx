@@ -162,6 +162,62 @@ function MarketSignals({ metrics }) {
 }
 
 
+
+function GenerationDemandPanel({ metrics }) {
+  const countries = ['SE', 'NO', 'DK', 'FI', 'IS'];
+  const latestFor = (country, indicator) => metrics
+    .filter(r => r.country === country && r.indicator === indicator &&
+      r.value != null && Number.isFinite(Number(r.value)) && r.ts)
+    .sort((a, b) => String(b.ts).localeCompare(String(a.ts)))[0] ?? null;
+  const rows = countries.map(country => {
+    const generation = latestFor(country, `Total produktion (${country})`);
+    const demand = latestFor(country, `Total förbrukning (${country})`);
+    const wind = latestFor(country, `Vindproduktion (${country})`);
+    const solar = latestFor(country, `Solproduktion (${country})`);
+    const combinedRenewables = latestFor(country, `Vind+sol-produktion ${country}`);
+    let renewable = combinedRenewables;
+    if (wind && solar && wind.ts === solar.ts && wind.unit === solar.unit) {
+      renewable = { value: Number(wind.value) + Number(solar.value), unit: wind.unit,
+        ts: wind.ts, sourceName: wind.sourceName ?? wind.source };
+    }
+    const aligned = generation && demand && generation.ts === demand.ts && generation.unit === demand.unit;
+    const renewableAligned = renewable && generation && renewable.ts === generation.ts &&
+      renewable.unit === generation.unit && Number(generation.value) > 0;
+    if (!generation && !demand && !renewable) return null;
+    return { country, generation, demand, renewable,
+      balance: aligned ? Number(generation.value) - Number(demand.value) : null,
+      renewableShare: renewableAligned ? Number(renewable.value) / Number(generation.value) * 100 : null,
+      aligned };
+  }).filter(Boolean);
+  const value = metric => metric
+    ? Number(metric.value).toLocaleString('sv-SE', { maximumFractionDigits: 1 }) + ' ' + metric.unit
+    : '—';
+  return <section className="card energy-generation-section">
+    <div className="energy-section-head"><div><h2>Generation & demand · Nordic comparison</h2>
+      <div className="mut">Country-level production and consumption, using the latest source observations available for each country.</div></div>
+      <span className="tag">{rows.length} countries with data</span>
+    </div>
+    {rows.length ? <div className="energy-generation-grid">{rows.map(row => <article className="energy-generation-country" key={row.country}>
+      <div className="energy-generation-country-head"><b>{COUNTRY_NAMES[row.country] ?? row.country}</b>
+        <span className="mut">{row.generation?.sourceName ?? row.demand?.sourceName ?? row.renewable?.sourceName ?? 'Source measurement'}</span></div>
+      <div className="energy-generation-values">
+        <div><span>Production</span><b>{value(row.generation)}</b></div>
+        <div><span>Consumption</span><b>{value(row.demand)}</b></div>
+        <div><span>Wind + solar</span><b>{value(row.renewable)}</b></div>
+      </div>
+      <div className="energy-generation-assessment">
+        {row.aligned ? <span className={row.balance < 0 ? 'energy-balance deficit' : 'energy-balance surplus'}>
+          Domestic balance {row.balance > 0 ? '+' : ''}{row.balance.toLocaleString('sv-SE', { maximumFractionDigits: 1 })} {row.generation.unit}
+        </span> : <span className="mut">Balance unavailable · timestamps or units do not align</span>}
+        {row.renewableShare != null ? <span className="mut">Wind + solar: {row.renewableShare.toLocaleString('sv-SE', { maximumFractionDigits: 1 })}% of reported production</span>
+          : <span className="mut">Renewable share unavailable · requires aligned wind, solar and total production</span>}
+      </div>
+      <div className="mut energy-generation-time">Latest observation: {fmtTime(row.generation?.ts ?? row.demand?.ts ?? row.renewable?.ts)}</div>
+    </article>)}</div> : <p className="mut">No generation, demand or wind/solar production measurements are currently available in this country scope.</p>}
+    <p className="mut energy-generation-caveat">A domestic production-demand difference is not a system adequacy assessment. Imports, exports, losses, storage and balancing resources are not included. Missing and non-aligned measurements are left blank; no zeroes or estimates are synthesized.</p>
+  </section>;
+}
+
 function ReserveMarketPanel({ metrics }) {
   const capacities = metrics.filter(r => /^(aFRR|mFRR)-kapacitet /.test(r.indicator) &&
     r.value != null && Number.isFinite(Number(r.value)) && r.ts);
@@ -273,6 +329,7 @@ export default function EnergyDashboard({ country = 'ALL' }) {
       <div className="mut">Latest source observations; comparisons are limited to values with compatible timestamps and units.</div></div></div>
       <MarketSignals metrics={metrics} comparisons={data?.marketComparisons ?? []}/>
     </section>
+    <GenerationDemandPanel metrics={metrics}/>
     <ReserveMarketPanel metrics={metrics}/>
     <section className="card energy-analysis-section"><div className="energy-section-head"><div><h2>Evidence-based observations</h2>
       <div className="mut">Deterministic comparisons of measurements; not incident declarations or forecasts.</div></div></div>
