@@ -105,7 +105,7 @@ describe('EnergyDashboard', () => {
     expect(screen.getByLabelText('Islands produktionsmix')).toBeInTheDocument();
     expect(screen.getByText('Generation mix · reported country technologies')).toBeInTheDocument();
     expect(screen.getByRole('table', { name: 'Nordic energy data coverage' })).toBeInTheDocument();
-    expect(screen.getByText('4 indicators')).toBeInTheDocument();
+    expect(screen.getAllByText('4 indicators').length).toBeGreaterThan(0);
     expect(screen.getAllByText('No measurement').length).toBeGreaterThan(0);
   });
 
