@@ -134,6 +134,12 @@ export const POINTS = parsePointsEnv(process.env.SMHI_FCST_POINTS) ?? DEFAULT_PO
 // ---- Inminnesstatus --------------------------------------------------------
 // pointsByCycle: createdTime -> { [namn]: { geometry, timeSeries } }
 // gridTiles:     "ds|param|time" -> values (barra aktuell cykel)
+export const MAX_ADHOC_POINTS = clampInt(process.env.SMHI_ADHOC_CACHE_MAX, 500, 10, 5000);
+const ADHOC_RATE_LIMIT = clampInt(process.env.SMHI_ADHOC_RATE_LIMIT_PER_MIN, 20, 1, 600);
+const ADHOC_RATE_WINDOW_MS = 60_000;
+const adhocRequests = new Map();
+const adhocInflight = new Map();
+
 export const fc = {
   cycle: null,
   pointsByCycle: new Map(),
@@ -142,6 +148,26 @@ export const fc = {
   gridCoords: new Map(),
   gridTiles: new Map(),
 };
+
+function allowAdhocRequest(clientKey) {
+  const nowMs = Date.now();
+  let bucket = adhocRequests.get(clientKey);
+  if (!bucket || nowMs - bucket.startedAt >= ADHOC_RATE_WINDOW_MS) {
+    bucket = { startedAt: nowMs, count: 0 };
+    adhocRequests.set(clientKey, bucket);
+  }
+  // Bound the limiter bookkeeping if clients rotate addresses.
+  if (adhocRequests.size > 10_000) {
+    for (const [key, value] of adhocRequests) {
+      if (nowMs - value.startedAt >= ADHOC_RATE_WINDOW_MS) adhocRequests.delete(key);
+    }
+    while (adhocRequests.size > 10_000) {
+      adhocRequests.delete(adhocRequests.keys().next().value);
+    }
+  }
+  bucket.count += 1;
+  return bucket.count <= ADHOC_RATE_LIMIT;
+}
 
 export const cacheDir = () =>
   process.env.SMHI_FCST_CACHE_DIR || path.join(root, '..', 'cache', 'smhi-forecast');
@@ -293,11 +319,25 @@ export function loadLatestFromDisk() {
 // Fritvald plats (klick på kartan) – hämtas on-demand per cykel.
 export async function getAdhocPoint(lon, lat) {
   const key = `${lat.toFixed(3)}|${lon.toFixed(3)}`;
-  if (fc.adhoc.has(key)) return fc.adhoc.get(key);
-  const p = await fetchPoint(lon, lat, { parameters: PARAMS });
-  if (p?.outside) return { outside: true };
-  fc.adhoc.set(key, { geometry: p.geometry ?? null, timeSeries: p.timeSeries ?? [] });
-  return fc.adhoc.get(key);
+  if (fc.adhoc.has(key)) {
+    const hit = fc.adhoc.get(key);
+    fc.adhoc.delete(key);
+    fc.adhoc.set(key, hit); // LRU: recently used points move to the end.
+    return hit;
+  }
+  if (adhocInflight.has(key)) return adhocInflight.get(key);
+  const request = (async () => {
+    const p = await fetchPoint(lon, lat, { parameters: PARAMS });
+    if (p?.outside) return { outside: true };
+    const value = { geometry: p.geometry ?? null, timeSeries: p.timeSeries ?? [] };
+    fc.adhoc.set(key, value);
+    while (fc.adhoc.size > MAX_ADHOC_POINTS) {
+      fc.adhoc.delete(fc.adhoc.keys().next().value);
+    }
+    return value;
+  })().finally(() => adhocInflight.delete(key));
+  adhocInflight.set(key, request);
+  return request;
 }
 
 // Första tidssteg som är nu eller senare (prognoserna börjar nu).
@@ -341,7 +381,7 @@ export function apiForecastMeta(u) {
   };
 }
 
-export async function apiForecastPoint(u) {
+export async function apiForecastPoint(u, clientKey = 'unknown-client') {
   loadLatestFromDisk();
   if (!fc.cycle) return { status: 503, body: { error: 'Prognoscykeln är inte klar ännu' } };
   const name = u.searchParams.get('point');
@@ -351,7 +391,16 @@ export async function apiForecastPoint(u) {
   if (name) {
     pt = POINTS.find(p => p.name === name);
   } else if (lat !== null && lon !== null) {
-    pt = { name: `Anpassad plats (${lat}, ${lon})`, lon: Number(lon), lat: Number(lat), country: 'NORDIC' };
+    const latitude = Number(lat);
+    const longitude = Number(lon);
+    if (!Number.isFinite(latitude) || !Number.isFinite(longitude)
+      || latitude < -90 || latitude > 90 || longitude < -180 || longitude > 180) {
+      return { status: 400, body: { error: 'Koordinater måste vara numeriska och inom lat -90..90, lon -180..180' } };
+    }
+    if (!allowAdhocRequest(clientKey)) {
+      return { status: 429, body: { error: 'För många anpassade prognosförfrågningar', retryAfterSeconds: 60 } };
+    }
+    pt = { name: `Anpassad plats (${lat}, ${lon})`, lon: longitude, lat: latitude, country: 'NORDIC' };
   }
   if (!pt || !Number.isFinite(pt.lon) || !Number.isFinite(pt.lat)) {
     return { status: 400, body: { error: 'Ange point=<namn> eller lat= och lon=' } };

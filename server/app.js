@@ -7,7 +7,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { COLLECTORS } from './collectors/index.js';
-import { registerSource } from './lib/store.js';
+import { registerSource, initStore } from './lib/store.js';
 import { startScheduler } from './lib/scheduler.js';
 import { state, healthList, areaSources, areaStatus, cellStatus, sourceStatus } from './lib/store.js';
 import { AREAS, COUNTRIES } from './areas.js';
@@ -17,6 +17,9 @@ import { apiForecastMeta, apiForecastPoint, apiForecastGrid, apiForecastGridCoor
 import { apiCyberNvd, apiCyberKev, apiCyberOsv, apiCyberPrioritized, apiCyberOverview } from './lib/cyber.js';
 
 for (const c of COLLECTORS) registerSource(c);
+// Restore the last snapshot before the first collector run, so the dashboard
+// can serve the previous good dataset immediately after a restart.
+await initStore();
 startScheduler(COLLECTORS);
 
 const root = path.dirname(fileURLToPath(import.meta.url));
@@ -125,7 +128,7 @@ const routes = {
 // anropet efter start kan alltså ta ~10–30 s medan datat hämtas.
 const asyncRoutes = {
   '/api/forecast/meta': u => apiForecastMeta(u),
-  '/api/forecast/point': u => apiForecastPoint(u),
+  '/api/forecast/point': (u, q) => apiForecastPoint(u, q.socket.remoteAddress ?? 'unknown-client'),
   '/api/forecast/grid': u => apiForecastGrid(u),
   '/api/forecast/grid-coords': u => apiForecastGridCoords(u),
   '/api/cyber/nvd': u => apiCyberNvd(u),
@@ -183,7 +186,7 @@ http.createServer((q, res) => {
   // Asynkna vägar (kan vänta på extern hämtning).
   const ar = q.method === 'GET' && asyncRoutes[u.pathname];
   if (ar) {
-    return Promise.resolve(ar(u)).then(
+    return Promise.resolve(ar(u, q)).then(
       ({ status, body }) => sendStatus(res, status ?? 200, body),
       e => sendStatus(res, 500, { error: String(e?.message ?? e) }),
     );

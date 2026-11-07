@@ -1,96 +1,130 @@
-// Minnesbaserat lager: normaliserade poster + källhälsa.
-// Posttyper:
+// Normalized in-memory read model backed by a pluggable durable persistence adapter.
+// Record types:
 //   metric { t:'m', area, country, source, indicator, value, unit, ts }
 //   event  { t:'e', area, country, source, kind, severity, title, detail, start, end?, geo? }
 //   asset  { t:'a', area, country, source, type, name, id?, geometry, attrs?, updated }
 import { now } from './http.js';
+import { createPersistence } from './persistence.js';
 
 export const state = { startedAt: now(), sources: new Map() };
+const persistence = createPersistence();
+
+function serializableSource(source) {
+  return {
+    id: source.id, name: source.name, area: source.area, country: source.country, every: source.every,
+    status: source.status, records: source.records, lastRun: source.lastRun, lastOk: source.lastOk,
+    lastError: source.lastError, error: source.error, ms: source.ms,
+  };
+}
+
+function persistSource(id) {
+  const source = state.sources.get(id);
+  if (!source) return Promise.resolve();
+  return persistence.saveSource(serializableSource(source));
+}
+
+export async function flushStore() {
+  await persistence.flush();
+}
+
+export async function initStore() {
+  try {
+    const savedSources = await persistence.loadSources();
+    let restored = 0;
+    for (const saved of savedSources) {
+      const current = state.sources.get(saved.id);
+      if (!current) continue;
+      current.records = Array.isArray(saved.records) ? saved.records : [];
+      current.status = saved.status === 'ok' ? 'stale' : (saved.status ?? 'stale');
+      current.lastRun = saved.lastRun ?? null;
+      current.lastOk = saved.lastOk ?? null;
+      current.lastError = saved.lastError ?? null;
+      current.error = saved.error ?? null;
+      current.ms = saved.ms ?? null;
+      restored++;
+    }
+    console.log(`[store] restored ${restored} source snapshots using ${persistence.driver} persistence`);
+  } catch (error) {
+    console.error(`[store] ${persistence.driver} restore failed:`, error?.message ?? error);
+    if ((process.env.STORE_REQUIRED || 'false').toLowerCase() === 'true') throw error;
+  }
+}
 
 export function registerSource(cfg) {
-  const s = {
-    ...cfg,
-    status: 'running',
-    records: [],
-    lastRun: null,
-    lastOk: null,
-    lastError: null,
-    error: null,
-    ms: null,
+  const source = {
+    ...cfg, status: 'running', records: [], lastRun: null, lastOk: null,
+    lastError: null, error: null, ms: null,
   };
-  state.sources.set(cfg.id, s);
-  return s;
+  state.sources.set(cfg.id, source);
+  return source;
 }
 
 export function setResult(id, records, ms) {
-  const s = state.sources.get(id);
-  s.records = records;
-  s.status = 'ok';
-  s.lastOk = now();
-  s.lastRun = now();
-  s.ms = ms;
-  s.error = null;
+  const source = state.sources.get(id);
+  if (!source) throw new Error(`Unknown collector: ${id}`);
+  source.records = records;
+  source.status = 'ok';
+  source.lastOk = now();
+  source.lastRun = source.lastOk;
+  source.ms = ms;
+  source.error = null;
+  void persistSource(id);
 }
 
 export function setError(id, err, ms) {
-  const s = state.sources.get(id);
-  s.status = 'error';
-  s.error = String(err?.message ?? err);
-  s.lastError = now();
-  s.lastRun = now();
-  s.ms = ms;
+  const source = state.sources.get(id);
+  if (!source) throw new Error(`Unknown collector: ${id}`);
+  source.status = 'error';
+  source.error = String(err?.message ?? err);
+  source.lastError = now();
+  source.lastRun = source.lastError;
+  source.ms = ms;
+  void persistSource(id);
 }
 
 export function setNoKey(id, envName) {
-  const s = state.sources.get(id);
-  s.status = 'no_key';
-  s.error = `Saknar ${envName}`;
-  s.lastRun = now();
+  const source = state.sources.get(id);
+  if (!source) throw new Error(`Unknown collector: ${id}`);
+  source.status = 'no_key';
+  source.error = `Saknar ${envName}`;
+  source.lastRun = now();
+  void persistSource(id);
 }
 
-// 'ok' som ligger längre tillbaka än 3× pollintervallet räknas som 'stale'.
-export function sourceStatus(s) {
-  if (s.status === 'ok' && s.lastOk && Date.now() - new Date(s.lastOk).getTime() > s.every * 3000) return 'stale';
-  return s.status;
+// An 'ok' older than three polling intervals is exposed as stale.
+export function sourceStatus(source) {
+  if (source.status === 'ok' && source.lastOk && Date.now() - new Date(source.lastOk).getTime() > source.every * 3000) return 'stale';
+  return source.status;
 }
 
 export function healthList() {
-  return [...state.sources.values()].map(s => ({
-    id: s.id,
-    name: s.name,
-    area: s.area,
-    country: s.country,
-    every: s.every,
-    status: sourceStatus(s),
-    lastOk: s.lastOk,
-    lastError: s.lastError,
-    lastRun: s.lastRun,
-    ms: s.ms,
-    error: s.error,
+  return [...state.sources.values()].map(source => ({
+    id: source.id, name: source.name, area: source.area, country: source.country,
+    every: source.every, status: sourceStatus(source), lastOk: source.lastOk,
+    lastError: source.lastError, lastRun: source.lastRun, ms: source.ms, error: source.error,
   }));
 }
 
-// Sammanställ status per cell (område × land): värst-vinnare.
-// error > no_key > stale > ok; 'none' om inga källor.
+// Worst status wins: error > no_key > stale > ok.
 const RANK = { error: 4, no_key: 3, stale: 2, running: 1, ok: 1, none: 0 };
 
 export function cellStatus(sources) {
   if (!sources.length) return 'none';
   let worst = 'ok';
-  for (const s of sources) {
-    const st = sourceStatus(s);
-    if (RANK[st] > RANK[worst]) worst = st;
+  for (const source of sources) {
+    const status = sourceStatus(source);
+    if (RANK[status] > RANK[worst]) worst = status;
     if (worst === 'error') break;
   }
   return worst;
 }
 
 export function areaSources(areaId) {
-  return [...state.sources.values()].filter(s => s.area === areaId);
+  return [...state.sources.values()].filter(source => source.area === areaId);
 }
 
 export function areaStatus(areaId) {
-  const srcs = areaSources(areaId);
-  if (!srcs.length) return 'none';
-  return cellStatus(srcs);
+  const sources = areaSources(areaId);
+  if (!sources.length) return 'none';
+  return cellStatus(sources);
 }

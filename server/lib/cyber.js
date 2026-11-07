@@ -69,9 +69,36 @@ const NVD_PAGE = 2000;
 export const NVD_WINDOW_DAYS = 30;
 export const NVD_MAX_PAGES = clampInt(process.env.NVD_MAX_PAGES, 5, 1, 10);
 const NVD_PAGE_DELAY = clampInt(process.env.NVD_PAGE_DELAY_MS, process.env.NVD_API_KEY ? 2000 : 7000, 0, 120000);
+const NVD_RETRY_MAX = clampInt(process.env.NVD_RETRY_MAX, 4, 0, 8);
+let nvdQueue = Promise.resolve();
+let nvdLastRequestAt = 0;
 
 const nvdHeaders = () => (process.env.NVD_API_KEY ? { apiKey: process.env.NVD_API_KEY } : {});
 const nvdDate = d => d.toISOString().replace(/\.\d{3}Z$/, '.000');
+
+// All NVD calls, including per-CVE enrichment, share one serialized queue.
+// This prevents the dashboard and collector from independently bursting NVD.
+export function nvdJson(url, opt = {}) {
+  const task = nvdQueue.then(async () => {
+    for (let attempt = 0; ; attempt += 1) {
+      const interval = NVD_PAGE_DELAY;
+      const wait = Math.max(0, interval - (Date.now() - nvdLastRequestAt));
+      if (wait) await sleep(wait);
+      nvdLastRequestAt = Date.now();
+      try {
+        return await jjson(url, { ...opt, headers: { ...nvdHeaders(), ...(opt.headers ?? {}) }, timeout: opt.timeout ?? 30000 });
+      } catch (error) {
+        const message = String(error?.message ?? error);
+        const retryable = /HTTP (429|5\d\d)\b|fetch failed|network|timed? ?out/i.test(message);
+        if (!retryable || attempt >= NVD_RETRY_MAX) throw error;
+        const retryDelay = Math.min(60_000, 1000 * (2 ** attempt));
+        await sleep(retryDelay);
+      }
+    }
+  });
+  nvdQueue = task.catch(() => {});
+  return task;
+}
 
 export const scoreSeverity = s =>
   (s == null ? null : s >= 9 ? 'CRITICAL' : s >= 7 ? 'HIGH' : s >= 4 ? 'MEDIUM' : 'LOW');
@@ -133,7 +160,7 @@ export async function fetchNvdWindow() {
   let dbTotal = null;
   if (process.env.NVD_API_KEY) {
     try {
-      dbTotal = (await jjson(`${NVD_BASE}?resultsPerPage=1`, { headers: nvdHeaders(), timeout: 30000 })).totalResults ?? null;
+      dbTotal = (await nvdJson(`${NVD_BASE}?resultsPerPage=1`, { timeout: 30000 })).totalResults ?? null;
     } catch { /* databastotalen är nice-to-have – fäll inte fönstret */ }
   }
   const week = 7 * 86400000;
@@ -151,7 +178,7 @@ export async function fetchNvdWindow() {
     for (let page = 1; page <= budgets[c]; page += 1) {
       const u = `${NVD_BASE}?resultsPerPage=${NVD_PAGE}&startIndex=${(page - 1) * NVD_PAGE}`
         + `&pubStartDate=${nvdDate(wStart)}&pubEndDate=${nvdDate(wEnd)}`;
-      const r = await jjson(u, { headers: nvdHeaders(), timeout: 30000 });
+      const r = await nvdJson(u, { timeout: 30000 });
       const list = r.vulnerabilities ?? [];
       for (const v of list) {
         const t = trimCve(v);
@@ -160,7 +187,7 @@ export async function fetchNvdWindow() {
       const total = r.totalResults ?? list.length;
       if (list.length < NVD_PAGE || (page - 1) * NVD_PAGE + list.length >= total) break;
       if (page === budgets[c]) { capped = true; break; }
-      await sleep(NVD_PAGE_DELAY);
+      // The shared NVD queue enforces the minimum interval between all requests.
     }
   }
   return {
@@ -502,7 +529,7 @@ export async function nvdScoreForCve(id) {
   if (hit && Date.now() - hit.at < KSV_TTL) return hit;
   if (!ksvInflight.has(id)) {
     ksvInflight.set(id, (async () => {
-      const r = await jjson(`${NVD_BASE}?cveId=${encodeURIComponent(id)}`, { headers: nvdHeaders(), timeout: 30000 });
+      const r = await nvdJson(`${NVD_BASE}?cveId=${encodeURIComponent(id)}`, { timeout: 30000 });
       const t = trimCve((r.vulnerabilities ?? [])[0] ?? {});
       return { id, score: t.score, severity: t.severity, vector: t.vector, at: Date.now() };
     })().finally(() => ksvInflight.delete(id)));

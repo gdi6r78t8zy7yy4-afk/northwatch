@@ -27,7 +27,7 @@ export default {
     const recs = [
       {
         t: 'm', area: 5, country: 'NORDIC', source: 'nvd',
-        indicator: 'NVD – totalt antal CVE', value: c.dbTotal ?? rows.length, unit: 'CVE', ts,
+        indicator: 'NVD – CVE i hämtat 30-dagarsfönster', value: rows.length, unit: 'CVE', ts,
       },
       {
         t: 'm', area: 5, country: 'NORDIC', source: 'nvd',
@@ -46,6 +46,12 @@ export default {
         indicator: 'NVD – medelvärde CVSS senaste 30 dagarna', value: avg, unit: '0–10', ts,
       },
     ];
+    if (Number.isFinite(c.dbTotal)) {
+      recs.push({
+        t: 'm', area: 5, country: 'NORDIC', source: 'nvd',
+        indicator: 'NVD – totalt antal CVE i databasen', value: c.dbTotal, unit: 'CVE', ts,
+      });
+    }
     if (crit.length) {
       recs.push({
         t: 'e', area: 5, country: 'NORDIC', source: 'nvd',
