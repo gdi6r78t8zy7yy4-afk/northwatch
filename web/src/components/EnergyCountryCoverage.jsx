@@ -19,7 +19,7 @@ const latest = (metrics, country, predicate) => metrics
 const latestPerPriceSeries = (metrics, country) => {
   const series = new Map();
   for (const metric of metrics) {
-    if (metric.country !== country || !metric.indicator.startsWith('Dag-ahead-pris ') || !valid(metric)) continue;
+    if (metric.country !== country || !String(metric.indicator ?? '').startsWith('Dag-ahead-pris ') || !valid(metric)) continue;
     const key = [metric.indicator, metric.source, metric.unit].join('|');
     const previous = series.get(key);
     if (!previous || Date.parse(metric.ts) > Date.parse(previous.ts)) series.set(key, metric);
