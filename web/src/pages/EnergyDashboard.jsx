@@ -289,12 +289,12 @@ function MarketSignals({ metrics, comparisons = [], country = 'ALL' }) {
           : <p className="mut">No aligned cross-country price snapshots yet. At least two countries must report the same timestamp and price unit.</p>}
         <p className="mut">Spread is the highest minus the lowest reported price. Only identical timestamps and units are compared; currencies are not converted.</p>
         <div className="energy-spread-movement">
-          <h4>Spread movement · same countries, sources and unit</h4>
-          {spreadMovements.length ? spreadMovements.slice(0, 4).map(movement => <div className="energy-spread-movement-row" key={movement.unit + movement.countries.join('-')}>
+          <h4>Spread movement · same bidding zones, sources and unit</h4>
+          {spreadMovements.length ? spreadMovements.slice(0, 4).map(movement => <div className="energy-spread-movement-row" key={movement.unit + movement.markets.join('-')}>
             <b>{movement.change > 0 ? '+' : ''}{movement.change.toLocaleString('sv-SE',{maximumFractionDigits:2})} {movement.unit}</b>
-            <span>{movement.change > 0 ? 'Wider spread' : movement.change < 0 ? 'Narrower spread' : 'Unchanged spread'} · {movement.countries.join(', ')}</span>
+            <span>{movement.change > 0 ? 'Wider spread' : movement.change < 0 ? 'Narrower spread' : 'Unchanged spread'} · {movement.markets.join(', ')}</span>
             <small>{fmtTime(movement.previousAsOf)} → {fmtTime(movement.latestAsOf)} · {movement.previousSpread.toLocaleString('sv-SE',{maximumFractionDigits:2})} → {movement.latestSpread.toLocaleString('sv-SE',{maximumFractionDigits:2})} {movement.unit}</small>
-          </div>) : <p className="mut">A spread trend needs at least two snapshots with identical countries, sources and units.</p>}
+          </div>) : <p className="mut">A spread trend needs at least two snapshots with identical bidding zones, sources and units.</p>}
           <p className="mut">This describes a change in observed price separation only. It does not establish congestion, available transfer capacity or its cause.</p>
         </div>
       </div>
