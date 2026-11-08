@@ -93,6 +93,17 @@ beforeEach(() => {
 });
 
 describe('EnergyDashboard', () => {
+  test('gives the Nordic grid map a full dashboard row and large default viewport', async () => {
+    localStorage.removeItem('nw-energy-mapsize');
+    const { container } = render(<EnergyDashboard country="ALL" />);
+    expect(await screen.findByText('Nordic Energy Situation')).toBeInTheDocument();
+    const mainGrid = container.querySelector('.energy-main-grid');
+    expect(mainGrid.firstElementChild).toHaveClass('energy-map-card');
+    expect(mainGrid.lastElementChild).toHaveClass('energy-assessment');
+    expect(container.querySelector('.energy-map-card .mapbox')).toHaveStyle({ height: '580px' });
+    expect(container.querySelector('.energy-map-card .map-workspace')).toBeInTheDocument();
+  });
+
   test('renders energy dashboard and KPI sections with data', async () => {
     render(<EnergyDashboard country="ALL" />);
     expect(await screen.findByText('Nordic Energy Situation')).toBeInTheDocument();
