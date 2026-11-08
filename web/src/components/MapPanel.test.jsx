@@ -127,16 +127,16 @@ describe('MapPanel – storlek S/M/L (M6)', () => {
   test('standard M (420 px); knapparna sätter höjd och persisterar valet', () => {
     const { container } = renderMap();
     const box = container.querySelector('.mapbox');
-    expect(box).toHaveStyle({ height: '420px' });
+    expect(box).toHaveClass('mapbox-size-M');
     expect(window.localStorage.getItem('nw-mapsize')).toBeNull();
 
     fireEvent.click(screen.getByRole('button', { name: 'L' }));
-    expect(box).toHaveStyle({ height: '580px' });
+    expect(box).toHaveClass('mapbox-size-L');
     expect(window.localStorage.getItem('nw-mapsize')).toBe('L');
     expect(screen.getByRole('button', { name: 'L' })).toHaveAttribute('aria-pressed', 'true');
 
     fireEvent.click(screen.getByRole('button', { name: 'S' }));
-    expect(box).toHaveStyle({ height: '260px' });
+    expect(box).toHaveClass('mapbox-size-S');
     expect(window.localStorage.getItem('nw-mapsize')).toBe('S');
     expect(screen.getByRole('button', { name: 'S' })).toHaveAttribute('aria-pressed', 'true');
     expect(screen.getByRole('button', { name: 'L' })).toHaveAttribute('aria-pressed', 'false');
@@ -161,14 +161,14 @@ describe('MapPanel – storlek S/M/L (M6)', () => {
   test('sparad storlek återställs vid nästa montering', () => {
     window.localStorage.setItem('nw-mapsize', 'S');
     const { container } = renderMap();
-    expect(container.querySelector('.mapbox')).toHaveStyle({ height: '260px' });
+    expect(container.querySelector('.mapbox')).toHaveClass('mapbox-size-S');
     expect(screen.getByRole('button', { name: 'S' })).toHaveAttribute('aria-pressed', 'true');
   });
 
   test('ogiltig sparad storlek → M', () => {
     window.localStorage.setItem('nw-mapsize', 'XXL');
     const { container } = renderMap();
-    expect(container.querySelector('.mapbox')).toHaveStyle({ height: '420px' });
+    expect(container.querySelector('.mapbox')).toHaveClass('mapbox-size-M');
   });
 });
 
