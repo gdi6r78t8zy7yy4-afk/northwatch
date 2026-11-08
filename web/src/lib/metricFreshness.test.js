@@ -16,6 +16,8 @@ describe('formatObservationAge', () => {
 
   test('does not silently clamp future timestamps', () => {
     expect(formatObservationAge('2026-11-07T12:03:00.000Z', now)).toBe('3 min ahead');
+    expect(formatObservationAge('2026-11-07T13:01:00.000Z', now)).toBe('1h 1m ahead');
+    expect(formatObservationAge('2026-11-08T14:00:00.000Z', now)).toBe('1d 2h ahead');
   });
 
   test('handles missing and invalid timestamps', () => {
