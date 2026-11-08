@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest';
-import { buildEnergyCountryCoverage } from './EnergyCountryCoverage.jsx';
+import { buildEnergyCountryCoverage, observationCollectorNote } from './EnergyCountryCoverage.jsx';
 
 describe('buildEnergyCountryCoverage', () => {
   test('counts Denmark combined wind and solar production as a generation component', () => {
@@ -26,5 +26,21 @@ describe('buildEnergyCountryCoverage', () => {
     ]);
 
     expect(rows.find(row => row.country === 'DK').componentCount).toBe(0);
+  });
+});
+
+describe('observationCollectorNote', () => {
+  test.each([
+    ['stale', 'Collector stale · last successful measurement retained'],
+    ['error', 'Collector error · last successful measurement retained'],
+    ['no_key', 'Collector credentials missing · last successful measurement retained'],
+  ])('explains retained observations when collector status is %s', (sourceStatus, expected) => {
+    expect(observationCollectorNote({ sourceStatus })).toBe(expected);
+  });
+
+  test('does not add a warning for a healthy or unspecified collector', () => {
+    expect(observationCollectorNote({ sourceStatus: 'ok' })).toBeNull();
+    expect(observationCollectorNote({})).toBeNull();
+    expect(observationCollectorNote(null)).toBeNull();
   });
 });
