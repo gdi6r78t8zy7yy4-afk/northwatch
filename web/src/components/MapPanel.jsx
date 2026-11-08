@@ -29,12 +29,12 @@ const NORDIC_ZOOM = 4;
 export const MAP_SIZES = { S: 260, M: 420, L: 580 };
 const MAP_SIZE_KEY = 'nw-mapsize';
 
-const readMapSize = () => {
+const readMapSize = (storageKey = MAP_SIZE_KEY, defaultSize = 'M') => {
   try {
-    const v = localStorage.getItem(MAP_SIZE_KEY);
-    return Object.prototype.hasOwnProperty.call(MAP_SIZES, v) ? v : 'M';
+    const v = localStorage.getItem(storageKey);
+    return Object.prototype.hasOwnProperty.call(MAP_SIZES, v) ? v : defaultSize;
   } catch {
-    return 'M';
+    return defaultSize;
   }
 };
 
@@ -111,12 +111,13 @@ function itemDetailRows(item) {
 export default function MapPanel({
   area, country, assets = [], staticGeo = null, events = [],
   forecastMeta = null, onMapClick = null,
+  defaultSize = 'M', sizeStorageKey = MAP_SIZE_KEY,
 }) {
   const divRef = useRef(null);
   const mapRef = useRef(null);
   const layerRef = useRef(null);
   const clickRef = useRef(null);
-  const [size, setSize] = useState(readMapSize);
+  const [size, setSize] = useState(() => readMapSize(sizeStorageKey, defaultSize));
   const [resetNonce, setResetNonce] = useState(0);
   const [wxParam, setWxParam] = useState(null);
   const [wx, setWx] = useState(null);
@@ -131,7 +132,7 @@ export default function MapPanel({
 
   const chooseSize = s => {
     setSize(s);
-    try { localStorage.setItem(MAP_SIZE_KEY, s); } catch { /* privat läge m.m. */ }
+    try { localStorage.setItem(sizeStorageKey, s); } catch { /* privat läge m.m. */ }
   };
 
   // Bygg kartan en gång, riva vid unmount.
