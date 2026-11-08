@@ -436,7 +436,7 @@ export default function MapPanel({
         </span>
       </h2>
       <div className="map-workspace">
-        <div ref={divRef} className="mapbox" style={{ height: MAP_SIZES[size] }} />
+        <div ref={divRef} className={`mapbox mapbox-size-${size}`} />
         <aside className="map-item-inspector" aria-label="Information om valt kartobjekt" aria-live="polite">
           {selectedItem ? <>
             <div className="map-item-inspector-head">
