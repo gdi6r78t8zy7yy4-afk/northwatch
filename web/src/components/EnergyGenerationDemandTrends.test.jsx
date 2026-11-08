@@ -1,5 +1,7 @@
 import { describe, expect, test } from 'vitest';
-import { buildEnergyGenerationDemandTrends, filterRenewableGenerationSeries } from './EnergyGenerationDemandTrends.jsx';
+import { render, screen } from '@testing-library/react';
+import React from 'react';
+import EnergyGenerationDemandTrends, { buildEnergyGenerationDemandTrends, filterRenewableGenerationSeries } from './EnergyGenerationDemandTrends.jsx';
 
 const point = (value, ts) => ({ value, ts });
 
@@ -95,6 +97,28 @@ describe('buildEnergyGenerationDemandTrends', () => {
     expect(rows[0].first.value).toBe(0);
     expect(rows[0].percent).toBeNull();
     expect(rows[0].count).toBe(2);
+  });
+
+  test('reports invalid observations and duplicate timestamps excluded from trend summaries', () => {
+    const series = [{
+      country:'SE', source:'svk', indicator:'Total produktion (SE)', unit:'MW',
+      points:[
+        point(100, '2026-11-07T08:00:00Z'),
+        point(null, '2026-11-07T08:15:00Z'),
+        point(100, '2026-11-07T08:00:00Z'),
+        point(120, '2026-11-07T09:00:00Z'),
+        point(130, 'invalid-timestamp'),
+      ],
+    }];
+    const rows = buildEnergyGenerationDemandTrends(series);
+    expect(rows).toHaveLength(1);
+    expect(rows[0].count).toBe(2);
+    expect(rows[0].invalidCount).toBe(2);
+    expect(rows[0].duplicateCount).toBe(1);
+
+    render(<EnergyGenerationDemandTrends series={series}/>);
+    expect(screen.getByText(/2 invalid observation\(s\) excluded/)).toBeInTheDocument();
+    expect(screen.getByText(/1 duplicate timestamp\(s\) collapsed/)).toBeInTheDocument();
   });
 
   test('requires two distinct valid timestamps and filters unrelated indicators', () => {
