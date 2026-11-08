@@ -26,7 +26,7 @@ export function buildEnergyCountryCoverage(metrics = []) {
       row.indicator.startsWith(`Beräknad förbrukning (${country}`));
     const price = latest(metrics, country, row => row.indicator.startsWith('Dag-ahead-pris '));
     const components = metrics.filter(row => row.country === country && valid(row) &&
-      /^(Vindproduktion|Solproduktion|Vind\\+sol-produktion|Vattenkraftproduktion|Geotermisk produktion|Oljeproduktion|Förnybar produktion|Kärnkraftsproduktion|Industriell kraftvärmeproduktion)/.test(row.indicator ?? ''));
+      /^(Vindproduktion|Solproduktion|Vind\+sol-produktion|Vattenkraftproduktion|Geotermisk produktion|Oljeproduktion|Förnybar produktion|Kärnkraftsproduktion|Industriell kraftvärmeproduktion)/.test(row.indicator ?? ''));
     const latestComponent = components.sort((a, b) => Date.parse(b.ts) - Date.parse(a.ts))[0] ?? null;
     return {
       country, production, consumption, price,
