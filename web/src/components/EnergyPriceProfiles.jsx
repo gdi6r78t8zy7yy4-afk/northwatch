@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { analyzeEnergyPriceProfile } from '../lib/energyPriceAnalysis.js';
+import { analyzeEnergyPriceProfile, analyzeEnergyPriceProfileCoverage } from '../lib/energyPriceAnalysis.js';
 
 const DAY_AHEAD_PREFIX = /^Dag-ahead-pris\s+/;
 const formatClock = value => new Intl.DateTimeFormat('sv-SE', {
@@ -50,6 +50,14 @@ function PriceProfile({ series }) {
   const yTicks = [0, 1, 2, 3].map(index => low + (high - low) * index / 3);
   const xTickIndices = [...new Set([0, Math.floor((points.length - 1) / 2), points.length - 1])];
   const analysis = analyzeEnergyPriceProfile(series);
+  const coverage = analyzeEnergyPriceProfileCoverage(series);
+  const formatGap = value => {
+    if (value == null) return 'Unavailable';
+    const minutes = value / 60_000;
+    if (minutes < 60) return `${Number(minutes.toFixed(1))} min`;
+    const hours = minutes / 60;
+    return `${Number(hours.toFixed(1))} h`;
+  };
   const formatDelta = value => (value > 0 ? '+' : '') + value.toLocaleString('sv-SE', { maximumFractionDigits:2 });
   const formatValue = value => value.toLocaleString('sv-SE', { maximumFractionDigits:2 });
   return <article className="energy-price-profile">
@@ -81,6 +89,12 @@ function PriceProfile({ series }) {
         <small>{formatClock(analysis.largestStep.from)} → {formatClock(analysis.largestStep.to)} UTC</small></span> : null}
       {analysis.negativeIntervals > 0 ? <span>Negative-price intervals: <b>{analysis.negativeIntervals}</b></span> : null}
     </div>
+    <div className="energy-price-profile-coverage" aria-label="Observation coverage diagnostics">
+      <span>Latest observation: <b>{formatAxisTime(Date.parse(coverage.latestObservationTs))} UTC</b></span>
+      <span>Typical spacing: <b>{formatGap(coverage.typicalGapMs)}</b></span>
+      <span>Largest gap: <b>{formatGap(coverage.largestGapMs)}</b></span>
+      {coverage.largeGapCount > 0 ? <span className="energy-price-gap-warning">Unusually large gaps: <b>{coverage.largeGapCount}</b></span> : null}
+    </div>
   </article>;
 }
 
@@ -103,6 +117,6 @@ export default function EnergyPriceProfiles({ metrics = [], now = Date.now() }) 
     {profiles.length ? <div className="energy-price-profiles-grid">
       {profiles.map(series => <PriceProfile key={series.key} series={series}/>)}
     </div> : <p className="mut">No current or upcoming day-ahead delivery intervals are available in this time range.</p>}
-    <p className="mut energy-price-profiles-note">Each bidding-zone series is plotted independently. Different currencies, units and sources are not combined. The line connects published interval values; it is not a forecast beyond the source's published day-ahead schedule.</p>
+    <p className="mut energy-price-profiles-note">Each bidding-zone series is plotted independently. Different currencies, units and sources are not combined. The line connects published interval values; it is not a forecast beyond the source's published day-ahead schedule. Gap diagnostics compare spacing with the median observed interval in each series (large gap = more than 1.5× that median); they do not assume a fixed delivery cadence or infer missing values.</p>
   </section>;
 }
