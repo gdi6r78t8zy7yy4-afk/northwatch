@@ -226,6 +226,8 @@ describe('EnergyDashboard', () => {
     expect(pointTitles[0]).toContain('100 MW');
     expect(pointTitles[1]).toContain('120 MW');
     expect(pointTitles[1]).toContain('2026-11-07');
+    expect(container.querySelector('.energy-chart-freshness')).toHaveTextContent('Latest observation:');
+    expect(container.querySelector('.energy-chart-freshness')).toHaveTextContent('2026-11-07');
   });
 
   test('Finland shows its reported wind, hydro, nuclear and CHP components', async () => {
