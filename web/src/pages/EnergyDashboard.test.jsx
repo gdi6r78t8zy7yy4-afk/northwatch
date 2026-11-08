@@ -1,7 +1,7 @@
 import { test, expect, describe, beforeEach, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import React from 'react';
-import EnergyDashboard from './EnergyDashboard.jsx';
+import EnergyDashboard, { formatEnergyMetricAge } from './EnergyDashboard.jsx';
 
 vi.mock('../api.js', () => ({
   fetchEnergyOverview: vi.fn(),
@@ -90,6 +90,16 @@ beforeEach(() => {
   vi.mocked(fetchEnergyAnalysis).mockResolvedValue({ observations: [] });
   vi.mocked(fetchAssets).mockResolvedValue({ assets: [] });
   vi.mocked(fetchStaticGeo).mockResolvedValue(null);
+});
+
+describe('EnergyDashboard metric age', () => {
+  test('formats past, future and invalid observation timestamps safely', () => {
+    const now = Date.parse('2026-11-08T10:00:00.000Z');
+    expect(formatEnergyMetricAge('2026-11-08T09:45:00.000Z', now)).toBe('15 min sedan');
+    expect(formatEnergyMetricAge('2026-11-08T12:01:00.000Z', now)).toBe('om 3 h');
+    expect(formatEnergyMetricAge('invalid-timestamp', now)).toBe('Tid saknas');
+    expect(formatEnergyMetricAge(null, now)).toBe('Tid saknas');
+  });
 });
 
 describe('EnergyDashboard', () => {
