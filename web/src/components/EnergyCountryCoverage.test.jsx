@@ -1,5 +1,6 @@
 import { describe, expect, test } from 'vitest';
-import { buildEnergyCountryCoverage, observationCollectorNote } from './EnergyCountryCoverage.jsx';
+import { render, screen } from '@testing-library/react';
+import EnergyCountryCoverage, { buildEnergyCountryCoverage, observationCollectorNote } from './EnergyCountryCoverage.jsx';
 
 describe('buildEnergyCountryCoverage', () => {
   test('counts Denmark combined wind and solar production as a generation component', () => {
@@ -72,5 +73,17 @@ describe('day-ahead price series coverage', () => {
       { country:'SE', indicator:'Dag-ahead-pris SE1', source:'local', unit:'SEK/kWh', value:0.8, ts:'2026-11-08T08:00:00Z' },
     ]);
     expect(rows.find(row => row.country === 'SE').priceSeries).toHaveLength(2);
+  });
+});
+
+
+describe('EnergyCountryCoverage price labels', () => {
+  test('renders the bidding-zone name without the internal indicator prefix', () => {
+    render(<EnergyCountryCoverage metrics={[
+      { country:'SE', indicator:'Dag-ahead-pris SE1', source:'entsoe', sourceName:'ENTSO-E',
+        unit:'EUR/MWh', value:42, ts:'2026-11-08T08:00:00Z' },
+    ]}/>);
+    expect(screen.getByText('SE1')).toBeInTheDocument();
+    expect(screen.queryByText(/Dag-ahead-pris\\s+SE1/)).not.toBeInTheDocument();
   });
 });
