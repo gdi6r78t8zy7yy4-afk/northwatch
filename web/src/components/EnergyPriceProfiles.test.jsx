@@ -82,6 +82,23 @@ describe('EnergyPriceProfiles', () => {
     expect(screen.getByRole('img', { name:/X-axis: date and time UTC\. Y-axis: price in EUR\/MWh/ })).toBeInTheDocument();
   });
 
+  test('labels a profile that contains only future delivery intervals', () => {
+    render(<EnergyPriceProfiles metrics={[
+      row('SE', 80, '2026-11-07T13:00:00Z'),
+      row('SE', 90, '2026-11-07T14:00:00Z'),
+    ]} now={now}/>);
+    expect(screen.getByText(/Upcoming schedule only/)).toBeInTheDocument();
+    expect(screen.getByText(/no delivery interval starting at or before now/)).toBeInTheDocument();
+  });
+
+  test('does not label a profile as future-only when an active or recent interval is present', () => {
+    render(<EnergyPriceProfiles metrics={[
+      row('SE', 30, '2026-11-07T11:00:00Z'),
+      row('SE', 80, '2026-11-07T13:00:00Z'),
+    ]} now={now}/>);
+    expect(screen.queryByText(/Upcoming schedule only/)).not.toBeInTheDocument();
+  });
+
   test('renders source-attributed profile values', () => {
     render(<EnergyPriceProfiles metrics={[
       row('SE', 30, '2026-11-07T13:00:00Z'),
