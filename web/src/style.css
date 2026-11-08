@@ -606,3 +606,7 @@ tr.detail-row > td { background: var(--mut-bg); padding: 10px 12px; font-size: 1
   .energy-country-control select { width:100%; min-width:0; }
   .energy-country-scope-note { text-align:left; }
 }
+
+.energy-price-profile-coverage { display:flex; flex-wrap:wrap; gap:4px 10px; margin-top:7px; padding-top:7px; border-top:1px solid var(--bd); color:var(--mut); font-size:9px; line-height:1.45; }
+.energy-price-profile-coverage b { color:var(--tx); font-variant-numeric:tabular-nums; }
+.energy-price-gap-warning { color:#e5b66b; }
