@@ -26,14 +26,18 @@ export function buildEnergyGenerationDemandTrends(series = []) {
     const consumption = CONSUMPTION.test(indicator);
     const renewable = RENEWABLE.test(indicator);
     if (!generation && !consumption && !renewable) continue;
+    const rawPoints = Array.isArray(item.points) ? item.points : [];
     const byTimestamp = new Map();
-    for (const point of item.points ?? []) {
-      if (point.value == null || point.value === '' || !Number.isFinite(Number(point.value))) continue;
-      const at = Date.parse(point.ts ?? '');
-      if (!Number.isFinite(at)) continue;
+    const validPoints = rawPoints.filter(point => point?.value != null &&
+      point.value !== '' && Number.isFinite(Number(point.value)) &&
+      Number.isFinite(Date.parse(point.ts ?? '')));
+    for (const point of validPoints) {
+      const at = Date.parse(point.ts);
       byTimestamp.set(at, { ts: new Date(at).toISOString(), value: Number(point.value) });
     }
     const points = [...byTimestamp.values()].sort((a, b) => a.ts.localeCompare(b.ts));
+    const invalidCount = rawPoints.length - validPoints.length;
+    const duplicateCount = validPoints.length - points.length;
     if (points.length < 2) continue;
     const first = points[0], latest = points.at(-1);
     const delta = latest.value - first.value;
@@ -48,6 +52,7 @@ export function buildEnergyGenerationDemandTrends(series = []) {
         (item.country === 'NO' && consumption && item.source === 'statnett'),
       first, latest, delta,
       percent: first.value === 0 ? null : delta / Math.abs(first.value) * 100,
+      invalidCount, duplicateCount,
       renewableShare: null,
       elapsedMs: Date.parse(latest.ts) - Date.parse(first.ts),
       count: points.length,
@@ -104,6 +109,11 @@ export default function EnergyGenerationDemandTrends({ series = [] }) {
             : fmt(row.renewableShare) + '% of total production at the latest aligned observation'}
         </div> : null}
         <div className="mut">{row.source} · {row.count} observations · {elapsed(row.elapsedMs)} · {row.latest.ts}</div>
+        {row.invalidCount > 0 || row.duplicateCount > 0 ? <div className="energy-history-quality">
+          Data quality: {row.invalidCount > 0 ? `${row.invalidCount} invalid observation(s) excluded` : null}
+          {row.invalidCount > 0 && row.duplicateCount > 0 ? ' · ' : null}
+          {row.duplicateCount > 0 ? `${row.duplicateCount} duplicate timestamp(s) collapsed` : null}
+        </div> : null}
         {row.derived ? <div className="energy-derived-label">Derived measurement · see methodology</div> : null}
       </article>;
     })}</div> : <p className="mut">No production or consumption series have at least two valid observations in this history window. More collector snapshots are needed.</p>}
