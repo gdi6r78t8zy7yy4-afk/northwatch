@@ -25,20 +25,24 @@ test('missing measurements are not synthesized as zeroes', () => { const out=bui
 
 import { buildEnergyMarketComparisons } from '../lib/energy.js';
 
-test('market comparisons only compare same timestamp and unit across countries', () => {
+test('market comparisons preserve individual bidding zones and align timestamp and unit', () => {
   const rows = [
-    { indicator:'Dag-ahead-pris SE', country:'SE', value:40, unit:'EUR/MWh', ts:'2026-11-07T10:00:00Z' },
+    { indicator:'Dag-ahead-pris SE1', country:'SE', value:40, unit:'EUR/MWh', ts:'2026-11-07T10:00:00Z' },
+    { indicator:'Dag-ahead-pris SE2', country:'SE', value:45, unit:'EUR/MWh', ts:'2026-11-07T10:00:00Z' },
+    { indicator:'Dag-ahead-pris SE3', country:'SE', value:55, unit:'EUR/MWh', ts:'2026-11-07T10:00:00Z' },
+    { indicator:'Dag-ahead-pris SE4', country:'SE', value:60, unit:'EUR/MWh', ts:'2026-11-07T10:00:00Z' },
     { indicator:'Dag-ahead-pris NO', country:'NO', value:25, unit:'EUR/MWh', ts:'2026-11-07T10:00:00Z' },
     { indicator:'Dag-ahead-pris FI', country:'FI', value:70, unit:'EUR/MWh', ts:'2026-11-07T10:15:00Z' },
     { indicator:'Dag-ahead-pris DK', country:'DK', value:300, unit:'DKK/MWh', ts:'2026-11-07T10:00:00Z' },
   ];
   const out = buildEnergyMarketComparisons(rows);
   assert.equal(out.length, 1);
-  assert.equal(out[0].countryCount, 2);
+  assert.equal(out[0].zoneCount, 5);
   assert.equal(out[0].unit, 'EUR/MWh');
-  assert.equal(out[0].low.country, 'NO');
-  assert.equal(out[0].high.country, 'SE');
-  assert.equal(out[0].spread, 15);
+  assert.equal(out[0].low.zone, 'NO');
+  assert.equal(out[0].high.zone, 'SE4');
+  assert.deepEqual(out[0].observations.filter(item => item.country === 'SE').map(item => item.zone), ['SE1','SE2','SE3','SE4']);
+  assert.equal(out[0].spread, 35);
 });
 
 test('market comparisons reject invalid measurements and de-duplicate country snapshots', () => {
