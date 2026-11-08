@@ -60,3 +60,30 @@ export function buildEnergyPriceSpreadMovements(comparisons = []) {
   }
   return movements.sort((a, b) => b.latestAsOf.localeCompare(a.latestAsOf));
 }
+
+
+// Coverage diagnostics compare gaps with the cadence observed in the same series.
+// They do not assume a fixed source interval or infer how many readings are missing.
+export function analyzeEnergyPriceProfileCoverage(series) {
+  const timestamps = [...new Set((series?.points ?? [])
+    .map(point => Date.parse(point?.ts ?? ''))
+    .filter(Number.isFinite))].sort((a, b) => a - b);
+  if (!timestamps.length) return {
+    intervalCount:0, typicalGapMs:null, largestGapMs:null,
+    largeGapCount:0, firstObservationTs:null, latestObservationTs:null,
+  };
+  const gaps = timestamps.slice(1).map((timestamp, index) => timestamp - timestamps[index]);
+  const sortedGaps = gaps.slice().sort((a, b) => a - b);
+  const middle = Math.floor(sortedGaps.length / 2);
+  const typicalGapMs = sortedGaps.length
+    ? (sortedGaps.length % 2 ? sortedGaps[middle] : (sortedGaps[middle - 1] + sortedGaps[middle]) / 2)
+    : null;
+  return {
+    intervalCount:timestamps.length,
+    typicalGapMs,
+    largestGapMs:gaps.length ? Math.max(...gaps) : null,
+    largeGapCount:typicalGapMs == null ? 0 : gaps.filter(gap => gap > typicalGapMs * 1.5).length,
+    firstObservationTs:new Date(timestamps[0]).toISOString(),
+    latestObservationTs:new Date(timestamps.at(-1)).toISOString(),
+  };
+}
