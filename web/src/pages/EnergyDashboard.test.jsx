@@ -94,7 +94,7 @@ beforeEach(() => {
 
 describe('EnergyDashboard metric age', () => {
   test('formats past, future and invalid observation timestamps precisely', () => {
-    const now = Date.parse('2026-11-08 10:00 UTC.000Z');
+    const now = Date.parse('2026-11-08T10:00:00.000Z');
     expect(formatEnergyMetricAge('2026-11-08T09:45:00.000Z', now)).toBe('15m ago');
     expect(formatEnergyMetricAge('2026-11-08T12:01:00.000Z', now)).toBe('2h 1m ahead');
     expect(formatEnergyMetricAge('2026-11-08T11:01:00.000Z', now)).toBe('1h 1m ahead');
@@ -237,7 +237,7 @@ describe('EnergyDashboard', () => {
         country:'SE', source:'svk', indicator:'Total produktion (SE)', unit:'MW',
         points:[
           { value:130, ts:'2026-11-08T10:00:00Z' },
-          { value:100, ts:'2026-11-08 08:00 UTCZ' },
+          { value:100, ts:'2026-11-08T08:00:00Z' },
           { value:'not-a-number', ts:'2026-11-08T09:00:00Z' },
         ],
       }],
@@ -250,9 +250,9 @@ describe('EnergyDashboard', () => {
     const pointTitles = [...chart.querySelectorAll('circle title')].map(node => node.textContent);
     expect(pointTitles).toHaveLength(2);
     expect(pointTitles[0]).toContain('100 MW');
-    expect(pointTitles[0]).toContain('2026-11-08T08:00:00');
+    expect(pointTitles[0]).toContain('2026-11-08 08:00 UTC');
     expect(pointTitles[1]).toContain('130 MW');
-    expect(pointTitles[1]).toContain('2026-11-08T10:00:00');
+    expect(pointTitles[1]).toContain('2026-11-08 10:00 UTC');
     expect(container.querySelector('.energy-chart-freshness')).toHaveTextContent('2026-11-08');
     expect(container.querySelector('.energy-chart-warning')).toHaveTextContent('1 invalid observation');
   });
