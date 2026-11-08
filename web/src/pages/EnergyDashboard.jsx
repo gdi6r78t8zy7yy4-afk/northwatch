@@ -128,6 +128,7 @@ function TrendChart({ series }) {
   };
   return <div className="energy-chart">
     <div className="energy-chart-meta"><b>{series.indicator}</b><span>{series.country} · {series.source} · {series.unit}</span></div>
+    <div className="mut energy-chart-freshness">Latest observation: {formatObservationAge(last.ts)} · {fmtTime(last.ts)}</div>
     <svg viewBox="0 0 360 142" role="img"
       aria-label={series.indicator + ' historical trend, value axis in ' + series.unit + ', time axis in UTC'}>
       <title>{series.indicator} · {series.country} · {series.unit}</title>
