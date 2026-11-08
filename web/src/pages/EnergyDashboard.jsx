@@ -21,11 +21,24 @@ export const formatEnergyMetricAge = (ts, now = Date.now()) => {
   if (!Number.isFinite(observedAt)) return 'Tid saknas';
   const deltaMs = now - observedAt;
   if (deltaMs < 0) {
-    const mins = Math.ceil(Math.abs(deltaMs) / 60000);
-    return mins < 60 ? `om ${mins} min` : `om ${Math.ceil(mins / 60)} h`;
+    const totalMinutes = Math.ceil(Math.abs(deltaMs) / 60000);
+    if (totalMinutes < 60) return `om ${totalMinutes} min`;
+    const hours = Math.floor(totalMinutes / 60);
+    const minutes = totalMinutes % 60;
+    if (hours < 24) return minutes ? `om ${hours} h ${minutes} min` : `om ${hours} h`;
+    const days = Math.floor(hours / 24);
+    const remainingHours = hours % 24;
+    return remainingHours ? `om ${days} d ${remainingHours} h` : `om ${days} d`;
   }
-  const mins = Math.floor(deltaMs / 60000);
-  return mins < 60 ? `${mins} min sedan` : `${Math.floor(mins / 60)} h sedan`;
+  const totalMinutes = Math.floor(deltaMs / 60000);
+  if (totalMinutes === 0) return 'nyss';
+  if (totalMinutes < 60) return `${totalMinutes} min sedan`;
+  const hours = Math.floor(totalMinutes / 60);
+  const minutes = totalMinutes % 60;
+  if (hours < 24) return minutes ? `${hours} h ${minutes} min sedan` : `${hours} h sedan`;
+  const days = Math.floor(hours / 24);
+  const remainingHours = hours % 24;
+  return remainingHours ? `${days} d ${remainingHours} h sedan` : `${days} d sedan`;
 };
 const age = ts => formatEnergyMetricAge(ts);
 function Kpi({ label, metric, fallback }) {
