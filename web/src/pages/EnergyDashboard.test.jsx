@@ -95,15 +95,15 @@ beforeEach(() => {
 describe('EnergyDashboard metric age', () => {
   test('formats past, future and invalid observation timestamps precisely', () => {
     const now = Date.parse('2026-11-08T10:00:00.000Z');
-    expect(formatEnergyMetricAge('2026-11-08T09:45:00.000Z', now)).toBe('15 min sedan');
-    expect(formatEnergyMetricAge('2026-11-08T12:01:00.000Z', now)).toBe('om 2 h 1 min');
-    expect(formatEnergyMetricAge('2026-11-08T11:01:00.000Z', now)).toBe('om 1 h 1 min');
-    expect(formatEnergyMetricAge('2026-11-08T10:01:00.000Z', now)).toBe('om 1 min');
-    expect(formatEnergyMetricAge('2026-11-09T11:00:00.000Z', now)).toBe('om 1 d 1 h');
-    expect(formatEnergyMetricAge('2026-11-07T09:00:00.000Z', now)).toBe('1 d 1 h sedan');
-    expect(formatEnergyMetricAge('2026-11-08T10:00:00.000Z', now)).toBe('nyss');
-    expect(formatEnergyMetricAge('invalid-timestamp', now)).toBe('Tid saknas');
-    expect(formatEnergyMetricAge(null, now)).toBe('Tid saknas');
+    expect(formatEnergyMetricAge('2026-11-08T09:45:00.000Z', now)).toBe('15m ago');
+    expect(formatEnergyMetricAge('2026-11-08T12:01:00.000Z', now)).toBe('2h 1m ahead');
+    expect(formatEnergyMetricAge('2026-11-08T11:01:00.000Z', now)).toBe('1h 1m ahead');
+    expect(formatEnergyMetricAge('2026-11-08T10:01:00.000Z', now)).toBe('1 min ahead');
+    expect(formatEnergyMetricAge('2026-11-09T11:00:00.000Z', now)).toBe('1d 1h ahead');
+    expect(formatEnergyMetricAge('2026-11-07T09:00:00.000Z', now)).toBe('1d 1h ago');
+    expect(formatEnergyMetricAge('2026-11-08T10:00:00.000Z', now)).toBe('just now');
+    expect(formatEnergyMetricAge('invalid-timestamp', now)).toBe('age unavailable');
+    expect(formatEnergyMetricAge(null, now)).toBe('age unavailable');
   });
 });
 
