@@ -92,3 +92,30 @@ describe('EnergyPriceProfiles', () => {
     expect(screen.getByText(/30 – 80 EUR\/MWh/)).toBeInTheDocument();
   });
 });
+
+
+describe('day-ahead price coverage diagnostics', () => {
+  test('shows latest observation, typical spacing and unusually large gaps', () => {
+    render(<EnergyPriceProfiles metrics={[
+      row('SE', 30, '2026-11-07T12:00:00Z'),
+      row('SE', 40, '2026-11-07T12:15:00Z'),
+      row('SE', 50, '2026-11-07T12:30:00Z'),
+      row('SE', 80, '2026-11-07T13:30:00Z'),
+      row('SE', 90, '2026-11-07T13:45:00Z'),
+    ]} now={now}/>);
+    expect(screen.getByText(/Latest observation:/)).toBeInTheDocument();
+    expect(screen.getByText(/Typical spacing:/)).toBeInTheDocument();
+    expect(screen.getByText(/Largest gap:/)).toBeInTheDocument();
+    expect(screen.getByText(/Unusually large gaps:/)).toBeInTheDocument();
+    expect(screen.getByText('1')).toBeInTheDocument();
+  });
+
+  test('states that spacing diagnostics are unavailable for a single observation', () => {
+    render(<EnergyPriceProfiles metrics={[
+      row('SE', 30, '2026-11-07T13:00:00Z'),
+    ]} now={now}/>);
+    expect(screen.getByText(/Typical spacing:/).textContent).toContain('Unavailable');
+    expect(screen.getByText(/Largest gap:/).textContent).toContain('Unavailable');
+    expect(screen.queryByText(/Unusually large gaps:/)).not.toBeInTheDocument();
+  });
+});
