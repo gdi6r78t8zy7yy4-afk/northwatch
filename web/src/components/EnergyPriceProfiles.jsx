@@ -36,7 +36,7 @@ function formatAxisTime(value) {
   }).format(new Date(value));
 }
 
-function PriceProfile({ series }) {
+function PriceProfile({ series, now }) {
   const points = series.points;
   const values = points.map(point => point.value);
   const min = Math.min(...values), max = Math.max(...values);
@@ -81,6 +81,7 @@ function PriceProfile({ series }) {
     </svg>
     <div className="energy-price-profile-range"><span>{formatClock(points[0].at)}</span><b>{formatValue(Math.min(...values))} – {formatValue(Math.max(...values))} {series.unit}</b><span>{formatClock(points.at(-1).at)}</span></div>
     <div className="mut">{points.length} delivery interval{points.length === 1 ? '' : 's'} · {series.source}</div>
+    {points.every(point => point.at > now) ? <div className="mut energy-price-profile-schedule-note">Upcoming schedule only · no delivery interval starting at or before now is available in this view.</div> : null}
     <div className="energy-price-profile-analysis" aria-label="Price movement analysis">
       {analysis.netChange === null
         ? <span>Movement: one published interval only</span>
@@ -115,7 +116,7 @@ export default function EnergyPriceProfiles({ metrics = [], now = Date.now() }) 
       </label>
     </div>
     {profiles.length ? <div className="energy-price-profiles-grid">
-      {profiles.map(series => <PriceProfile key={series.key} series={series}/>)}
+      {profiles.map(series => <PriceProfile key={series.key} series={series} now={now}/>)}
     </div> : <p className="mut">No current or upcoming day-ahead delivery intervals are available in this time range.</p>}
     <p className="mut energy-price-profiles-note">Each bidding-zone series is plotted independently. Different currencies, units and sources are not combined. The line connects published interval values; it is not a forecast beyond the source's published day-ahead schedule. Gap diagnostics compare spacing with the median observed interval in each series (large gap = more than 1.5× that median); they do not assume a fixed delivery cadence or infer missing values.</p>
   </section>;
