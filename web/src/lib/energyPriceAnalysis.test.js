@@ -34,8 +34,8 @@ describe('buildEnergyPriceSpreadMovements', () => {
   const snapshot = (asOf, spread, overrides = {}) => ({
     asOf, spread, unit:'EUR/MWh',
     observations:[
-      { country:'DK', source:'energinet', value:20 },
-      { country:'SE', source:'elprisetjustnu', value:20 + spread },
+      { zone:'DK1', country:'DK', source:'energinet', value:20 },
+      { zone:'SE3', country:'SE', source:'elprisetjustnu', value:20 + spread },
     ],
     ...overrides,
   });
@@ -47,14 +47,15 @@ describe('buildEnergyPriceSpreadMovements', () => {
       snapshot('2026-11-07T14:00:00Z', 60),
       snapshot('2026-11-07T14:30:00Z', 900, { unit:'SEK/MWh' }),
       snapshot('2026-11-07T14:45:00Z', 100, { observations:[
-        { country:'DK', source:'energinet', value:20 },
-        { country:'NO', source:'statnett', value:120 },
+        { zone:'DK1', country:'DK', source:'energinet', value:20 },
+        { zone:'NO1', country:'NO', source:'statnett', value:120 },
       ] }),
     ]);
     expect(movements).toHaveLength(1);
     expect(movements[0].previousSpread).toBe(45);
     expect(movements[0].latestSpread).toBe(60);
     expect(movements[0].change).toBe(15);
+    expect(movements[0].markets).toEqual(['DK1', 'SE3']);
     expect(movements[0].countries).toEqual(['DK', 'SE']);
   });
 
