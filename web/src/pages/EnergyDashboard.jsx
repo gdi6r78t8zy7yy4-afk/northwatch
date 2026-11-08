@@ -103,8 +103,13 @@ function GenerationMix({ metrics, country = 'DK' }) {
   </>;
 }
 function TrendChart({ series }) {
-  const points = series.points ?? [];
-  if (points.length < 2) return <div className="energy-chart-empty">Insufficient history · {points.length} observation(s)</div>;
+  const rawPoints = Array.isArray(series.points) ? series.points : [];
+  const points = rawPoints
+    .filter(point => point?.value != null && point.value !== '' &&
+      Number.isFinite(Number(point.value)) && Number.isFinite(Date.parse(point.ts ?? '')))
+    .sort((a, b) => Date.parse(a.ts) - Date.parse(b.ts));
+  const omittedCount = rawPoints.length - points.length;
+  if (points.length < 2) return <div className="energy-chart-empty">Insufficient valid history · {points.length} observation(s){omittedCount ? ` · ${omittedCount} invalid observation(s) omitted` : ''}</div>;
   const values = points.map(p => Number(p.value));
   const min = Math.min(...values), max = Math.max(...values), span = max - min || 1;
   const plot = { left: 52, right: 344, top: 18, bottom: 104 };
@@ -129,6 +134,7 @@ function TrendChart({ series }) {
   return <div className="energy-chart">
     <div className="energy-chart-meta"><b>{series.indicator}</b><span>{series.country} · {series.source} · {series.unit}</span></div>
     <div className="mut energy-chart-freshness">Latest observation: {formatObservationAge(last.ts)} · {fmtTime(last.ts)}</div>
+    {omittedCount > 0 ? <div className="mut energy-chart-warning">{omittedCount} invalid observation(s) omitted from this chart (timestamp or numeric value unavailable).</div> : null}
     <svg viewBox="0 0 360 142" role="img"
       aria-label={series.indicator + ' historical trend, value axis in ' + series.unit + ', time axis in UTC'}>
       <title>{series.indicator} · {series.country} · {series.unit}</title>
