@@ -16,6 +16,18 @@ const latest = (metrics, country, predicate) => metrics
   .filter(metric => metric.country === country && predicate(metric) && valid(metric))
   .sort((a, b) => Date.parse(b.ts) - Date.parse(a.ts))[0] ?? null;
 
+const latestPerPriceSeries = (metrics, country) => {
+  const series = new Map();
+  for (const metric of metrics) {
+    if (metric.country !== country || !metric.indicator.startsWith('Dag-ahead-pris ') || !valid(metric)) continue;
+    const key = [metric.indicator, metric.source, metric.unit].join('|');
+    const previous = series.get(key);
+    if (!previous || Date.parse(metric.ts) > Date.parse(previous.ts)) series.set(key, metric);
+  }
+  return [...series.values()].sort((a, b) => a.indicator.localeCompare(b.indicator) ||
+    String(a.source).localeCompare(String(b.source)));
+};
+
 function ObservationCell({ metric, label }) {
   if (!metric) return <span className="energy-coverage-empty">No measurement</span>;
   return <span className="energy-coverage-observation">
@@ -32,12 +44,13 @@ export function buildEnergyCountryCoverage(metrics = []) {
     const consumption = latest(metrics, country, row =>
       row.indicator === `Total förbrukning (${country})` ||
       row.indicator.startsWith(`Beräknad förbrukning (${country}`));
-    const price = latest(metrics, country, row => row.indicator.startsWith('Dag-ahead-pris '));
+    const priceSeries = latestPerPriceSeries(metrics, country);
+    const price = priceSeries.slice().sort((a, b) => Date.parse(b.ts) - Date.parse(a.ts))[0] ?? null;
     const components = metrics.filter(row => row.country === country && valid(row) &&
       /^(Vindproduktion|Solproduktion|Vind\+sol-produktion|Vattenkraftproduktion|Geotermisk produktion|Oljeproduktion|Förnybar produktion|Kärnkraftsproduktion|Industriell kraftvärmeproduktion)/.test(row.indicator ?? ''));
     const latestComponent = components.sort((a, b) => Date.parse(b.ts) - Date.parse(a.ts))[0] ?? null;
     return {
-      country, production, consumption, price,
+      country, production, consumption, price, priceSeries,
       componentCount: new Set(components.map(row => row.indicator)).size,
       latestComponent,
       consumptionDerived: Boolean(consumption?.indicator.startsWith('Beräknad förbrukning')),
@@ -59,7 +72,14 @@ export default function EnergyCountryCoverage({ metrics = [] }) {
           <td><b>{COUNTRY_NAMES[row.country] ?? row.country}</b></td>
           <td><ObservationCell metric={row.production} label="Reported"/></td>
           <td><ObservationCell metric={row.consumption} label={row.consumptionDerived ? 'Derived' : 'Reported'}/></td>
-          <td><ObservationCell metric={row.price} label="Reported"/></td>
+          <td>{row.priceSeries.length ? <span className="energy-coverage-observation">
+            <b>{row.priceSeries.length} reported series</b>
+            {row.priceSeries.map(metric => <span key={[metric.indicator, metric.source, metric.unit].join('|')}>
+              <b>{metric.indicator.replace(/^Dag-ahead-pris\\s+/, '')}</b> · {metric.sourceName ?? metric.source ?? 'Source unavailable'}
+              <span title={fmtTime(metric.ts)}>{formatObservationAge(metric.ts)} · {fmtTime(metric.ts)}</span>
+              {observationCollectorNote(metric) ? <span className="energy-coverage-collector-state">{observationCollectorNote(metric)}</span> : null}
+            </span>)}
+          </span> : <span className="energy-coverage-empty">No measurement</span>}</td>
           <td>{row.componentCount ? <span className="energy-coverage-observation">
             <b>{row.componentCount} indicator{row.componentCount === 1 ? '' : 's'}</b>
             <span>{row.latestComponent?.sourceName ?? row.latestComponent?.source ?? 'Source unavailable'}</span>
