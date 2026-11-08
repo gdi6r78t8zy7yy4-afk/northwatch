@@ -32,17 +32,18 @@ export function buildEnergyPriceSpreadMovements(comparisons = []) {
     const at = Date.parse(snapshot.asOf ?? '');
     const unit = String(snapshot.unit ?? '').trim();
     const observations = (snapshot.observations ?? [])
-      .filter(item => item.country && item.source && item.value != null && item.value !== '' && Number.isFinite(Number(item.value)))
-      .map(item => ({ country: String(item.country), source: String(item.source) }))
-      .sort((a, b) => a.country.localeCompare(b.country) || a.source.localeCompare(b.source));
+      .filter(item => (item.zone || item.country) && item.source && item.value != null && item.value !== '' && Number.isFinite(Number(item.value)))
+      .map(item => ({ zone: String(item.zone ?? item.country), country: String(item.country ?? ''), source: String(item.source) }))
+      .sort((a, b) => a.zone.localeCompare(b.zone) || a.source.localeCompare(b.source));
     if (!Number.isFinite(at) || !unit || observations.length < 2 ||
         snapshot.spread == null || !Number.isFinite(Number(snapshot.spread))) continue;
-    const coverage = observations.map(item => item.country + ':' + item.source).join('|');
+    const coverage = observations.map(item => item.zone + ':' + item.source).join('|');
     const key = unit + '|' + coverage;
     if (!groups.has(key)) groups.set(key, new Map());
     groups.get(key).set(new Date(at).toISOString(), {
       asOf: new Date(at).toISOString(), spread: Number(snapshot.spread),
-      unit, countries: [...new Set(observations.map(item => item.country))],
+      unit, markets: observations.map(item => item.zone),
+      countries: [...new Set(observations.map(item => item.country).filter(Boolean))],
     });
   }
   const movements = [];
