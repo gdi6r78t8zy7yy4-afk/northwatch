@@ -474,7 +474,8 @@ export default function EnergyDashboard({ country = 'ALL', onCountryChange }) {
     <div className="energy-main-grid">
       <section className="card energy-map-card"><div className="energy-section-head"><div><h2>Nordic grid · live observations</h2>
         <div className="mut">Regionalt nordiskt nätperspektiv visas även när ett enskilt land är valt. Zonankare och vissa länkar är schematiska approximationer, inte verifierad fysisk nätgeometri.</div></div><span className="tag">{data?.coverage?.flowCount ?? 0} flödeslänkar</span></div>
-        <MapPanel area={ENERGY_AREA} country={country} assets={assets} staticGeo={geo} events={[]}/></section>
+        <MapPanel area={ENERGY_AREA} country={country} assets={assets} staticGeo={geo} events={[]}
+           defaultSize="L" sizeStorageKey="nw-energy-mapsize"/></section>
       <section className="card energy-assessment"><h2>Operational assessment</h2>
         <div className="energy-assessment-row"><span className="mut">Källor i urvalet</span><b>{data?.coverage?.sourceCount ?? '—'}</b></div>
         <div className="energy-assessment-row"><span className="mut">Mätvärden</span><b>{data?.coverage?.metricCount ?? '—'}</b></div>
