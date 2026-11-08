@@ -65,3 +65,59 @@ describe('buildEnergyPriceSpreadMovements', () => {
     ])).toEqual([]);
   });
 });
+
+
+describe('analyzeEnergyPriceProfileCoverage', () => {
+  test('reports regular observed cadence without flagging large gaps', async () => {
+    const { analyzeEnergyPriceProfileCoverage } = await import('./energyPriceAnalysis.js');
+    const result = analyzeEnergyPriceProfileCoverage({ points:[
+      { ts:'2026-11-07T12:00:00Z' },
+      { ts:'2026-11-07T12:15:00Z' },
+      { ts:'2026-11-07T12:30:00Z' },
+      { ts:'2026-11-07T12:45:00Z' },
+    ] });
+    expect(result.typicalGapMs).toBe(15 * 60_000);
+    expect(result.largestGapMs).toBe(15 * 60_000);
+    expect(result.largeGapCount).toBe(0);
+    expect(result.intervalCount).toBe(4);
+  });
+
+  test('identifies unusually large gaps relative to the series median cadence', async () => {
+    const { analyzeEnergyPriceProfileCoverage } = await import('./energyPriceAnalysis.js');
+    const result = analyzeEnergyPriceProfileCoverage({ points:[
+      { ts:'2026-11-07T12:00:00Z' },
+      { ts:'2026-11-07T12:15:00Z' },
+      { ts:'2026-11-07T12:30:00Z' },
+      { ts:'2026-11-07T13:30:00Z' },
+      { ts:'2026-11-07T13:45:00Z' },
+    ] });
+    expect(result.typicalGapMs).toBe(15 * 60_000);
+    expect(result.largestGapMs).toBe(60 * 60_000);
+    expect(result.largeGapCount).toBe(1);
+  });
+
+  test('uses the observed median for irregular source intervals', async () => {
+    const { analyzeEnergyPriceProfileCoverage } = await import('./energyPriceAnalysis.js');
+    const result = analyzeEnergyPriceProfileCoverage({ points:[
+      { ts:'2026-11-07T12:00:00Z' },
+      { ts:'2026-11-07T12:10:00Z' },
+      { ts:'2026-11-07T12:30:00Z' },
+      { ts:'2026-11-07T12:50:00Z' },
+    ] });
+    expect(result.typicalGapMs).toBe(20 * 60_000);
+    expect(result.largeGapCount).toBe(0);
+  });
+
+  test('handles one point, duplicate timestamps and empty or invalid input', async () => {
+    const { analyzeEnergyPriceProfileCoverage } = await import('./energyPriceAnalysis.js');
+    const one = analyzeEnergyPriceProfileCoverage({ points:[
+      { ts:'2026-11-07T12:00:00Z' },
+      { ts:'2026-11-07T12:00:00Z' },
+    ] });
+    expect(one.intervalCount).toBe(1);
+    expect(one.typicalGapMs).toBeNull();
+    expect(one.largestGapMs).toBeNull();
+    expect(analyzeEnergyPriceProfileCoverage({ points:[] }).intervalCount).toBe(0);
+    expect(analyzeEnergyPriceProfileCoverage({ points:[{ ts:'invalid' }] }).latestObservationTs).toBeNull();
+  });
+});
