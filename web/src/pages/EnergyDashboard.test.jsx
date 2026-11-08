@@ -100,7 +100,7 @@ describe('EnergyDashboard', () => {
     const mainGrid = container.querySelector('.energy-main-grid');
     expect(mainGrid.firstElementChild).toHaveClass('energy-map-card');
     expect(mainGrid.lastElementChild).toHaveClass('energy-assessment');
-    expect(container.querySelector('.energy-map-card .mapbox')).toHaveStyle({ height: '580px' });
+    expect(container.querySelector('.energy-map-card .mapbox')).toHaveClass('mapbox-size-L');
     expect(container.querySelector('.energy-map-card .map-workspace')).toBeInTheDocument();
   });
 
