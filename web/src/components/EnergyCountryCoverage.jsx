@@ -5,6 +5,13 @@ import { formatObservationAge } from '../lib/metricFreshness.js';
 const COUNTRIES = ['SE', 'NO', 'DK', 'FI', 'IS'];
 const valid = metric => metric && metric.value != null && metric.value !== '' &&
   Number.isFinite(Number(metric.value)) && Number.isFinite(Date.parse(metric.ts ?? ''));
+export function observationCollectorNote(metric) {
+  if (metric?.sourceStatus === 'stale') return 'Collector stale · last successful measurement retained';
+  if (metric?.sourceStatus === 'error') return 'Collector error · last successful measurement retained';
+  if (metric?.sourceStatus === 'no_key') return 'Collector credentials missing · last successful measurement retained';
+  return null;
+}
+
 const latest = (metrics, country, predicate) => metrics
   .filter(metric => metric.country === country && predicate(metric) && valid(metric))
   .sort((a, b) => Date.parse(b.ts) - Date.parse(a.ts))[0] ?? null;
@@ -15,6 +22,7 @@ function ObservationCell({ metric, label }) {
     <b>{label}</b>
     <span>{metric.sourceName ?? metric.source ?? 'Source unavailable'}</span>
     <span title={fmtTime(metric.ts)}>{formatObservationAge(metric.ts)} · {fmtTime(metric.ts)}</span>
+    {observationCollectorNote(metric) ? <span className="energy-coverage-collector-state">{observationCollectorNote(metric)}</span> : null}
   </span>;
 }
 
@@ -56,6 +64,7 @@ export default function EnergyCountryCoverage({ metrics = [] }) {
             <b>{row.componentCount} indicator{row.componentCount === 1 ? '' : 's'}</b>
             <span>{row.latestComponent?.sourceName ?? row.latestComponent?.source ?? 'Source unavailable'}</span>
             <span title={fmtTime(row.latestComponent?.ts)}>{formatObservationAge(row.latestComponent?.ts)} · {fmtTime(row.latestComponent?.ts)}</span>
+            {observationCollectorNote(row.latestComponent) ? <span className="energy-coverage-collector-state">{observationCollectorNote(row.latestComponent)}</span> : null}
           </span> : <span className="energy-coverage-empty">No component data</span>}</td>
         </tr>)}</tbody>
       </table>
