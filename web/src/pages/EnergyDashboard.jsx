@@ -279,22 +279,22 @@ function MarketSignals({ metrics, comparisons = [], country = 'ALL' }) {
         <h4>Aligned Nordic price spreads</h4>
         {regionalComparisons.length ? <div className="energy-spread-list">{regionalComparisons.slice(0, 6).map(snapshot =>
           <article className="energy-spread-row" key={snapshot.asOf + snapshot.unit}>
-            <div className="energy-spread-heading"><b>{snapshot.spread.toLocaleString('sv-SE',{maximumFractionDigits:2})} {snapshot.unit}</b><span>{snapshot.countryCount} bidding zones · {fmtTime(snapshot.asOf)}</span></div>
-            <div className="energy-spread-track" role="img" aria-label={`Lowest ${snapshot.low.country} ${snapshot.low.value}; highest ${snapshot.high.country} ${snapshot.high.value}`}>
-              {snapshot.observations.map(item => <span key={item.country} style={{left:(snapshot.high.value === snapshot.low.value ? 50 : (item.value-snapshot.low.value)/(snapshot.high.value-snapshot.low.value)*100)+'%'}} title={item.country+': '+item.value+' '+item.unit}><i/></span>)}
+            <div className="energy-spread-heading"><b>{snapshot.spread.toLocaleString('sv-SE',{maximumFractionDigits:2})} {snapshot.unit}</b><span>{snapshot.zoneCount} bidding zones · {fmtTime(snapshot.asOf)}</span></div>
+            <div className="energy-spread-track" role="img" aria-label={`Lowest ${snapshot.low.zone} ${snapshot.low.value}; highest ${snapshot.high.zone} ${snapshot.high.value}`}>
+              {snapshot.observations.map(item => <span key={item.zone} style={{left:(snapshot.high.value === snapshot.low.value ? 50 : (item.value-snapshot.low.value)/(snapshot.high.value-snapshot.low.value)*100)+'%'}} title={item.zone+': '+item.value+' '+item.unit}><i/></span>)}
             </div>
-            <div className="energy-spread-detail"><span>Low: {snapshot.low.country} · {snapshot.low.value.toLocaleString('sv-SE')}</span><span>High: {snapshot.high.country} · {snapshot.high.value.toLocaleString('sv-SE')}</span></div>
-            <div className="mut">{snapshot.observations.map(item => item.country + ' ' + item.sourceName).join(' · ')}</div>
+            <div className="energy-spread-detail"><span>Low: {snapshot.low.zone} · {snapshot.low.value.toLocaleString('sv-SE')}</span><span>High: {snapshot.high.zone} · {snapshot.high.value.toLocaleString('sv-SE')}</span></div>
+            <div className="mut">{snapshot.observations.map(item => item.zone + ' (' + item.country + ') ' + item.sourceName).join(' · ')}</div>
           </article>)}</div>
-          : <p className="mut">No aligned cross-country price snapshots yet. At least two countries must report the same timestamp and price unit.</p>}
+          : <p className="mut">No aligned bidding-zone price snapshots yet. At least two distinct zones must report the same timestamp and price unit.</p>}
         <p className="mut">Spread is the highest minus the lowest reported price. Only identical timestamps and units are compared; currencies are not converted.</p>
         <div className="energy-spread-movement">
-          <h4>Spread movement · same countries, sources and unit</h4>
-          {spreadMovements.length ? spreadMovements.slice(0, 4).map(movement => <div className="energy-spread-movement-row" key={movement.unit + movement.countries.join('-')}>
+          <h4>Spread movement · same bidding zones, sources and unit</h4>
+          {spreadMovements.length ? spreadMovements.slice(0, 4).map(movement => <div className="energy-spread-movement-row" key={movement.unit + movement.markets.join('-')}>
             <b>{movement.change > 0 ? '+' : ''}{movement.change.toLocaleString('sv-SE',{maximumFractionDigits:2})} {movement.unit}</b>
-            <span>{movement.change > 0 ? 'Wider spread' : movement.change < 0 ? 'Narrower spread' : 'Unchanged spread'} · {movement.countries.join(', ')}</span>
+            <span>{movement.change > 0 ? 'Wider spread' : movement.change < 0 ? 'Narrower spread' : 'Unchanged spread'} · {movement.markets.join(', ')}</span>
             <small>{fmtTime(movement.previousAsOf)} → {fmtTime(movement.latestAsOf)} · {movement.previousSpread.toLocaleString('sv-SE',{maximumFractionDigits:2})} → {movement.latestSpread.toLocaleString('sv-SE',{maximumFractionDigits:2})} {movement.unit}</small>
-          </div>) : <p className="mut">A spread trend needs at least two snapshots with identical countries, sources and units.</p>}
+          </div>) : <p className="mut">A spread trend needs at least two snapshots with identical bidding zones, sources and units.</p>}
           <p className="mut">This describes a change in observed price separation only. It does not establish congestion, available transfer capacity or its cause.</p>
         </div>
       </div>

@@ -10,14 +10,17 @@ export function buildEnergyMarketComparisons(metrics) {
     const unit = String(row.unit ?? '').trim();
     const country = String(row.country ?? '').toUpperCase();
     if (!Number.isFinite(value) || !Number.isFinite(at) || !unit || !/^[A-Z]{2}$/.test(country)) continue;
-    const key = `${at}| ${unit}`;
+    const zone = String(row.indicator).replace(/^Dag-ahead-pris\s+/, '').trim();
+    if (!zone) continue;
+    const key = `${at}|${unit}`;
     if (!groups.has(key)) groups.set(key, { at, unit, observations: new Map() });
     const group = groups.get(key);
-    // A country contributes at most once to a comparison snapshot.
-    // Keep the first record; overview metrics are already sorted newest-first.
-    if (!group.observations.has(country)) {
-      group.observations.set(country, {
-        country, value, unit, ts: row.ts,
+    // Keep each bidding zone distinct (e.g. SE1–SE4). A country may report
+    // several zones at the same instant; collapsing by country hides them.
+    // Keep the first record per zone; overview metrics are newest-first.
+    if (!group.observations.has(zone)) {
+      group.observations.set(zone, {
+        zone, country, value, unit, ts: row.ts,
         source: row.source, sourceName: row.sourceName ?? row.source,
       });
     }
@@ -32,9 +35,9 @@ export function buildEnergyMarketComparisons(metrics) {
       return {
         asOf: new Date(group.at).toISOString(),
         unit: group.unit,
-        countryCount: observations.length,
-        low: { country: low.country, value: low.value },
-        high: { country: high.country, value: high.value },
+        zoneCount: observations.length,
+        low: { zone: low.zone, country: low.country, value: low.value },
+        high: { zone: high.zone, country: high.country, value: high.value },
         spread: high.value - low.value,
         observations,
       };
