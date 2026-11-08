@@ -5,9 +5,17 @@ import { formatObservationAge } from '../lib/metricFreshness.js';
 
 const duration = value => value == null || value === '' || !Number.isFinite(Number(value)) ? '—' : `${Math.round(Number(value))} ms`;
 const cadence = value => {
-  const seconds = Number(value);
+  const raw = String(value ?? '').trim();
+  const match = raw.match(/^(\\d+(?:\\.\\d+)?)\\s*(s|m|h|d)$/i);
+  const seconds = match
+    ? Number(match[1]) * ({ s: 1, m: 60, h: 3600, d: 86400 }[match[2].toLowerCase()])
+    : Number(value);
   if (!Number.isFinite(seconds) || seconds <= 0) return '—';
   if (seconds < 60) return `${seconds} s`;
+  if (seconds >= 3600) {
+    const hours = seconds / 3600;
+    return Number.isInteger(hours) ? `${hours} h` : `${hours.toFixed(1)} h`;
+  }
   const minutes = seconds / 60;
   return Number.isInteger(minutes) ? `${minutes} min` : `${minutes.toFixed(1)} min`;
 };
