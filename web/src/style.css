@@ -576,6 +576,7 @@ tr.detail-row > td { background: var(--mut-bg); padding: 10px 12px; font-size: 1
 .energy-generation-history-values span { display:flex; flex-direction:column; gap:3px; color:var(--mut); font-size:9px; }
 .energy-generation-history-values b { color:var(--tx); font-size:11px; font-variant-numeric:tabular-nums; overflow-wrap:anywhere; }
 .energy-generation-history-row > .mut,.energy-generation-history-note { font-size:9px; line-height:1.5; overflow-wrap:anywhere; }
+.energy-history-quality { margin-top:5px; color:#e5b66b; font-size:9px; line-height:1.45; }
 .energy-generation-history-note { margin:10px 0 0; }
 .energy-derived-label { margin-top:6px; color:#e5b66b; font-size:9px; }
 
