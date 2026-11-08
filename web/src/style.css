@@ -103,9 +103,12 @@ tr.area-row:hover td { background: var(--mut-bg); }
   gap: 10px; align-items: stretch; min-width: 0;
 }
 .mapbox {
-  width: 100%; min-width: 0; height: 420px; border: 1px solid var(--bd);
+  width: 100%; min-width: 0; border: 1px solid var(--bd);
   border-radius: 8px; background: var(--mut-bg);
 }
+.mapbox-size-S { height: 260px; }
+.mapbox-size-M { height: 420px; }
+.mapbox-size-L { height: 580px; }
 .map-item-inspector {
   min-width: 0; height: 420px; overflow: auto; border: 1px solid var(--bd);
   border-radius: 8px; background: #101a25; color: var(--tx); padding: 12px;
@@ -319,7 +322,7 @@ tr.detail-row > td { background: var(--mut-bg); padding: 10px 12px; font-size: 1
 .energy-section-head { display:flex; align-items:flex-start; justify-content:space-between; gap:10px; margin-bottom:8px; }
 .energy-section-head h2 { margin-bottom:3px; }
 .energy-map-card .map-workspace { grid-template-columns:minmax(0,1fr) minmax(260px,300px); gap:12px; }
-.energy-map-card .mapbox { height:580px; }
+.energy-map-card .mapbox-size-L { height:clamp(420px, 58vh, 580px); }
 .energy-map-card .map-item-inspector { height:580px; }
 .energy-assessment { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:8px 14px; }
 .energy-assessment > h2 { grid-column:1 / -1; margin:0; }
@@ -343,7 +346,7 @@ tr.detail-row > td { background: var(--mut-bg); padding: 10px 12px; font-size: 1
 }
 @media (max-width:760px) {
   .energy-map-card .map-workspace { grid-template-columns:1fr; }
-  .energy-map-card .mapbox { height:460px; }
+  .energy-map-card .mapbox-size-L { height:clamp(360px, 52vh, 460px); }
   .energy-map-card .map-item-inspector { height:auto; max-height:300px; }
   .energy-assessment { grid-template-columns:repeat(2,minmax(0,1fr)); }
   .energy-note { grid-column:1 / -1; }
@@ -353,7 +356,7 @@ tr.detail-row > td { background: var(--mut-bg); padding: 10px 12px; font-size: 1
   .energy-updated { text-align:left; }
   .energy-kpis { grid-template-columns:repeat(2,minmax(0,1fr)); }
   .energy-lower-grid { grid-template-columns:1fr; }
-  .energy-map-card .mapbox { height:420px; }
+  .energy-map-card .mapbox-size-L { height:clamp(320px, 52vh, 420px); }
 }
 
 /* Energy workspace uses an operational dark palette independent of OS theme. */
