@@ -75,7 +75,7 @@ export default function EnergyCountryCoverage({ metrics = [] }) {
           <td>{row.priceSeries.length ? <span className="energy-coverage-observation">
             <b>{row.priceSeries.length} reported series</b>
             {row.priceSeries.map(metric => <span key={[metric.indicator, metric.source, metric.unit].join('|')}>
-              <b>{metric.indicator.replace(/^Dag-ahead-pris\\s+/, '')}</b> · {metric.sourceName ?? metric.source ?? 'Source unavailable'}
+              <b>{metric.indicator.replace(/^Dag-ahead-pris\s+/, '')}</b> · {metric.sourceName ?? metric.source ?? 'Source unavailable'}
               <span title={fmtTime(metric.ts)}>{formatObservationAge(metric.ts)} · {fmtTime(metric.ts)}</span>
               {observationCollectorNote(metric) ? <span className="energy-coverage-collector-state">{observationCollectorNote(metric)}</span> : null}
             </span>)}
