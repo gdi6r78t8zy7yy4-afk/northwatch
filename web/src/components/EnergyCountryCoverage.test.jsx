@@ -44,3 +44,33 @@ describe('observationCollectorNote', () => {
     expect(observationCollectorNote(null)).toBeNull();
   });
 });
+
+
+describe('day-ahead price series coverage', () => {
+  test('keeps each valid bidding-zone series visible instead of collapsing a country to one price', () => {
+    const rows = buildEnergyCountryCoverage([
+      { country:'SE', indicator:'Dag-ahead-pris SE1', source:'entsoe', sourceName:'ENTSO-E', unit:'EUR/MWh', value:42, ts:'2026-11-08T08:00:00Z' },
+      { country:'SE', indicator:'Dag-ahead-pris SE1', source:'entsoe', sourceName:'ENTSO-E', unit:'EUR/MWh', value:44, ts:'2026-11-08T09:00:00Z' },
+      { country:'SE', indicator:'Dag-ahead-pris SE2', source:'entsoe', sourceName:'ENTSO-E', unit:'EUR/MWh', value:0, ts:'2026-11-08T08:00:00Z' },
+      { country:'SE', indicator:'Dag-ahead-pris SE3', source:'other', sourceName:'Other source', unit:'SEK/kWh', value:80, ts:'2026-11-08T08:00:00Z' },
+      { country:'DK', indicator:'Dag-ahead-pris DK1', source:'entsoe', unit:'EUR/MWh', value:50, ts:'2026-11-08T08:00:00Z' },
+      { country:'SE', indicator:'Dag-ahead-pris SE4', source:'entsoe', unit:'EUR/MWh', value:null, ts:'2026-11-08T08:00:00Z' },
+    ]);
+    const sweden = rows.find(row => row.country === 'SE');
+    expect(sweden.priceSeries).toHaveLength(3);
+    expect(sweden.priceSeries.map(item => item.indicator)).toEqual([
+      'Dag-ahead-pris SE1', 'Dag-ahead-pris SE2', 'Dag-ahead-pris SE3',
+    ]);
+    expect(sweden.priceSeries.find(item => item.indicator.endsWith('SE1')).value).toBe(44);
+    expect(sweden.priceSeries.find(item => item.indicator.endsWith('SE2')).value).toBe(0);
+    expect(rows.find(row => row.country === 'DK').priceSeries).toHaveLength(1);
+  });
+
+  test('does not mix source or unit variants into one price series', () => {
+    const rows = buildEnergyCountryCoverage([
+      { country:'SE', indicator:'Dag-ahead-pris SE1', source:'entsoe', unit:'EUR/MWh', value:42, ts:'2026-11-08T08:00:00Z' },
+      { country:'SE', indicator:'Dag-ahead-pris SE1', source:'local', unit:'SEK/kWh', value:0.8, ts:'2026-11-08T08:00:00Z' },
+    ]);
+    expect(rows.find(row => row.country === 'SE').priceSeries).toHaveLength(2);
+  });
+});
