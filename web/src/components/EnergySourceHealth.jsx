@@ -6,7 +6,7 @@ import { formatObservationAge } from '../lib/metricFreshness.js';
 const duration = value => value == null || value === '' || !Number.isFinite(Number(value)) ? '—' : `${Math.round(Number(value))} ms`;
 const cadence = value => {
   const raw = String(value ?? '').trim();
-  const match = raw.match(/^(\\d+(?:\\.\\d+)?)\\s*(s|m|h|d)$/i);
+  const match = raw.match(/^(\d+(?:\.\d+)?)\s*(s|m|h|d)$/i);
   const seconds = match
     ? Number(match[1]) * ({ s: 1, m: 60, h: 3600, d: 86400 }[match[2].toLowerCase()])
     : Number(value);
