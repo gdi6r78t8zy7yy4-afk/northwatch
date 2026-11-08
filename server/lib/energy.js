@@ -10,7 +10,7 @@ export function buildEnergyMarketComparisons(metrics) {
     const unit = String(row.unit ?? '').trim();
     const country = String(row.country ?? '').toUpperCase();
     if (!Number.isFinite(value) || !Number.isFinite(at) || !unit || !/^[A-Z]{2}$/.test(country)) continue;
-    const zone = String(row.indicator).replace(/^Dag-ahead-pris\\s+/, '').trim();
+    const zone = String(row.indicator).replace(/^Dag-ahead-pris\s+/, '').trim();
     if (!zone) continue;
     const key = `${at}|${unit}`;
     if (!groups.has(key)) groups.set(key, { at, unit, observations: new Map() });
