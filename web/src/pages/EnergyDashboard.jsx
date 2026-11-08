@@ -286,7 +286,7 @@ function MarketSignals({ metrics, comparisons = [], country = 'ALL' }) {
             <div className="energy-spread-detail"><span>Low: {snapshot.low.zone} · {snapshot.low.value.toLocaleString('sv-SE')}</span><span>High: {snapshot.high.zone} · {snapshot.high.value.toLocaleString('sv-SE')}</span></div>
             <div className="mut">{snapshot.observations.map(item => item.zone + ' (' + item.country + ') ' + item.sourceName).join(' · ')}</div>
           </article>)}</div>
-          : <p className="mut">No aligned cross-country price snapshots yet. At least two countries must report the same timestamp and price unit.</p>}
+          : <p className="mut">No aligned bidding-zone price snapshots yet. At least two distinct zones must report the same timestamp and price unit.</p>}
         <p className="mut">Spread is the highest minus the lowest reported price. Only identical timestamps and units are compared; currencies are not converted.</p>
         <div className="energy-spread-movement">
           <h4>Spread movement · same bidding zones, sources and unit</h4>
