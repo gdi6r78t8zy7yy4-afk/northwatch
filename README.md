@@ -230,7 +230,7 @@ asset  { t:'a', area, country, source, type, name, id?, geometry, attrs?, update
 | Eurostat SDMX 2.1 (industri- och råvaruflöden) | 7 Industri (Nordiskt) | ok – nyckelfri; sju flöden (se "Industri (M10, område 7)"), contentconstraint-drivena keyqueries; CC- och keyquery-kontraktet verifierat live 2026-11-07, data-API:t var systembrett nede samma dag → datafixtures är CC-formverifierade med synthetiska värden (canary: `NAMA_10_GDP/A.CP_MEUR.B1GQ.SE+NO+DK+FI+IS?format=JSON`) |
 | OECD SDMX (STI stålkapacitet) | 7 Industri (Nordiskt) | ok – nyckelfri; råstålkapacitet per land, årlig (Mt); CSV med kod+etikett-kolumnpar (högerankrade fält – "China (People's Republic of)" bär ett OTCITERAT kommatecken); DNK/ISL utan kapacitet släpps; verifierat live 2026-11-07 |
 | JRC RMIS / EU CRMs (kritiska råvaror) | 7 Industri (Nordiskt) | ok – nyckelfri; materialkatalogen (36 råvaror), EU-importberoende (händelser vid ≥50 %, high vid ≥80 %), nordisk leverans/utvinning till EU, nordiska reservor, MCI per land, CRMA-ambitioner; verifierat live 2026-11-07 |
-| UN Comtrade (varuhandel) | 7 Industri (Nordiskt) | preview-läge nyckelfri (hårt rate-limited → 4 s paus, `COMTRADE_PREVIEW_DELAY_MS`); `COMTRADE_API_KEY` (gratis, comtradeplus.un.org, ~500 anrop/dag) ger fullt data-API; export/import per land, senaste genomförda år, USD, partner=världen; preview-verifierat live 2026-11-07 |
+| UN Comtrade (varuhandel) | 7 Industri (Nordiskt) | ok – preview-läge nyckelfri (hårt rate-limited → 4 s paus, `COMTRADE_PREVIEW_DELAY_MS`); `COMTRADE_API_KEY` (gratis, comtradeplus.un.org, ~500 anrop/dag) ger fullt data-API. Båda querystring-baserade (API-dokumentation: comtradeplus.un.org/ApiDocs); keyed svaret väljs på den unika raden `motCode=0 && partner2Code=0` (totalraden, klientsida); export/import per land, senaste genomförda år, USD, partner=världen; bägge lägen verifierade live 2026-11-08 |
 | Statistics Iceland (Hagstofan, pxwebapi v1) | 7 Industri (IS) | ok – nyckelfri; varuhandel UTA06002 (exports/imports fob, cif, balans, mISK, månad); 429 vid <8 s → 9 s paus (`STATICE_DELAY_MS`); ingen aktuell industriproduktionstabell (IDN01000 avslutad 2018) → produktion via Eurostat; verifierat live 2026-11-07 |
 
 OSM-källorna köas internt (den publika instansen 429:ar vid samtidighet) och återförs med
@@ -462,15 +462,34 @@ länder som har en); `drivers` visar per land `XX: poäng (label)` och
   nordisk leverans/utvinning till EU (senaste år per land+material) och
   nordiska reservor, CRMA-ambitioner. `env`-endpolet sanitykallas men ger inga
   records (semantik obekräftad).
-- **UN Comtrade** (`comtrade.js`) – två lägen. **Utans nyckel:** preview-API:t
-  (`/public/v1/preview`), gratis men hårt rate-limited (429) → 4 s paus mellan
-  anropen (`COMTRADE_PREVIEW_DELAY_MS`, standard 4000). **Med `COMTRADE_API_KEY`:**
-  fullt data-API (`/data/v1/get`) med header `Ocp-Apim-Subscription-Key`;
-  gratisnyckel från **comtradeplus.un.org** (registrera med e-post, verifiera
-  via e-postlänk, skapa subscription under "My data", kopiera nyckeln;
-  ~500 anrop/dag). Data: export/import per land (reporter 752 SE / 578 NO /
-  208 DK / 246 FI / 352 IS, partner 0 = världen, cmd TOTAL, USD, senaste
-  genomförda år → år oberoende av när pollingen sker). Per-anrops-felisolering.
+- **UN Comtrade** (`comtrade.js`) – två lägen. API:t dokumenteras på
+  **comtradeplus.un.org/ApiDocs** (Swagger ur OpenAPI-specarna
+  `comtradeapi.un.org/files/v1/app/apim/{public,comtrade}.json`). BÅDA
+  produkterna är querystring-baserade: sökvägen bär bara typ/freq/klassificering
+  (`/C/A/HS`), resterande koder – inkl. `period` som PLINT 4-siffrigt år
+  (inte `A2025`) – går som query parameters; den äldre vägsbaserade formen
+  ger 404. **Utans nyckel:** `public/v1/preview` (1 rad per anrop), gratis men
+  hårt rate-limited (429) → 4 s paus mellan anropen (`COMTRADE_PREVIEW_DELAY_MS`,
+  standard 4000). **Med `COMTRADE_API_KEY`:** `data/v1/get` med header
+  `Ocp-Apim-Subscription-Key`; gratisnyckel från **comtradeplus.un.org**
+  (registrera med e-post, verifiera via e-postlänk, skapa subscription i
+  "My API portal", kopiera nyckeln; ~500 anrop/dag). Data: export/import per
+  land (reporter 752 SE / 578 NO / 208 DK / 246 FI / 352 IS, partner 0 =
+  världen, cmd TOTAL, USD, senaste genomförda år → år oberoende av när
+  pollingen sker). Keyed-svaret bryter ner raderna på `motCode`
+  (transportmedel; 0 = summa, 9900 = ej deklarerat) × `partner2Code` (0 = allt)
+  med `isAggregate:true` på ALLA rader → kollektören väljer den unika raden
+  `motCode=0 && partner2Code=0` klientsida (samma selektor som preview:s
+  enskilda rad; `motCode` som query-param hänger, väljs ej server-side).
+  Keyed-API:t är långsamt (1–6 s/anrop) och ger sporadiska 500:or → 2 s takt
+  mellan anropen (`COMTRADE_KEYED_DELAY_MS`, standard 2000) + begränsad retry
+  med exponentiell backoff på 429/5xx/nätverk/timeout (`COMTRADE_RETRY_MAX`,
+  standard 2 → 3 försök; samma mönster som NVD i M9). Per-anrops-felisolering.
+  `count=0` (HTTP 200 men rapportören har inga data) är **inte** ett hämtfel →
+  record "Comtrade {land} {X/M}: ej rapporterat ({år})" med value null (panelen
+  visar landet som en "–"-rad med året). Norge (578) har inga dataset i Comtrade
+  alls – verifierat 2026-11-08 via `public/v1/getDA` (SE 1992–2025, DK 1989–2025,
+  FI 1988–2025, IS 1988–2025, NO 0 rader) → NO visas alltid "ej rapporterat".
 - **Statistics Iceland** (`statice.js`) – pxwebapi v1, `Efnahagur/UTA06002.px`
   (varuhandel, mISK: exports fob, imports fob/cif, balans fob-fob/cif-fob,
   månad). 429 vid anrop tättare än ~8 s → 9 s paus mellan struktur- och
@@ -496,18 +515,26 @@ Datafelet visar fel i alla per-källa-panelerna (records blir null, inte []),
 retry hämtar datat igen. Nordic-vyn visar luckkort (IEA har inget publikt API,
 Statistics Denmark ej upptaget – TLS-mellanhänt, Comtrade preview-nyckel).
 
-**Live-status 2026-11-07:** OECD, RMIS, Comtrade (preview) och Statice
-verifierade live. Eurostats **data-API var systembrett nede** samma dag
-(contentconstraint-kontraktet fungerade) → `server/testdata/industry/` har
-CC-formverifierade datafixtures med **syntetiska värden**; kollektorn pickar upp
-det riktiga datat automatiskt vid nästa körning. Canary för liveverifiering av
-de sju datafrågorna: `NAMA_10_GDP/A.CP_MEUR.B1GQ.SE+NO+DK+FI+IS?format=JSON`
-→ 200.
+**Live-status 2026-11-07/08:** OECD, RMIS, Statice verifierade live
+2026-11-07. **Comtrade verifierat live i BÅDA lägen 2026-11-08** mot nuvarande
+API:t (querystring-form, se ovan): preview ger 1 totalrad per anrop, keyed ger
+`motCode`×`partner2Code`-nedbrytning – kollektörns totalradselector
+(`motCode=0 && partner2Code=0`) matchar i båda (SE X 2025 = 208 483 056 356 USD,
+SE M 2025 = 202 212 034 647 USD; fixtures i `testdata/industry/` är
+form- och värdeverifierade mot live). **NO (578) svarar count=0 för alla år** –
+Norge har inga Comtrade-dataset alls (getDA) → "ej rapporterat"-records (se ovan). Eurostats **data-API var systembrett nede**
+2026-11-07 (contentconstraint-kontraktet fungerade) och var fortfarande nede
+2026-11-08 → `server/testdata/industry/` har CC-formverifierade datafixtures med
+**syntetiska värden**; kollektorn pickar upp det riktiga datat automatiskt vid
+nästa körning. Canary för liveverifiering av de sju datafrågorna:
+`NAMA_10_GDP/A.CP_MEUR.B1GQ.SE+NO+DK+FI+IS?format=JSON` → 200.
 
-**Tester:** `server/test/industry.test.js` (41 tester: kollektorns recordantal
+**Tester:** `server/test/industry.test.js` (50 tester: kollektorns recordantal
 mot fixtures med URL-rutad fetch-mock, `parseCC`/`buildKey`, OECD `parseRow`,
-RMIS `latestByCountryMaterial` + `tradeQuery`, `classify`, komponentformlerna,
-`labelOf`, status-/data-regressionvärden per land + NORDIC) + webbtest
+RMIS `latestByCountryMaterial` + `tradeQuery`, Comtrade `pickTotal`/`queryFor`
++ keyed fetch (URL/header) + `fetchTotal`-retry + count=0 "ej rapporterat",
+`classify`, komponentformlerna, `labelOf`, status-/data-regressionvärden per
+land + NORDIC) + webbtest
 (`industryPanels.test.jsx` – alla panels ok/fel/loading-lägen + IndustryView:s
 koppling; `DashboardPage.test.jsx` – område 7 grenar, övriga områden rör aldrig
 `/api/industry/*`).
@@ -542,6 +569,8 @@ OSV_WATCH_PACKAGES=… # M9 – OSV.dev-watchlist "Ecosystem:Paket;…" (26 kure
 COMTRADE_API_KEY=…  # M10 – UN Comtrade, gratis: comtradeplus.un.org (header
                      #   Ocp-Apim-Subscription-Key, ~500 anrop/dag). Utan nyckel:
                      #   rate-limiteda preview-endpointen (4 s paus, COMTRADE_PREVIEW_DELAY_MS)
+COMTRADE_KEYED_DELAY_MS=…  # M10 – takt mellan keyed-anropen (standard 2000 ms)
+COMTRADE_RETRY_MAX=…  # M10 – retryar på transients 429/5xx (standard 2 → 3 försök)
 NVE_API_KEY=…        # M4 – NVE HydAPI, gratis: https://hydapi.nve.no (header X-API-Key)
 NVE_STATIONS=…       # M4 – valfri fast stationslista "6.10.0,..." (annars hämtas
                      #   NVE_STATION_LIMIT första aktiva stationerna, standard 5)
@@ -681,10 +710,14 @@ SMHI_FCST_CACHE_DIR=…   # M8 – diskcache (standard server/cache/smhi-forecas
   (`OSV_WATCH_PACKAGES`) uppdateras var 6:e timme.
 - CISA KEV (M9): publikt JSON, ingen nyckel. Hela katalogen cachas i minnet 6 timmar
   (används för prioritering, ej incidentdetektion).
-- UN Comtrade (M10): preview-API:t är gratis men hårt rate-limited (429 vid snabba
-  upprepningar) → 4 s paus mellan anropen (`COMTRADE_PREVIEW_DELAY_MS`, standard
-  4000). Gratis `COMTRADE_API_KEY` (comtradeplus.un.org, ~500 anrop/dag) växlar till
-  fullt data-API; nyckeln skickas som `Ocp-Apim-Subscription-Key`, bara i `.env`.
+- UN Comtrade (M10): dokumenterat på comtradeplus.un.org/ApiDocs. Preview-API:t
+  är gratis men hårt rate-limited (429 vid snabba upprepningar) → 4 s paus mellan
+  anropen (`COMTRADE_PREVIEW_DELAY_MS`, standard 4000). Gratis `COMTRADE_API_KEY`
+  (comtradeplus.un.org, ~500 anrop/dag) växlar till fullt data-API; nyckeln skickas
+  som `Ocp-Apim-Subscription-Key`, bara i `.env`. Båda produkterna är
+  querystring-baserade (`period` = 4-siffrigt år) och keyed-svaret bryts ner på
+  `motCode`×`partner2Code` med `isAggregate` true på alla rader → totalraden
+  väljs klientsida via `motCode=0 && partner2Code=0`.
 - Eurostat SDMX 2.1 (M10): öppet API, ingen nyckel. Data hämtas via
   contentconstraint + per-flödes keyqueries (skonsamt). Data-API:t var systembrett
   nede 2026-11-07 – canary och status, se "Industri (M10, område 7)".

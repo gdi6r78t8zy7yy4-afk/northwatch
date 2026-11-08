@@ -223,6 +223,20 @@ describe('IndustryComtradePanel', () => {
     render(<IndustryComtradePanel records={[]} meta={META_OK} />);
     expect(screen.getByText('Ingen Comtrade-data just nu.')).toBeInTheDocument();
   });
+
+  test('land som bara har null-records (ej rapporterat) visas med –-rad', () => {
+    const noRecs = ['X', 'M'].map(f => ({
+      t: 'm', area: 7, country: 'NO', source: 'comtrade',
+      indicator: `Comtrade NO ${f}: ej rapporterat (2025)`, value: null, unit: '', ts: '2025',
+    }));
+    render(<IndustryComtradePanel
+      records={[...RECS.filter(r => r.source === 'comtrade'), ...noRecs]} meta={META_OK} />);
+    expect(screen.getByText('Norge')).toBeInTheDocument();
+    // NO-raden: export –, import –, saldo – → exakt 3 streck, och ts = år
+    // ("2025") från null-records visas i År-kolumnen.
+    expect(screen.getAllByText('–')).toHaveLength(3);
+    expect(screen.getAllByText('2025')).toHaveLength(3); // SE + IS + NO
+  });
 });
 
 describe('IndustryRmisPanel', () => {

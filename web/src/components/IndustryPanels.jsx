@@ -99,14 +99,24 @@ export function IndustrySteelPanel({ records, meta }) {
 export function IndustryComtradePanel({ records, meta }) {
   const byCountry = {};
   for (const r of records ?? []) {
-    if (r.value == null) continue;
-    const isX = /export/i.test(r.indicator);
-    const isM = /import/i.test(r.indicator);
+    // Flödet koderas antingen som namn ("Exporter/Importer (UN Comtrade, USD)")
+    // eller som kod i null-records ("Comtrade NO X/M: …").
+    const flowMatch = /comtrade\s+[A-Z]{2}\s+([XM])\b/i.exec(r.indicator);
+    const isX = flowMatch ? flowMatch[1] === 'X' : /export/i.test(r.indicator);
+    const isM = flowMatch ? flowMatch[1] === 'M' : /import/i.test(r.indicator);
     if (!isX && !isM) continue;
-    byCountry[r.country] ??= {};
-    byCountry[r.country].ts = r.ts;
-    if (isX) byCountry[r.country].x = r.value;
-    if (isM) byCountry[r.country].m = r.value;
+    // Länder med bara null-records (ej rapporterat/hämtfel) visas ändå –
+    // med "–"-värden – så att gapet syns i tabellen.
+    const g = byCountry[r.country] ?? (byCountry[r.country] = {});
+    if (r.value == null) {
+      // "ej rapporterat"-records bär ts = år (t.ex. "2025") → visas i År-kolumnen;
+      // "hämtfel"-records bär ett timestamp → "–" istället.
+      if (/^\d{4}$/.test(r.ts ?? '')) g.ts = r.ts;
+      continue;
+    }
+    g.ts = r.ts;
+    if (isX) g.x = r.value;
+    if (isM) g.m = r.value;
   }
   const rows = Object.entries(byCountry);
   const fmt = v => (v == null ? '–' : Math.abs(v) >= 1e6 ? `${(v / 1e9).toFixed(1)} bn` : String(v));
@@ -228,7 +238,7 @@ export function IndustryGapCards() {
       <ul className="mut ind-gaps">
         <li><b>IEA</b> – industriell energianvändning (elektricitet, värme, förnybart). Inget verifierat öppet API.</li>
         <li><b>Statistics Denmark</b> – dansk industriproduktionsindex. Ej anslutet ännu; Danmarks produktion täcks via Eurostat.</li>
-        <li><b>UN Comtrade</b> – körs i gratis preview-läge. För fullt API (~500 anrop/dag) sätt <span className="mono">COMTRADE_API_KEY</span> från comtradeplus.un.org.</li>
+        <li><b>UN Comtrade</b> – <span className="mono">COMTRADE_API_KEY</span> (gratis: comtradeplus.un.org) ger fullt data-API; utan nyckel används rate-limiteda preview-läget. Norge rapporterar inte till Comtrade (inga dataset, verifierat via getDA 2026-11-08) → visas som "ej rapporterat".</li>
       </ul>
     </div>
   );

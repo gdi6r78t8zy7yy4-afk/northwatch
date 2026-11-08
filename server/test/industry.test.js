@@ -19,8 +19,12 @@ import { fileURLToPath } from 'node:url';
 
 // Miljön sätts INNAN körs: COMTRADE_PREVIEW_DELAY_MS/STATICE_DELAY_MS nollas
 // (4 s/9 s rate-limitpausar i preview-läge) och COMTRADE_API_KEY tas bort så
-// att comtrade körs i preview-läge mot enstat fixtures.
+// att comtrade körs i preview-läge mot enstat fixtures. COMTRADE_KEYED_DELAY_MS
+// nollas (annars 2 s paus × 9 i keyed-testet) och COMTRADE_RETRY_MAX=0 så att
+// simulerade misslyckanden inte väntar på backoff.
 process.env.COMTRADE_PREVIEW_DELAY_MS = '0';
+process.env.COMTRADE_KEYED_DELAY_MS = '0';
+process.env.COMTRADE_RETRY_MAX = '0';
 process.env.STATICE_DELAY_MS = '0';
 delete process.env.COMTRADE_API_KEY;
 
@@ -29,16 +33,29 @@ const rd = f => fs.readFileSync(path.join(TESTDATA, f), 'utf8');
 
 // ---- Mockad fetch per URL → fixture ------------------------------------------
 const realFetch = globalThis.fetch;
+const comtradeCalls = []; // {url, headers} – sparas för keyed/preview-URL-anspråk
+let comtradeFail = { count: 0, status: 500 }; // X första comtrade-anropen returnerar status
+const comtradeEmpty = new Set(); // reporter-koder som returnerar count=0 (t.ex. NO – inga dataset)
 globalThis.fetch = (url, opt) => {
   const u = String(url);
   const method = opt?.method ?? 'GET';
   const ok = text => ({ ok: true, status: 200, text: async () => text, json: async () => JSON.parse(text) });
+  const fail = status => ({ ok: false, status, text: async () => '', json: async () => ({}) });
   let m;
   if ((m = u.match(/contentconstraint\/ESTAT\/([^/]+)\/latest/))) return ok(rd('eurostat-cc-' + m[1] + '.xml'));
   if ((m = u.match(/data\/ESTAT\/([^/]+)\//))) return ok(rd('eurostat-data-' + m[1] + '.json'));
   if (u.includes('sdmx.oecd.org')) return ok(rd('oecd-steel.csv'));
   if ((m = u.match(/eucrm\/([^/]+)/))) return ok(rd('rmis-' + m[1] + '.json'));
-  if (u.includes('comtradeapi.un.org')) return ok(rd('comtrade-preview.json'));
+  if (u.includes('comtradeapi.un.org')) {
+    comtradeCalls.push({ url: u, headers: opt?.headers ?? {} });
+    if (comtradeFail.count > 0) { comtradeFail.count -= 1; return fail(comtradeFail.status); }
+    const rep = u.match(/reporterCode=(\d+)/);
+    if (rep && comtradeEmpty.has(rep[1])) {
+      return ok('{"elapsedTime":"0.1 secs","count":0,"data":[],"error":""}');
+    }
+    // data/v1/get (keyed) → 16-raders mot×p2-svar; public/v1/preview → enskild totalrad.
+    return ok(u.includes('/data/v1/') ? rd('comtrade-keyed.json') : rd('comtrade-preview.json'));
+  }
   if (u.includes('px.hagstofa.is')) return ok(method === 'POST' ? rd('is-data.json') : rd('is-structure.json'));
   throw new Error('fetch-mock: oväntad URL ' + u);
 };
@@ -51,6 +68,7 @@ const { parseRow } = await import('../collectors/oecd.js');
 const rmisCol = (await import('../collectors/rmis.js')).default;
 const { latestByCountryMaterial } = await import('../collectors/rmis.js');
 const comtradeCol = (await import('../collectors/comtrade.js')).default;
+const { queryFor, pickTotal, periodYear, fetchTotal } = await import('../collectors/comtrade.js');
 const staticeCol = (await import('../collectors/statice.js')).default;
 const { tradeQuery } = await import('../collectors/statice.js');
 const {
@@ -242,6 +260,106 @@ describe('statice tradeQuery', () => {
   });
   test('kastar utan tidsvariabel', () => {
     assert.throws(() => tradeQuery({ variables: [{ code: 'x', values: [1, 2] }] }), /tidsvariabel/);
+  });
+});
+
+// ---- comtrade pickTotal / queryFor / keyed ----------------------------------------
+
+describe('comtrade pickTotal / queryFor', () => {
+  test('keyed-svar: isAggregate true på ALLA rader – väljer mot=0 & p2=0', () => {
+    const doc = JSON.parse(rd('comtrade-keyed.json'));
+    assert.ok(doc.data.length > 1); // nedbrytning mot×p2, ej enskild rad
+    assert.ok(doc.data.every(r => r.isAggregate === true)); // onyttig signal – ignorerad
+    const v = pickTotal(doc, 2025);
+    const m9900 = doc.data.find(r => Number(r.motCode) === 9900 && Number(r.partner2Code) === 0);
+    assert.notEqual(v, m9900.primaryValue); // inte "ej deklarerat"-raden
+    assert.equal(v, 208483056355.924); // unik totalrad (SE X 2025, verifierad mot live)
+  });
+  test('preview-svaret (enskild rad) väljs av samma selektor', () => {
+    const doc = JSON.parse(rd('comtrade-preview.json'));
+    assert.equal(doc.count, 1);
+    assert.equal(pickTotal(doc, 2024), doc.data[0].primaryValue);
+  });
+  test('kastar när totalraden saknas; API-felet propageras', () => {
+    assert.throws(() => pickTotal({ data: [{ motCode: 9900, partner2Code: 0, primaryValue: 123 }] }, 2025), /totalrad/);
+    assert.throws(() => pickTotal({ data: [], error: 'Invalid API key' }, 2025), /Invalid API key/);
+  });
+  test('queryFor: 4-siffrigt år (inte A-prefix) + koder som query-parametrar', () => {
+    assert.equal(queryFor({ code: 752, country: 'SE' }, 2025, { code: 'X' }),
+      'reporterCode=752&period=2025&partnerCode=0&cmdCode=TOTAL&flowCode=X');
+    assert.equal(queryFor({ code: 578, country: 'NO' }, 2026, { code: 'M' }),
+      'reporterCode=578&period=2026&partnerCode=0&cmdCode=TOTAL&flowCode=M');
+  });
+});
+
+describe('comtrade keyed fetch (data/v1/get)', () => {
+  after(() => { delete process.env.COMTRADE_API_KEY; });
+  test('10 querystring-anrop med subscription-key-header, totalrad per land/flöde', async () => {
+    process.env.COMTRADE_API_KEY = 'test-nordwatch-key';
+    comtradeCalls.length = 0;
+    const recs = await comtradeCol.fetch();
+    const year = periodYear();
+    assert.equal(comtradeCalls.length, 10);
+    for (const c of comtradeCalls) {
+      assert.ok(c.url.startsWith('https://comtradeapi.un.org/data/v1/get/C/A/HS?'), c.url);
+      assert.ok(!c.url.includes('/A' + year + '/'), 'legacy vägsform (A2025) används ej');
+      assert.equal(c.headers['Ocp-Apim-Subscription-Key'], 'test-nordwatch-key');
+    }
+    assert.ok(comtradeCalls[0].url.includes(`reporterCode=752&period=${year}&partnerCode=0&cmdCode=TOTAL&flowCode=X`));
+    assert.ok(comtradeCalls[1].url.includes(`reporterCode=752&period=${year}&partnerCode=0&cmdCode=TOTAL&flowCode=M`));
+    // Förväntat värde beräknas ur keyed-fixturens totalrad (mot=0 & p2=0).
+    const doc = JSON.parse(rd('comtrade-keyed.json'));
+    const total = doc.data.find(r => Number(r.motCode) === 0 && Number(r.partner2Code) === 0).primaryValue;
+    assert.equal(recs.length, 10);
+    for (const r of recs) assert.equal(r.value, total);
+    const seX = recs.find(r => r.country === 'SE' && /export/i.test(r.indicator));
+    assert.equal(seX.value, total);
+    assert.equal(seX.unit, 'USD');
+  });
+});
+
+describe('comtrade fetchTotal retry', () => {
+  const url = 'https://comtradeapi.un.org/data/v1/get/C/A/HS?reporterCode=752&period=2025&partnerCode=0&cmdCode=TOTAL&flowCode=X';
+  after(() => { delete process.env.COMTRADE_RETRY_MAX; comtradeFail = { count: 0, status: 500 }; });
+  test('transient 500s retryas (backoff) tills svaret kommer', async () => {
+    process.env.COMTRADE_RETRY_MAX = '2';
+    comtradeCalls.length = 0;
+    comtradeFail = { count: 2, status: 500 }; // två 500:or, därefter 200
+    const doc = await fetchTotal(url, { headers: { 'Ocp-Apim-Subscription-Key': 'k' } });
+    assert.equal(comtradeCalls.length, 3); // 2 misslyckade + 1 lyckad
+    assert.equal(pickTotal(doc, 2025), 208483056355.924);
+  });
+  test('icke-transient fel (404) throwas direkt utan retry', async () => {
+    process.env.COMTRADE_RETRY_MAX = '2';
+    comtradeCalls.length = 0;
+    comtradeFail = { count: 5, status: 404 };
+    await assert.rejects(() => fetchTotal(url, { headers: { 'Ocp-Apim-Subscription-Key': 'k' } }), /HTTP 404/);
+    assert.equal(comtradeCalls.length, 1); // inget retry på 404
+  });
+  test('retry-tak: alla försök 500 → throwas efter RETRY_MAX + 1 anrop', async () => {
+    process.env.COMTRADE_RETRY_MAX = '1';
+    comtradeCalls.length = 0;
+    comtradeFail = { count: 5, status: 500 };
+    await assert.rejects(() => fetchTotal(url, { headers: { 'Ocp-Apim-Subscription-Key': 'k' } }), /HTTP 500/);
+    assert.equal(comtradeCalls.length, 2); // initial + 1 retry
+  });
+});
+
+describe('comtrade ej rapporterat (count=0)', () => {
+  test('rapportör utan data ger "ej rapporterat"-records, inte hämtfel', async () => {
+    comtradeEmpty.add('578'); // NO har inga dataset i Comtrade alls
+    const recs = await comtradeCol.fetch();
+    comtradeEmpty.delete('578');
+    assert.equal(recs.length, 10);
+    const seX = recs.find(r => r.country === 'SE' && /export/i.test(r.indicator));
+    assert.ok(Number.isFinite(seX.value)); // övriga länder levererar
+    const noX = recs.find(r => r.country === 'NO' && /X/.test(r.indicator));
+    const noM = recs.find(r => r.country === 'NO' && /M/.test(r.indicator));
+    assert.ok(/ej rapporterat/.test(noX.indicator));
+    assert.ok(/ej rapporterat/.test(noM.indicator));
+    assert.equal(noX.value, null);
+    assert.equal(noX.ts, String(periodYear()));
+    assert.ok(!recs.some(r => /hämtfel/.test(r.indicator)));
   });
 });
 
