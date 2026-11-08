@@ -129,6 +129,35 @@ describe('EnergyDashboard', () => {
     expect(onCountryChange).toHaveBeenCalledWith('NO');
   });
 
+  test('country scope control is placed in a prominent toolbar below the page heading', async () => {
+    const { container } = render(<EnergyDashboard country="SE" />);
+    const toolbar = container.querySelector('.energy-country-toolbar');
+    expect(toolbar).toBeInTheDocument();
+    expect(toolbar.querySelector('select')).toHaveValue('SE');
+    expect(toolbar).toHaveTextContent('Showing country-specific indicators for Sverige');
+  });
+
+  test('historical trend and price movement widgets exclude other countries in a selected scope', async () => {
+    vi.mocked(fetchEnergyHistory).mockResolvedValue({
+      count: 4,
+      series: [
+        { country:'SE', source:'svk', indicator:'Total produktion (SE)', unit:'MW',
+          points:[{ value:100, ts:'2026-11-07T08:00:00Z' }, { value:120, ts:'2026-11-07T09:00:00Z' }] },
+        { country:'DK', source:'energinet', indicator:'Total produktion (DK)', unit:'MW',
+          points:[{ value:200, ts:'2026-11-07T08:00:00Z' }, { value:220, ts:'2026-11-07T09:00:00Z' }] },
+        { country:'SE', source:'svk', indicator:'Dag-ahead-pris SE3', unit:'SEK/MWh',
+          points:[{ value:30, ts:'2026-11-07T08:00:00Z' }, { value:35, ts:'2026-11-07T09:00:00Z' }] },
+        { country:'DK', source:'energinet', indicator:'Dag-ahead-pris DK1', unit:'DKK/MWh',
+          points:[{ value:20, ts:'2026-11-07T08:00:00Z' }, { value:25, ts:'2026-11-07T09:00:00Z' }] },
+      ],
+    });
+    render(<EnergyDashboard country="SE" />);
+    expect(await screen.findByText('SE · Production')).toBeInTheDocument();
+    expect(screen.queryByText('DK · Production')).not.toBeInTheDocument();
+    expect(screen.getByText('SE · SE3')).toBeInTheDocument();
+    expect(screen.queryByText('DK · DK1')).not.toBeInTheDocument();
+  });
+
   test('country selection renders only country-specific generation and KPI measurements', async () => {
     render(<EnergyDashboard country="SE" />);
     expect(await screen.findByText('Generation & demand · Sverige')).toBeInTheDocument();

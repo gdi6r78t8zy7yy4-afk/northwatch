@@ -437,7 +437,9 @@ export default function EnergyDashboard({ country = 'ALL', onCountryChange }) {
   useEffect(() => { let stopped = false; fetchAssets(1, country).then(r => { if (!stopped) setAssets(r.assets ?? []); }).catch(() => {}); return () => { stopped = true; }; }, [country]);
   useEffect(() => { let stopped = false; fetchStaticGeo().then(r => { if (!stopped) setGeo(r); }).catch(() => {}); return () => { stopped = true; }; }, []);
   const metrics = data?.metrics ?? [];
-  const renewableHistory = useMemo(() => filterRenewableGenerationSeries(history?.series ?? []), [history?.series]);
+  const scopedHistorySeries = useMemo(() => country === 'ALL' ? (history?.series ?? [])
+    : (history?.series ?? []).filter(item => item.country === country), [history?.series, country]);
+  const renewableHistory = useMemo(() => filterRenewableGenerationSeries(scopedHistorySeries), [scopedHistorySeries]);
   const kpi = useMemo(() => {
     const scope = country === 'ALL' ? null : country;
     const scoped = scope ? metrics.filter(r => r.country === scope) : metrics.filter(r => r.country !== 'NORDIC');
@@ -466,7 +468,11 @@ export default function EnergyDashboard({ country = 'ALL', onCountryChange }) {
     <header className="energy-heading"><div><div className="energy-eyebrow">NORTHWATCH / OPERATIONAL ENERGY</div>
       <h1>Nordic Energy Situation <StatusPill status={status} /></h1>
       <p className="mut">Elförsörjning, gränsflöden, balans och källornas aktualitet · {country === 'ALL' ? 'Alla länder' : COUNTRY_NAMES[country]}</p></div>
-      <div className="energy-heading-actions"><label className="energy-country-control"><span>VALT LAND</span><select aria-label="Select energy dashboard country" value={country} onChange={event => onCountryChange?.(event.target.value)}><option value="ALL">Alla länder</option>{Object.entries(COUNTRY_NAMES).filter(([code]) => ['SE','NO','DK','FI','IS'].includes(code)).map(([code,name]) => <option key={code} value={code}>{name}</option>)}</select></label><div className="energy-updated"><span className="dot" /> Uppdateras var 60:e sekund<br/><span className="mut">Senast hämtad: {updated ? fmtTime(updated) : '—'}</span></div></div></header>
+      <div className="energy-heading-actions"><div className="energy-updated"><span className="dot" /> Uppdateras var 60:e sekund<br/><span className="mut">Senast hämtad: {updated ? fmtTime(updated) : '—'}</span></div></div></header>
+    <div className="energy-country-toolbar" aria-label="Country scope">
+      <label className="energy-country-control"><span>COUNTRY SCOPE</span><select aria-label="Select energy dashboard country" value={country} onChange={event => onCountryChange?.(event.target.value)}><option value="ALL">Alla länder · Nordic overview</option>{Object.entries(COUNTRY_NAMES).filter(([code]) => ['SE','NO','DK','FI','IS'].includes(code)).map(([code,name]) => <option key={code} value={code}>{name}</option>)}</select></label>
+      <span className="energy-country-scope-note">{country === 'ALL' ? 'Showing the full Nordic overview' : `Showing country-specific indicators for ${COUNTRY_NAMES[country] ?? country}`}</span>
+    </div>
     {error && <div className="card"><StatusPill status="error"/> <span className="mut">Kunde inte uppdatera energivyn: {error}. Visar senast hämtade data om sådan finns.</span></div>}
     <div className="energy-kpis">{kpi.map(item => item.metric !== undefined
       ? <Kpi key={item.label} label={item.label} metric={item.metric} fallback={item.fallback}/>
@@ -496,7 +502,7 @@ export default function EnergyDashboard({ country = 'ALL', onCountryChange }) {
         : <p className="mut">Historical data is accumulating. Charts will populate as new collector measurements are recorded; the system does not backfill invented values.</p>}
       <div className="mut energy-history-meta">{history?.count ?? 0} observations · range {history?.from ? fmtTime(history.from) : '—'} – {history?.to ? fmtTime(history.to) : '—'}</div>
     </section>
-    <EnergyGenerationDemandTrends series={history?.series ?? []}/>
+    <EnergyGenerationDemandTrends series={scopedHistorySeries}/>
     <section className="card energy-history-section energy-renewable-history-section">
       <div className="energy-section-head"><div><h2>Renewable generation history</h2>
         <div className="mut">Selectable source-reported renewable technology time series. Each country, source, indicator and unit remains independent.</div></div>
@@ -505,9 +511,9 @@ export default function EnergyDashboard({ country = 'ALL', onCountryChange }) {
         : <p className="mut">No renewable generation history with two or more recorded observations is available in this time window. No values are estimated or backfilled.</p>}
     </section>
     <section className="card energy-market-section">
-      <EnergyPriceMovementAnalysis series={history?.series ?? []}/>
+      <EnergyPriceMovementAnalysis series={scopedHistorySeries}/>
     </section>
-    {history?.series?.length ? <GridOperationsExplorer series={history.series}/> : null}
+    {scopedHistorySeries.length ? <GridOperationsExplorer series={scopedHistorySeries}/> : null}
     <section className="card energy-market-section"><div className="energy-section-head"><div><h2>Market & renewable signals</h2>
       <div className="mut">Latest source observations; comparisons are limited to values with compatible timestamps and units.</div></div></div>
       <MarketSignals metrics={metrics} comparisons={data?.marketComparisons ?? []} country={country}/>
