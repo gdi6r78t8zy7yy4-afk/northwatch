@@ -61,13 +61,13 @@ const MOCK_OVERVIEW = {
     {
       asOf: MOCK_TIMESTAMP,
       unit: 'EUR/MWh',
-      countryCount: 2,
-      low: { country: 'SE', value: 24.5 },
-      high: { country: 'DK', value: 29.8 },
+      zoneCount: 2,
+      low: { zone: 'SE3', country: 'SE', value: 24.5 },
+      high: { zone: 'DK1', country: 'DK', value: 29.8 },
       spread: 5.3,
       observations: [
-        { country: 'SE', value: 24.5, unit: 'EUR/MWh', ts: MOCK_TIMESTAMP, sourceName: 'Svenska kraftnät' },
-        { country: 'DK', value: 29.8, unit: 'EUR/MWh', ts: MOCK_TIMESTAMP, sourceName: 'Energi Data Service' },
+        { zone: 'SE3', country: 'SE', value: 24.5, unit: 'EUR/MWh', ts: MOCK_TIMESTAMP, source: 'svk', sourceName: 'Svenska kraftnät' },
+        { zone: 'DK1', country: 'DK', value: 29.8, unit: 'EUR/MWh', ts: MOCK_TIMESTAMP, source: 'energinet', sourceName: 'Energi Data Service' },
       ],
     },
   ],
@@ -292,7 +292,7 @@ describe('EnergyDashboard', () => {
     });
     render(<EnergyDashboard country="ALL" />);
     expect(await screen.findByText('Aligned Nordic price spreads')).toBeInTheDocument();
-    expect(screen.getByText(/No aligned cross-country price snapshots yet/)).toBeInTheDocument();
+    expect(screen.getByText(/No aligned bidding-zone price snapshots yet/)).toBeInTheDocument();
   });
 
   test('renders reserve capacity table', async () => {
