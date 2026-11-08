@@ -52,7 +52,7 @@ export function buildEnergyPriceSpreadMovements(comparisons = []) {
     if (ordered.length < 2) continue;
     const previous = ordered.at(-2), latest = ordered.at(-1);
     movements.push({
-      unit: latest.unit, countries: latest.countries,
+      unit: latest.unit, markets: latest.markets, countries: latest.countries,
       previousAsOf: previous.asOf, latestAsOf: latest.asOf,
       previousSpread: previous.spread, latestSpread: latest.spread,
       change: latest.spread - previous.spread,
