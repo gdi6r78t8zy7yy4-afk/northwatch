@@ -1,0 +1,1065 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -18.7,
+          64.9
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "ALB00ISL",
+        "Lat/Lon/Height": "64.9000/-18.7000/75.9",
+        "Country/Region": "ISL",
+        "City": "Reykjavík",
+        "Station Status": "Decommissioned",
+        "Satellite Constellation (Current)": null,
+        "GNSS Network": "ISLNET",
+        "RINEX Data DOI": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -18.65,
+          64.98
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "ARJ01ISL",
+        "Lat/Lon/Height": "64.9800/-18.6500/75.9",
+        "Country/Region": "ISL",
+        "City": "Keflavík",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS",
+        "GNSS Network": "ISLNET",
+        "RINEX Data DOI": "doi:10.24414/m3g.arj01isl"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -18.6,
+          65.06
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "GOT02ISL",
+        "Lat/Lon/Height": "65.0600/-18.6000/75.9",
+        "Country/Region": "ISL",
+        "City": "Akureyri",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS",
+        "GNSS Network": "ISLNET",
+        "RINEX Data DOI": "doi:10.24414/m3g.got02isl"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -18.55,
+          65.14
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "HIS03ISL",
+        "Lat/Lon/Height": "65.1400/-18.5500/75.9",
+        "Country/Region": "ISL",
+        "City": "Ísafjörður",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS",
+        "GNSS Network": "ISLNET",
+        "RINEX Data DOI": "doi:10.24414/m3g.his03isl"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -18.5,
+          65.22
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "KAR04ISL",
+        "Lat/Lon/Height": "65.2200/-18.5000/75.9",
+        "Country/Region": "ISL",
+        "City": "Vestmannaeyjar",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS",
+        "GNSS Network": "ISLNET",
+        "RINEX Data DOI": "doi:10.24414/m3g.kar04isl"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -18.45,
+          65.3
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "KIR05ISL",
+        "Lat/Lon/Height": "65.3000/-18.4500/75.9",
+        "Country/Region": "ISL",
+        "City": "Höfn",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS",
+        "GNSS Network": "ISLNET",
+        "RINEX Data DOI": "doi:10.24414/m3g.kir05isl"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -18.4,
+          65.38
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "LUL06ISL",
+        "Lat/Lon/Height": "65.3800/-18.4000/75.9",
+        "Country/Region": "ISL",
+        "City": "Reykjavík",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS",
+        "GNSS Network": "ISLNET",
+        "RINEX Data DOI": "doi:10.24414/m3g.lul06isl"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -18.35,
+          65.46
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "UME07ISL",
+        "Lat/Lon/Height": "65.4600/-18.3500/75.9",
+        "Country/Region": "ISL",
+        "City": "Keflavík",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo",
+        "GNSS Network": "ISLNET",
+        "RINEX Data DOI": "doi:10.24414/m3g.ume07isl"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -18.3,
+          65.54
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "MAL08ISL",
+        "Lat/Lon/Height": "65.5400/-18.3000/75.9",
+        "Country/Region": "ISL",
+        "City": "Akureyri",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo",
+        "GNSS Network": "ISLNET",
+        "RINEX Data DOI": "doi:10.24414/m3g.mal08isl"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -18.25,
+          65.62
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "NOR09ISL",
+        "Lat/Lon/Height": "65.6200/-18.2500/75.9",
+        "Country/Region": "ISL",
+        "City": "Ísafjörður",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo+BeiDou",
+        "GNSS Network": "ISLNET",
+        "RINEX Data DOI": "doi:10.24414/m3g.nor09isl"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -18.2,
+          65.7
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "ALB10ISL",
+        "Lat/Lon/Height": "65.7000/-18.2000/75.9",
+        "Country/Region": "ISL",
+        "City": "Vestmannaeyjar",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo",
+        "GNSS Network": "ISLNET",
+        "RINEX Data DOI": "doi:10.24414/m3g.alb10isl"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -18.15,
+          65.78
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "ARJ11ISL",
+        "Lat/Lon/Height": "65.7800/-18.1500/75.9",
+        "Country/Region": "ISL",
+        "City": "Höfn",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo",
+        "GNSS Network": "ISLNET",
+        "RINEX Data DOI": "doi:10.24414/m3g.arj11isl"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -18.1,
+          65.86
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "GOT12ISL",
+        "Lat/Lon/Height": "65.8600/-18.1000/75.9",
+        "Country/Region": "ISL",
+        "City": "Reykjavík",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo+BeiDou",
+        "GNSS Network": "ISLNET",
+        "RINEX Data DOI": "doi:10.24414/m3g.got12isl"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -18.05,
+          65.94
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "HIS13ISL",
+        "Lat/Lon/Height": "65.9400/-18.0500/75.9",
+        "Country/Region": "ISL",
+        "City": "Keflavík",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo",
+        "GNSS Network": "ISLNET",
+        "RINEX Data DOI": "doi:10.24414/m3g.his13isl"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -18,
+          66.02
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "KAR14ISL",
+        "Lat/Lon/Height": "66.0200/-18.0000/75.9",
+        "Country/Region": "ISL",
+        "City": "Akureyri",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo",
+        "GNSS Network": "ISLNET",
+        "RINEX Data DOI": "doi:10.24414/m3g.kar14isl"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -17.95,
+          66.1
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "KIR15ISL",
+        "Lat/Lon/Height": "66.1000/-17.9500/75.9",
+        "Country/Region": "ISL",
+        "City": "Ísafjörður",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo+BeiDou",
+        "GNSS Network": "ISLNET",
+        "RINEX Data DOI": "doi:10.24414/m3g.kir15isl"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -17.9,
+          66.18
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "LUL16ISL",
+        "Lat/Lon/Height": "66.1800/-17.9000/75.9",
+        "Country/Region": "ISL",
+        "City": "Vestmannaeyjar",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo",
+        "GNSS Network": "ISLNET",
+        "RINEX Data DOI": "doi:10.24414/m3g.lul16isl"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -17.85,
+          66.26
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "UME17ISL",
+        "Lat/Lon/Height": "66.2600/-17.8500/75.9",
+        "Country/Region": "ISL",
+        "City": "Höfn",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo",
+        "GNSS Network": "ISLNET",
+        "RINEX Data DOI": "doi:10.24414/m3g.ume17isl"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -17.8,
+          66.34
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "MAL18ISL",
+        "Lat/Lon/Height": "66.3400/-17.8000/75.9",
+        "Country/Region": "ISL",
+        "City": "Reykjavík",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo+BeiDou",
+        "GNSS Network": "ISLNET",
+        "RINEX Data DOI": "doi:10.24414/m3g.mal18isl"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -17.75,
+          66.42
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "NOR19ISL",
+        "Lat/Lon/Height": "66.4200/-17.7500/75.9",
+        "Country/Region": "ISL",
+        "City": "Keflavík",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo",
+        "GNSS Network": "ISLNET",
+        "RINEX Data DOI": "doi:10.24414/m3g.nor19isl"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -24.5,
+          63.1
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "ALB20ISL",
+        "Lat/Lon/Height": "63.1000/-24.5000/75.9",
+        "Country/Region": "ISL",
+        "City": "Akureyri",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo",
+        "GNSS Network": "ISLNET",
+        "RINEX Data DOI": "doi:10.24414/m3g.alb20isl"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -23.6,
+          63.23
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "ARJ21ISL",
+        "Lat/Lon/Height": "63.2300/-23.6000/75.9",
+        "Country/Region": "ISL",
+        "City": "Ísafjörður",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo+BeiDou",
+        "GNSS Network": "ISLNET",
+        "RINEX Data DOI": "doi:10.24414/m3g.arj21isl"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -22.7,
+          63.36
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "GOT22ISL",
+        "Lat/Lon/Height": "63.3600/-22.7000/75.9",
+        "Country/Region": "ISL",
+        "City": "Vestmannaeyjar",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo",
+        "GNSS Network": "ISLNET",
+        "RINEX Data DOI": "doi:10.24414/m3g.got22isl"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -21.8,
+          63.49
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "HIS23ISL",
+        "Lat/Lon/Height": "63.4900/-21.8000/75.9",
+        "Country/Region": "ISL",
+        "City": "Höfn",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo",
+        "GNSS Network": "ISLNET",
+        "RINEX Data DOI": "doi:10.24414/m3g.his23isl"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -24.5,
+          63.62
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "KAR24ISL",
+        "Lat/Lon/Height": "63.6200/-24.5000/75.9",
+        "Country/Region": "ISL",
+        "City": "Reykjavík",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo+BeiDou",
+        "GNSS Network": "ISLNET",
+        "RINEX Data DOI": "doi:10.24414/m3g.kar24isl"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -23.6,
+          63.75
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "KIR25ISL",
+        "Lat/Lon/Height": "63.7500/-23.6000/75.9",
+        "Country/Region": "ISL",
+        "City": "Keflavík",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo",
+        "GNSS Network": "ISLNET",
+        "RINEX Data DOI": "doi:10.24414/m3g.kir25isl"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -22.7,
+          63.88
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "LUL26ISL",
+        "Lat/Lon/Height": "63.8800/-22.7000/75.9",
+        "Country/Region": "ISL",
+        "City": "Akureyri",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo",
+        "GNSS Network": "ISLNET",
+        "RINEX Data DOI": "doi:10.24414/m3g.lul26isl"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -21.8,
+          64.01
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "UME27ISL",
+        "Lat/Lon/Height": "64.0100/-21.8000/75.9",
+        "Country/Region": "ISL",
+        "City": "Ísafjörður",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo+BeiDou",
+        "GNSS Network": "ISLNET",
+        "RINEX Data DOI": "doi:10.24414/m3g.ume27isl"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -24.5,
+          64.14
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "MAL28ISL",
+        "Lat/Lon/Height": "64.1400/-24.5000/75.9",
+        "Country/Region": "ISL",
+        "City": "Vestmannaeyjar",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo",
+        "GNSS Network": "ISLNET",
+        "RINEX Data DOI": "doi:10.24414/m3g.mal28isl"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -23.6,
+          64.27
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "NOR29ISL",
+        "Lat/Lon/Height": "64.2700/-23.6000/75.9",
+        "Country/Region": "ISL",
+        "City": "Höfn",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo",
+        "GNSS Network": "ISLNET",
+        "RINEX Data DOI": "doi:10.24414/m3g.nor29isl"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -22.7,
+          64.4
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "ALB30ISL",
+        "Lat/Lon/Height": "64.4000/-22.7000/75.9",
+        "Country/Region": "ISL",
+        "City": "Reykjavík",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo+BeiDou",
+        "GNSS Network": "ISLNET",
+        "RINEX Data DOI": "doi:10.24414/m3g.alb30isl"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -21.8,
+          64.53
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "ARJ31ISL",
+        "Lat/Lon/Height": "64.5300/-21.8000/75.9",
+        "Country/Region": "ISL",
+        "City": "Keflavík",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo",
+        "GNSS Network": "ISLNET",
+        "RINEX Data DOI": "doi:10.24414/m3g.arj31isl"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -24.5,
+          64.9
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "GOT32ISL",
+        "Lat/Lon/Height": "64.9000/-24.5000/75.9",
+        "Country/Region": "ISL",
+        "City": "Akureyri",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo",
+        "GNSS Network": "ISLNET",
+        "RINEX Data DOI": "doi:10.24414/m3g.got32isl"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -23.6,
+          65.03
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "HIS33ISL",
+        "Lat/Lon/Height": "65.0300/-23.6000/75.9",
+        "Country/Region": "ISL",
+        "City": "Ísafjörður",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo+BeiDou",
+        "GNSS Network": "ISLNET",
+        "RINEX Data DOI": "doi:10.24414/m3g.his33isl"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -22.7,
+          65.16
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "KAR34ISL",
+        "Lat/Lon/Height": "65.1600/-22.7000/75.9",
+        "Country/Region": "ISL",
+        "City": "Vestmannaeyjar",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo",
+        "GNSS Network": "ISLNET",
+        "RINEX Data DOI": "doi:10.24414/m3g.kar34isl"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -21.8,
+          65.29
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "KIR35ISL",
+        "Lat/Lon/Height": "65.2900/-21.8000/75.9",
+        "Country/Region": "ISL",
+        "City": "Höfn",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo",
+        "GNSS Network": "ISLNET",
+        "RINEX Data DOI": "doi:10.24414/m3g.kir35isl"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -24.5,
+          65.42
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "LUL36ISL",
+        "Lat/Lon/Height": "65.4200/-24.5000/75.9",
+        "Country/Region": "ISL",
+        "City": "Reykjavík",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo+BeiDou",
+        "GNSS Network": "ISLNET",
+        "RINEX Data DOI": "doi:10.24414/m3g.lul36isl"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -23.6,
+          65.55
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "UME37ISL",
+        "Lat/Lon/Height": "65.5500/-23.6000/75.9",
+        "Country/Region": "ISL",
+        "City": "Keflavík",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo",
+        "GNSS Network": "ISLNET",
+        "RINEX Data DOI": "doi:10.24414/m3g.ume37isl"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -22.7,
+          65.68
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "MAL38ISL",
+        "Lat/Lon/Height": "65.6800/-22.7000/75.9",
+        "Country/Region": "ISL",
+        "City": "Akureyri",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo",
+        "GNSS Network": "ISLNET",
+        "RINEX Data DOI": "doi:10.24414/m3g.mal38isl"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -21.8,
+          65.81
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "NOR39ISL",
+        "Lat/Lon/Height": "65.8100/-21.8000/75.9",
+        "Country/Region": "ISL",
+        "City": "Ísafjörður",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo+BeiDou",
+        "GNSS Network": "ISLNET",
+        "RINEX Data DOI": "doi:10.24414/m3g.nor39isl"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -24.5,
+          65.94
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "ALB40ISL",
+        "Lat/Lon/Height": "65.9400/-24.5000/75.9",
+        "Country/Region": "ISL",
+        "City": "Vestmannaeyjar",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo",
+        "GNSS Network": "ISLNET",
+        "RINEX Data DOI": "doi:10.24414/m3g.alb40isl"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -23.6,
+          66.07
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "ARJ41ISL",
+        "Lat/Lon/Height": "66.0700/-23.6000/75.9",
+        "Country/Region": "ISL",
+        "City": "Höfn",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo",
+        "GNSS Network": "ISLNET",
+        "RINEX Data DOI": "doi:10.24414/m3g.arj41isl"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -22.7,
+          66.2
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "GOT42ISL",
+        "Lat/Lon/Height": "66.2000/-22.7000/75.9",
+        "Country/Region": "ISL",
+        "City": "Reykjavík",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo+BeiDou",
+        "GNSS Network": "ISLNET",
+        "RINEX Data DOI": "doi:10.24414/m3g.got42isl"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -18.7,
+          63.1
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "HIS43ISL",
+        "Lat/Lon/Height": "63.1000/-18.7000/75.9",
+        "Country/Region": "ISL",
+        "City": "Keflavík",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo",
+        "GNSS Network": "ISLNET",
+        "RINEX Data DOI": "doi:10.24414/m3g.his43isl"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -17.8,
+          63.23
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "KAR44ISL",
+        "Lat/Lon/Height": "63.2300/-17.8000/75.9",
+        "Country/Region": "ISL",
+        "City": "Akureyri",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo",
+        "GNSS Network": "ISLNET",
+        "RINEX Data DOI": "doi:10.24414/m3g.kar44isl"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -16.9,
+          63.36
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "KIR45ISL",
+        "Lat/Lon/Height": "63.3600/-16.9000/75.9",
+        "Country/Region": "ISL",
+        "City": "Ísafjörður",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo+BeiDou",
+        "GNSS Network": "ISLNET",
+        "RINEX Data DOI": "doi:10.24414/m3g.kir45isl"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -16,
+          63.49
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "LUL46ISL",
+        "Lat/Lon/Height": "63.4900/-16.0000/75.9",
+        "Country/Region": "ISL",
+        "City": "Vestmannaeyjar",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo",
+        "GNSS Network": "ISLNET",
+        "RINEX Data DOI": "doi:10.24414/m3g.lul46isl"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -18.7,
+          63.62
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "UME47ISL",
+        "Lat/Lon/Height": "63.6200/-18.7000/75.9",
+        "Country/Region": "ISL",
+        "City": "Höfn",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo",
+        "GNSS Network": "ISLNET",
+        "RINEX Data DOI": "doi:10.24414/m3g.ume47isl"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -17.8,
+          63.75
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "MAL48ISL",
+        "Lat/Lon/Height": "63.7500/-17.8000/75.9",
+        "Country/Region": "ISL",
+        "City": "Reykjavík",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo+BeiDou",
+        "GNSS Network": "ISLNET",
+        "RINEX Data DOI": "doi:10.24414/m3g.mal48isl"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -16.9,
+          63.88
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "NOR49ISL",
+        "Lat/Lon/Height": "63.8800/-16.9000/75.9",
+        "Country/Region": "ISL",
+        "City": "Keflavík",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo",
+        "GNSS Network": "ISLNET",
+        "RINEX Data DOI": "doi:10.24414/m3g.nor49isl"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -16,
+          64.01
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "ALB50ISL",
+        "Lat/Lon/Height": "64.0100/-16.0000/75.9",
+        "Country/Region": "ISL",
+        "City": "Akureyri",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo",
+        "GNSS Network": "ISLNET",
+        "RINEX Data DOI": "doi:10.24414/m3g.alb50isl"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -18.7,
+          64.14
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "ARJ51ISL",
+        "Lat/Lon/Height": "64.1400/-18.7000/75.9",
+        "Country/Region": "ISL",
+        "City": "Ísafjörður",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo+BeiDou",
+        "GNSS Network": "ISLNET",
+        "RINEX Data DOI": "doi:10.24414/m3g.arj51isl"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -17.8,
+          64.27
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "GOT52ISL",
+        "Lat/Lon/Height": "64.2700/-17.8000/75.9",
+        "Country/Region": "ISL",
+        "City": "Vestmannaeyjar",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo",
+        "GNSS Network": "ISLNET",
+        "RINEX Data DOI": "doi:10.24414/m3g.got52isl"
+      }
+    }
+  ]
+}

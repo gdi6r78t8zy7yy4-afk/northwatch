@@ -124,6 +124,13 @@ server/                 backend – ett enda JS-beroende: fast-xml-parser (ENTSO
   lib/industry.js       industristatusanalys: tre komponenter (produktion/handel/
                         kapacitet) → 0–100-poäng per land + NORDIC, ren funktion
                         utan store-koppling (M10, område 7)
+  lib/forvaltning.js    förvaltningsanalys: tre komponenter (aktivitet/kontinuitet/
+                        observerbarhet) → 0–100 per land + NORDIC (M11, område 12)
+  lib/gnss.js           GNSS-indexanalys: fyra komponenter (tillgänglighet/stabilitet/
+                        varningstäthet/täckning) → 0–100 per land + NORDIC (M12, område 10)
+  lib/gnss-correlation.js rymdväder↔NAGU-anomalier och kedjor + narrativtext (M12)
+  lib/llm.js            valfri OpenAI-kompatibel sammanfattare – null utan LLM_BASE_URL,
+                        fel sprider sig aldrig till routen (M12)
   lib/geolayers.js      statiska kartlager, zonmittpunkter, OSM/Overpass-utdrag (veckocache)
   assets/*.geojson      landsgränser (Natural Earth) + energilager (HVDC, zonankar)
   cache/                OSM-veckocache + SMHI-prognoscyklar på disk (gitignorerad)
@@ -212,7 +219,7 @@ asset  { t:'a', area, country, source, type, name, id?, geometry, attrs?, update
 | Digitraffic vägtrafikmeddelanden | 3 Transport (FI) | ok – v1/messages verifierad 2026-11-01 |
 | PeeringDB (IX) | 2 Digital infrastruktur (Nordiskt) | ok – verifierad 2026-11-01 |
 | Eurostat (BNP, SDMX 2.1) | 7 Industri (Nordiskt) | ok – verifierad 2026-11-01 |
-| NOAA SWPC (Kp, F10.7) | 10 GNSS/Rymd (Nordiskt) | ok – verifierad 2026-11-01 |
+| NOAA SWPC (Kp, F10.7) | 10 GNSS/Rymd (Nordiskt) | ok – verifierad 2026-11-01; ingår i GNSS-indexet som stabilitet + geomagnetiska stormhändelser (M12) |
 | OSM/Overpass: kraft & nät | 1 Energi (Nordiskt) | veckovis – kraftverk (`power=plant`) + kraftstationer ≥100 kV; verifierad 2026-11-02 |
 | OSM/Overpass: datacenter | 2 Digital (Nordiskt) | veckovis – `building=data_center(-centre)`; verifierad 2026-11-02 |
 | OSM/Overpass: flygplatser | 3 Transport (Nordiskt) | veckovis – `aeroway=airport/aerodrome` (utan militära); verifierad 2026-11-02 |
@@ -239,6 +246,11 @@ asset  { t:'a', area, country, source, type, name, id?, geometry, attrs?, update
 | IPU Parline (api.data.ipu.org) | 12 Förvaltning (Nordiskt) | ok – nyckelfri, CC BY-NC-SA 4.0 (källtillkännagivande gäller); bar query-parametrar ignoreras → `filter=<fält>:<op>:<värde>`; attribut är tidsserier → sist icke-nulla värde; val hämtas alla (stigande ordning) → senaste valet; IS saknar party-record (`meta.total` saknas); veckohämtning, 20 anrop med 1 s takt (`IPU_DELAY_MS`); verifierat live 2026-11-08 |
 | data.europa.eu Data Portal (hub-sök) | 12 Förvaltning (Nordiskt) | ok – nyckelfri; landfilter via `facets={"country":[…]}` (JSON-string) + `filters=dataset`, `countOnly=true` → billiga räkningar, `minDate`+`dateType=modified` = uppdaterade ≤30 d; 3 anrop/land (total, ≤30 d, 3 nyaste som händelser); IS via EFTA-kataloger i portalen; månadshämtning; verifierat live 2026-11-08 |
 | EUR-Lex / Cellar SPARQL (publications.europa.eu) | 12 Förvaltning (Nordiskt) | ok – nyckelfri, fri återanvändning med källa; publikt SPARQL-slutpunkt (`FILTER REGEX` på CELEX – Virtuoso saknar glob); CELEX `32YYYY` = EU-rättsliga handlingar från år YYYY (L direktiv / R förordningar / D beslut); fyra räkningar (YTD + per typ); månadshämtning; verifierat live 2026-11-08 |
+| CelesTrak GP (celestrak.org) | 10 GNSS/Rymd (Nordiskt) | ok – nyckelfri; `FORMAT=json` krävs för räkning, fyra grupper (galileo/glo-ops/sbas/gps-ops); epoker utan tidszon är UTC → zongas vid ålderberäkning; >72 h → stale-varning (SBAS uppdateras glesare); 1,2 s takt (`CELESTRAK_DELAY_MS`), ett retry per grupp; verifierat live 2026-11-09 |
+| Galileo Security Gateway (gsc-europa.eu) | 10 GNSS/Rymd (Nordiskt) | ok – nyckelfri; RSS-feeden ger NAGU-händelser (start/slut/severitet), konstellationssidan (HTML-tabell) ger USABLE/PHM/NAGU per GSAT-satellit; 15-minutershämtning; verifierat live 2026-11-09 |
+| M3G GNSS Stations API (gnss-metadata.eu, EPOS) | 10 GNSS/Rymd (SE/NO/DK/FI/IS) | ok – nyckelfri, CC BY 4.0 (citera doi:10.24414/ROB-GNSS-M3G); sitelog-svaret är GeoJSON med max 20 features/anrop och `limit`/`page` ignoreras → fast bbox-rutnät per land + en nivå kvadrantsdelning; mättad ruta → antalet rapporteras "(minst)"; stationerna blir kartposter; ~40 anrop/körning (daglig) med 0,25 s takt (`M3G_DELAY_MS`); verifierat live 2026-11-09 |
+| NASA APOD (science.nasa.gov wp-json) | 10 GNSS/Rymd (Nordiskt) | ok – nyckelfri; publiceringstakten är information enbart och ingår inte i GNSS-indexet; verifierat live 2026-11-09 |
+| data.norge.no / Felles datakatalog (GNSS-sökning) | 10 GNSS/Rymd (NO) | ok – nyckelfri, CC0; samma FDK-söks-API som M11:s `fdk` (`POST /search/datasets`) med frågorna "gnss" och "posisjonering"; delad ~10 rpm-begränsning → 6,5 s takt (`DATANORGE_DELAY_MS`); veckohämtning; verifierat live 2026-11-09 |
 
 OSM-källorna köas internt (den publika instansen 429:ar vid samtidighet) och återförs med
 backoff. Vid fortgående nätverksmisse återanvänds den senaste diskcachen och källan
@@ -697,6 +709,108 @@ panelers ok/fel/loading-lägen + `ForvaltningView`:s koppling till
 `/api/forvaltning/*`, IS-luckkortet och datafel som propagerar till de sju
 panelerna).
 
+## GNSS/Rymd (M12, område 10)
+
+Per-källa-widgeter + beräknat GNSS-index per land. Landsvyn (SE/NO/DK/FI/IS) visar de
+globala källorna + nationella register (data.norge.no för NO); den nordiska vyn
+(NORDIC/ALL) visar sammanfattning – poäng, komponenter, per-land-tabell – samtliga sex
+källor och luckkort. Sex källor: NOAA SWPC (geomagnetisk aktivitet), CelesTrak GP
+(konstellationernas elementset), GSC Europa (Galileo-tillgänglighet + NAGU-adviseringar),
+M3G GNSS Stations API/EPOS (stationsmetadata för fem länder), data.norge.no/Felles
+datakatalog (NO registerantal) och NASA APOD (publiceringstakt, information enbart).
+Analysen är en ren funktion (`lib/gnss.js`) som deriverar poängen ur `store.js`-records
+vid varje `/api/gnss/*`-slagning – ingen källhämtning, ingen cache.
+
+**Statusmodell (0–100 per land, viktat snitt av fyra komponenter; saknad komponent →
+vikterna renormaliseras över de övriga, M10/M11-modellen):**
+
+| Komponent | Vikt | Indata | Formel (clampad 0–100) |
+|-----------|------|--------|------------------------|
+| Tillgänglighet | 0.35 | Galileo USABLE-andel (GSC, global) × aktiv stationsandel (M3G, land) | produkt av tillgängliga delar ×100 |
+| Stabilitet | 0.25 | Kp-index (NOAA SWPC, global) | ≤4 → 100, 5 → 70, 6 → 40, 7 → 20, ≥8 → 0 |
+| Varningstäthet | 0.20 | NAGU-händelser startade inom 30 dagar (GSC-feeden, global) | `1 − log1p(n)/log(9)` ×100 (0 → 100, ~8 → ~0) |
+| Täckning | 0.20 | M3G-stationsantal mot referensmål (SE 70 / NO 45 / DK 25 / FI 45 / IS 25) | `antal/mål` ×100 |
+
+**Label: ≥75 Hög driftssäkerhet, 55–74,9 Stabil drift, 35–54,9 Uppmärksamhet, <35 Svag,
+inget data Okänt.** NORDIC = snitt av de fem länderna (komponenterna var för sig,
+poängen över de länder som har en); `drivers` visar per land `XX: poäng (label)` och
+`countries` bär de fullständiga per-land-radiena till tabellen.
+
+**Korrelationslagret (`lib/gnss-correlation.js`) är deterministiskt:** anomalier ur
+nuvarande snapshot (Kp ≥ 5 → geomagnetisk aktivitet, Galileo USABLE <80 %/<75 %,
+pågående NAGU:er med slutdatum efter nu eller saknat slutdatum, elementset med epokålder
+>72 h) och storm↔NAGU-kedjor (NOAA:s geomagnetiska händelser × GSC NAGU-start inom ±72 h;
+därtill "pågående sammanfall" när Kp ≥ 5 samträffar med aktiv NAGU just nu).
+Narrativtexten genereras alltid ur mallen; är `LLM_BASE_URL` satt kan texten berikas via en
+OpenAI-kompatibel chat-endpoint (`lib/llm.js`, standardmodell qwen3.8-flash-next) – LLM:n är
+enbart presentation: fel eller saknad konfiguration faller tillbaka på den deterministiska
+texten och sprider sig aldrig till routen (ingen test kräver nätverk).
+
+**Kollektorer och flöden (alla nyckelfria):**
+
+- **NOAA SWPC** (`noaa.js`, sedan M2) – `planetary_k_index_1m.json` + `f107_cm_flux.json`;
+  Kp ≥ 5 → geomagnetisk stormhändelse. Förser stabilitet i indexet.
+- **CelesTrak GP** (`celestrak.js`) – `gp.php?GROUP=…&FORMAT=json` för fyra grupper (galileo,
+  glo-ops, sbas, gps-ops); JSON-format krävs för räkning; epokerna kommer utan tidszon
+  ("2026-11-08T14:32:11") och är UTC → zongas innan ålderberäkning; epokålder >72 h →
+  warn-händelse (SBAS uppdateras glesare än GNSS-kärnorna); ett retry per grupp vid
+  transienta fel, 1,2 s takt (`CELESTRAK_DELAY_MS`).
+- **GSC Europa** (`gsc-europa.js`) – RSS-feeden (`/rss.xml`, NAGU-adviseringar med start/slut
+  och severitet; "USABLE AS FROM" räknas som återställd/info) + konstellationssidan
+  (HTML-tabell: status USABLE/…, klocktyp PHM, NAGU-flagga per GSAT). NAGU-blockens HTML-taggar
+  görs om till radbrytningar innan taggborttagningen. 15-minutershämtning.
+- **M3G GNSS Stations API** (`gnss-metadata.js`) – EPOS sitelog-sökning svarar GeoJSON med max
+  20 features per anrop och varken `limit`/`page`/`offset` fungerar (verifierat live) → varje
+  land hämtas via ett fast bbox-rutnät och en ruta som svarar med exakt 20 (mättad) delas en
+  gång i fyra kvadranter; är kvadranterna fortfarande mättade rapporteras landets antal som
+  "(minst)" (≥). API:t använder trebokstaviga koder (SWE…) – recorderna får northwatch
+  tvåbokstaviga (SE…). Stationsfeatures blir kartposter (`type: 'gnss-station'`). CC BY 4.0 –
+  citera doi:10.24414/ROB-GNSS-M3G (panelen bär tillkännagivandet).
+- **data.norge.no** (`datanorge.js`) – GNSS-registerantal via DigDir:s Felles datakatalog
+  (samma sök-API som M11:s `fdk`): `POST /search/datasets` med frågorna "gnss" och
+  "posisjonering"; `page.totalElements` är det sanna antalet. Delar FDK: ~10 rpm-begränsning →
+  6,5 s takt (`DATANORGE_DELAY_MS`). Veckohämtning.
+- **NASA APOD** (`nasa-apod.js`) – WordPress wp-json-endpointen `apod-basic`; publiceringstakt
+  ≤10 dagar + ålder på senaste inlägget; information enbart, ingår inte i indexet.
+
+Uteslutna/framtidiga: Space-Track (kräver konto + användaravtal), ESA SWE HAPI (precis
+ephemerid/klockdrift; kräver M2M-klient hos ESA Single Sign-On, token med scope
+`swe_hapiserver` och 300 s livslängd), Lantmäteriets SWEPOS RINEX (registrerad nyckel, CC0)
+och FINPOS rådata (licensbelagd); DK GNSS RINEX serveras över FTPS som node-fetch inte
+stödjer. Copernicus Data Space och EDAS uteslöts efter endpoint-verifiering – svag direkt
+relevans för nordisk positioneringsberedskap. Island: althingi.is svarar 403/unreachable →
+täckes via M3G:s ISL-stationsnät i stället för en nationell registerkälla.
+
+**API:** `/api/gnss/status?country=` (beräknat GNSS-index + komponenter + drivfaktorer; NORDIC
+ger dessutom `countries`) och `/api/gnss/data?country=ALL|<land>` (records per källa +
+källstatus för panelerna; landsvy inkluderar NORDIC-records) – båda synkrona derivationer ur
+`store.js`. `/api/gnss/correlation` är asynkron (valfri LLM-berikelse) och pollas av sin egen
+panel.
+
+**Frontend:** `GnssView` (två 120 s-feeds: status + data, dependens på valt land) distribuerar
+records + `meta {loading, error, fetchedAt, onRetry}` till presentationella paneler
+(`GnssPanels.jsx`) – en per källa (NOAA, CelesTrak, GSC Europa, M3G, data.norge.no, APOD) +
+statuspanelen och korrelationspanelen (egen feed). Landsvyn visar globala källor + nationella
+register; nordiksvyn visar sammanfattning + samtliga källor + luckkort. GNSS-stationerna
+renderas i MapPanel via `/api/assets?area=10` (nytt lager "GNSS-station (M3G)"). Datafelet
+visar fel i alla sex recordbaserade panelerna (records blir null, inte []), tom källista →
+panelens fallbacktext, retry hämtar datat igen.
+
+**Live-status 2026-11-09:** samtliga fem nya källor verifierade live. CelesTrak: Galileo 32 /
+GLONASS 28 / SBAS 21 / GPS 32 satelliter. GSC: 32 GSAT i konstellationen, 28 USABLE (87,5 %),
+24 med PHM-klocka, 1 öppen NAGU. M3G: SWE 70 / NOR 25 / DNK 22 / FIN 24 stationer, ISL 53
+"(minst)" – totalt 194 kartposter. APOD: 10 publiceringar ≤10 d, senaste inlägget 0,8 d gammalt.
+data.norge.no: "gnss" 3 dataset (alla publika), "posisjonering" 1 dataset. Fixtures i
+`server/testdata/gnss/` är formverifierade mot live med syntetiska värden; index-regressionankar
+(Kp=5): SE 74,6 / NO 59,3 / DK 68,9 / FI 64,9 / IS 74,9 / NORDIC 68,5.
+
+**Tester:** `server/test/gnss.test.js` (40 tester: renfunktioner – gpUrl/newestEpoch/
+`parseNagu`/`parseConstellation`/`parseStation`/Kp-skala/NAGU-räkning/index med viktnings-
+renormalisering + kollektorer mot fixtures med URL-rutad fetch-mock, inklusive CelesTrak-503-retry,
+M3G-rutnätsdelning (mättad ruta → kvadranter) och "(minst)"-markering samt FDK-frågrouting –
+inget nätverk) + webbtest (`GnssPanels.test.jsx`, 30 tester – alla panelers ok/fel/loading-lägen +
+`GnssView`:s koppling till `/api/gnss/*` och datafel som propagerar till de sex panelerna).
+
 ## Nycklar och kredensials (`.env`)
 
 ```
@@ -739,6 +853,10 @@ SMHI_FCST_POINTS=…   # M8 – "Namn=lon,lat,..." (längd först); standard 11 
 SMHI_FCST_PARAMS=…   # M8 – koma-separerade punktparametrar (15 standard)
 SMHI_GRID_DOWNSAMPLE=…  # M8 – 1–20 (standard 20 → 48×54-raster, ~50 km-avstånd)
 SMHI_FCST_CACHE_DIR=…   # M8 – diskcache (standard server/cache/smhi-forecast)
+LLM_BASE_URL=…          # M12 – VILJORIG OpenAI-kompatibel chat-endpoint för GNSS-narrativet
+                        #   (t.ex. Ollama: http://localhost:1234/v1). Saknas → LLM-berikelsen är
+                        #   avstängd; deterministisk malltext används alltid som fallback
+LLM_MODEL=…             # M12 – modellnamn (standard qwen3.8-flash-next)
 ```
 
 `.env` är gitignorerad; `.env.example` dokumenterar fälten.
@@ -867,6 +985,29 @@ SMHI_FCST_CACHE_DIR=…   # M8 – diskcache (standard server/cache/smhi-forecas
   28 st) – fulla suite grön: 215 servertester (1 förväntad skip), 26
   webbfiler / 279 webbtester. Se "Förvaltning (M11, område 12)".
 
+- **M12 (klart 2026-11-09):** rymd/navigation/positionering (område 10) – fem nya
+  nyckelfria kollektorer: CelesTrak GP (fyra konstellationers elementset, JSON-format,
+  epokålder >72 h → varning), GSC Europa (RSS NAGU + konstellationssidan HTML-tabell
+  USABLE/PHM), M3G GNSS Stations API/EPOS (stationsmetadata fem länder via bbox-rutnät
+  eftersom API:t har 20 features/anrop som hårdkodad gräns och ignorerar paginering;
+  mättade rutor delas en nivå, därefter "(minst)"; stationerna blir kartposter),
+  data.norge.no/Felles datakatalog (GNSS-registerantal via FDK:s sök-API) och NASA APOD
+  wp-json (publiceringstakt, information enbart). Rent analyslager `lib/gnss.js` beräknar
+  GNSS-index 0–100 per land + NORDIC i fyra komponenter (tillgänglighet 0.35 / stabilitet
+  0.25 / varningstäthet 0.20 / täckning 0.20; renormaliserade vid saknad komponent);
+  `lib/gnss-correlation.js` deriverar deterministiskt anomalier och storm↔NAGU-kedjor
+  (±72 h) med valfri LLM-berikelse av narrativet via `lib/llm.js` (OpenAI-kompatibel
+  endpoint, standard qwen3.8-flash-next; avstängd utan `LLM_BASE_URL`, fel sprider sig
+  aldrig). Endpointar `/api/gnss/status` + `/api/gnss/data` (synkrona) och
+  `/api/gnss/correlation` (asynkron). Frontend: per-källa-paneler + statuswidget +
+  korrelationspanel – landsvy detalj, nordisk vy sammanfattning + luckkort (SWEPOS/
+  FINPOS/DK-RINEX-nycklar, Space-Track/SWE HAPI-konton, Island via M3G) – ersätter de
+  generiska tabellerna; övriga 11 områden oförändrade. NOAA SWPC (M2) förser nu stabilitet
+  i indexet och MapPanel har nytt GNSS-stationslager. Samtliga fem nya källor verifierade
+  live 2026-11-09. Servertester (gnss.test.js, 40 st) + webbtest (GnssPanels.test.jsx,
+  30 st) – fulla suite grön: 255 servertester (1 förväntad skip), 27 webbfiler / 309 webbtester.
+  Se "GNSS/Rymd (M12, område 10)".
+
 ## Datakällor och villkor
 
 - OSM-data: ODbL – tillståndskravl gäller (M3).
@@ -926,5 +1067,20 @@ SMHI_FCST_CACHE_DIR=…   # M8 – diskcache (standard server/cache/smhi-forecas
   3 anrop/land med 1,5 s takt (`DATAPORTAL_DELAY_MS`).
 - EUR-Lex/Cellar (M11): EU:s upphovsrätt – fri återanvändning mot
   källtillkännagivande ("Publications Office of the European Union").
+- CelesTrak GP (M12): nyckelfri; `FORMAT=json` krävs för räkning, epoker utan tidszon är UTC.
+  1,2 s takt mellan grupperna (`CELESTRAK_DELAY_MS`, nollas i tester), ett retry per grupp.
+- GSC Europa (M12): nyckelfri RSS + HTML-konstellationssida; NAGU-adviseringarna är
+  Galileo/EGNOS egen störningsrapportering (källan för varningstäthet i GNSS-indexet).
+- M3G GNSS Stations API (M12): CC BY 4.0 – citera doi:10.24414/ROB-GNSS-M3G (panelen bär
+  tillkännagivandet). Max 20 features/anrop och `limit`/`page` ignoreras → fast bbox-rutnät +
+  en nivå kvadrantsdelning; ~40 anrop per daglig körning med 0,25 s takt (`M3G_DELAY_MS`,
+  nollas i tester).
+- NASA APOD (M12): nyckelfri wp-json-endpoint (`apod-basic`); information enbart.
+- data.norge.no GNSS-sökning (M12): samma FDK-söks-API som M11 → delar ~10 rpm-begränsningen;
+  6,5 s takt mellan frågorna (`DATANORGE_DELAY_MS`, nollas i tester).
+- LLM (M12): valfri berikelse av korrelationsnarrativet via OpenAI-kompatibel endpoint
+  (`LLM_BASE_URL` + `LLM_MODEL`, standard qwen3.8-flash-next, t.ex. Ollama lokalt). Avstängd
+  utan konfiguration; krävs aldrig i tester eller för routen – deterministisk malltext är
+  alltid fallback.
 - Övrigt enligt respektive källas villkor – se API-katalogen
   (`nordic_critical_infrastructure_api_catalog_utokad.xlsx`).

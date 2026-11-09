@@ -1,0 +1,12 @@
+[
+  {
+    "time_tag": "@@ISO:-1h@@",
+    "flux": 158.9,
+    "reporting_schedule": "Daily"
+  },
+  {
+    "time_tag": "@@ISO:-25h@@",
+    "flux": 161.2,
+    "reporting_schedule": "Daily"
+  }
+]

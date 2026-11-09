@@ -18,6 +18,8 @@ import { apiCyberNvd, apiCyberKev, apiCyberOsv, apiCyberPrioritized, apiCyberOve
 import { buildEnergyOverview } from './lib/energy.js';
 import { industryStatus, industryData } from './lib/industry.js';
 import { forvaltningStatus, forvaltningData } from './lib/forvaltning.js';
+import { gnssStatus, gnssData } from './lib/gnss.js';
+import { gnssCorrelation } from './lib/gnss-correlation.js';
 import { parseEnergyRange, buildEnergyHistory, buildEnergyAnalysis } from './lib/energy-insights.js';
 
 for (const c of COLLECTORS) registerSource(c);
@@ -159,6 +161,21 @@ const routes = {
     const srcs = areaSources(12).map(s => ({ ...s, status: sourceStatus(s) }));
     return { generatedAt: now(), country, ...forvaltningData(country, srcs) };
   },
+
+  // M12: GNSS/rymdstatus (område 10) – synkron, beräknad ur kollektornas
+  // records (lib/gnss.js). /status ger GNSS-index + drivfaktorer per land
+  // eller NORDIC; /data ger records + källstatus för panelerna.
+  '/api/gnss/status': u => {
+    const country = (u.searchParams.get('country') || 'NORDIC').toUpperCase();
+    const recs = areaSources(10).flatMap(s => s.records);
+    return { generatedAt: now(), ...gnssStatus(country, recs) };
+  },
+
+  '/api/gnss/data': u => {
+    const country = (u.searchParams.get('country') || 'NORDIC').toUpperCase();
+    const srcs = areaSources(10).map(s => ({ ...s, status: sourceStatus(s) }));
+    return { generatedAt: now(), country, ...gnssData(country, srcs) };
+  },
 };
 
 // M8: SMHI-prognosapi:t – asynkront (påfrågan kan utlösa SMHI-hämtning
@@ -195,6 +212,15 @@ const asyncRoutes = {
   '/api/cyber/osv': u => apiCyberOsv(u),
   '/api/cyber/prioritized': u => apiCyberPrioritized(u),
   '/api/cyber/overview': u => apiCyberOverview(u),
+
+  // M12: korrelation/anomalier (område 10) – async för att den valfria
+  // LLM-berikelsen (lib/llm.js) kan ta sekunder; utan LLM_BASE_URL är allt
+  // deterministiskt. Den deterministiska analysen körs varje gång, LLM-svaret
+  // cachas per prompt i lib/llm.js (15 min).
+  '/api/gnss/correlation': async () => {
+    const recs = areaSources(10).flatMap(s => s.records);
+    return { status: 200, body: await gnssCorrelation(recs) };
+  },
 };
 
 function sendJson(res, obj) {

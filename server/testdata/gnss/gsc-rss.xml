@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- M12-fixtures: form verifierad mot https://www.gsc-europa.eu/rss.xml 2026-11-09
+     (Drupal-RSS, HTML-entitykodade <p>/<br>-block i description). Värden är
+     synthetiska. @@±n@@ = datum n dagar relativt testklockan – expanderas av
+     testmocken innan texten returneras till kollektorn. -->
+<rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>GSC News</title>
+    <link>https://www.gsc-europa.eu/news</link>
+    <item>
+      <title>NOTICE ADVISORY TO GALILEO USERS (NAGU) 2099001</title>
+      <link>https://www.gsc-europa.eu/galileo/nagu-2099001</link>
+      <description>&lt;span class="field field--name-title"&gt;NOTICE ADVISORY TO GALILEO USERS (NAGU) 2099001&lt;/span&gt;&lt;div class="text-formatted"&gt;&lt;p&gt;DATE GENERATED (UTC): @@-2@@ 18:30&lt;/p&gt;&lt;p&gt;NAGU TYPE: UNP_SHTRCVR&lt;br&gt;NAGU NUMBER: 2099001&lt;br&gt;NAGU SUBJECT: SHORT TERM OUTAGE ON @@-2@@ RECOVERED&lt;br&gt;NAGU REFERENCED TO: N/A&lt;br&gt;START DATE EVENT (UTC): @@-2@@ 13:41&lt;br&gt;END DATE EVENT (UTC): @@-2@@ 15:44&lt;br&gt;SATELLITE AFFECTED: GSAT0208&lt;/p&gt;&lt;p&gt;EVENT DESCRIPTION: USERS ARE ADVISED THAT THE OUTAGE WAS RECOVERED.&lt;/p&gt;&lt;p&gt;&amp;nbsp;&lt;/p&gt;&lt;p&gt;&lt;a href="https://www.gsc-europa.eu/sites/default/files/NAGU_2099001.txt"&gt;Download NAGU (.txt)&lt;/a&gt;&lt;/p&gt;&lt;/div&gt;</description>
+    </item>
+    <item>
+      <title>NOTICE ADVISORY TO GALILEO USERS (NAGU) 2099002</title>
+      <link>https://www.gsc-europa.eu/galileo/nagu-2099002</link>
+      <description>&lt;div class="text-formatted"&gt;&lt;p&gt;DATE GENERATED (UTC): @@-10@@ 21:30&lt;/p&gt;&lt;p&gt;NAGU TYPE: HAS UNP_SHTRCVR&lt;br&gt;NAGU NUMBER: 2099002&lt;br&gt;NAGU SUBJECT: SHORT TERM HAS SERVICE OUTAGE ON @@-10@@&lt;br&gt;NAGU REFERENCED TO: N/A&lt;br&gt;START DATE EVENT (UTC): @@-10@@ 06:39&lt;br&gt;END DATE EVENT (UTC): @@-10@@ 10:24&lt;br&gt;SATELLITE AFFECTED: ALL&lt;/p&gt;&lt;p&gt;EVENT DESCRIPTION: HAS SERVICE UNAVAILABILITIES OCCURRED.&lt;/p&gt;&lt;/div&gt;</description>
+    </item>
+    <item>
+      <title>NOTICE ADVISORY TO GALILEO USERS (NAGU) 2099003</title>
+      <link>https://www.gsc-europa.eu/galileo/nagu-2099003</link>
+      <description>&lt;div class="text-formatted"&gt;&lt;p&gt;DATE GENERATED (UTC): @@-10@@ 21:35&lt;/p&gt;&lt;p&gt;NAGU TYPE: OSNMA UNP_SHTRCVR&lt;br&gt;NAGU NUMBER: 2099003&lt;br&gt;NAGU SUBJECT: SHORT TERM OSNMA SERVICE OUTAGE ON @@-10@@&lt;br&gt;NAGU REFERENCED TO: N/A&lt;br&gt;START DATE EVENT (UTC): @@-10@@ 06:39&lt;br&gt;END DATE EVENT (UTC): @@-10@@ 10:24&lt;br&gt;SATELLITE AFFECTED: ALL&lt;/p&gt;&lt;p&gt;EVENT DESCRIPTION: OSNMA SERVICE UNAVAILABLE.&lt;/p&gt;&lt;/div&gt;</description>
+    </item>
+    <item>
+      <title>NOTICE ADVISORY TO GALILEO USERS (NAGU) 2099004</title>
+      <link>https://www.gsc-europa.eu/galileo/nagu-2099004</link>
+      <description>&lt;div class="text-formatted"&gt;&lt;p&gt;DATE GENERATED (UTC): @@-60@@ 05:00&lt;/p&gt;&lt;p&gt;NAGU TYPE: USABLE&lt;br&gt;NAGU NUMBER: 2099004&lt;br&gt;NAGU SUBJECT: USABLE AS FROM @@-60@@&lt;br&gt;NAGU REFERENCED TO: N/A&lt;br&gt;START DATE EVENT (UTC): @@-60@@ 04:54&lt;br&gt;END DATE EVENT (UTC): N/A&lt;br&gt;SATELLITE AFFECTED: GSAT0234&lt;/p&gt;&lt;p&gt;EVENT DESCRIPTION: SATELLITEN ÄTER I DRIFT.&lt;/p&gt;&lt;/div&gt;</description>
+    </item>
+    <item>
+      <title>NOTICE ADVISORY TO GALILEO USERS (NAGU) 2099005</title>
+      <link>https://www.gsc-europa.eu/galileo/nagu-2099005</link>
+      <description>&lt;div class="text-formatted"&gt;&lt;p&gt;DATE GENERATED (UTC): @@-70@@ 12:00&lt;/p&gt;&lt;p&gt;NAGU TYPE: GENERAL (END DATE)&lt;br&gt;NAGU NUMBER: 2099005&lt;br&gt;NAGU SUBJECT: END DATE OF UNPLANNED OUTAGE&lt;br&gt;NAGU REFERENCED TO: N/A&lt;br&gt;START DATE EVENT (UTC): @@-70@@ 05:54&lt;br&gt;END DATE EVENT (UTC): @@-60@@ 05:20&lt;br&gt;SATELLITE AFFECTED: GSAT0234&lt;/p&gt;&lt;p&gt;EVENT DESCRIPTION: AVBROTT AVSLUTAT.&lt;/p&gt;&lt;/div&gt;</description>
+    </item>
+    <item>
+      <title>Galileo Performance Reports for Q3 2026 are now available!</title>
+      <link>https://www.gsc-europa.eu/galileo/performance-reports-q3-2026</link>
+      <description>&lt;span class="field field--name-title"&gt;&lt;span class="first-word"&gt;Galileo&lt;/span&gt; Performance Reports for Q3 2026 are now available!&lt;/span&gt;&lt;div class="text-formatted"&gt;&lt;p&gt;Rapporterna finns på portalen.&lt;/p&gt;&lt;/div&gt;</description>
+    </item>
+  </channel>
+</rss>

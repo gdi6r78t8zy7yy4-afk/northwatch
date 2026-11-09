@@ -1,0 +1,1405 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          5,
+          55.3889
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "ALB00SWE",
+        "Lat/Lon/Height": "55.3889/5.0000/75.9",
+        "Country/Region": "SWE",
+        "City": "Kiruna",
+        "Station Status": "Decommissioned",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo",
+        "GNSS Network": "SWENET",
+        "RINEX Data DOI": "doi:10.24414/m3g.alb00swe"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          7,
+          56.1667
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "ARJ01SWE",
+        "Lat/Lon/Height": "56.1667/7.0000/75.9",
+        "Country/Region": "SWE",
+        "City": "Göteborg",
+        "Station Status": "Decommissioned",
+        "Satellite Constellation (Current)": null,
+        "GNSS Network": "SWENET",
+        "RINEX Data DOI": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          9,
+          56.9444
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "GOT02SWE",
+        "Lat/Lon/Height": "56.9444/9.0000/75.9",
+        "Country/Region": "SWE",
+        "City": "Malmö",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo",
+        "GNSS Network": "SWENET",
+        "RINEX Data DOI": "doi:10.24414/m3g.got02swe"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          5,
+          57.7222
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "HIS03SWE",
+        "Lat/Lon/Height": "57.7222/5.0000/75.9",
+        "Country/Region": "SWE",
+        "City": "Visby",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo+BeiDou",
+        "GNSS Network": "SWENET",
+        "RINEX Data DOI": "doi:10.24414/m3g.his03swe"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          7,
+          58.5
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "KAR04SWE",
+        "Lat/Lon/Height": "58.5000/7.0000/75.9",
+        "Country/Region": "SWE",
+        "City": "Vaxholm",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo",
+        "GNSS Network": "SWENET",
+        "RINEX Data DOI": "doi:10.24414/m3g.kar04swe"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          9,
+          59.2778
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "KIR05SWE",
+        "Lat/Lon/Height": "59.2778/9.0000/75.9",
+        "Country/Region": "SWE",
+        "City": "Östersund",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo",
+        "GNSS Network": "SWENET",
+        "RINEX Data DOI": "doi:10.24414/m3g.kir05swe"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          5,
+          60.0556
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "LUL06SWE",
+        "Lat/Lon/Height": "60.0556/5.0000/75.9",
+        "Country/Region": "SWE",
+        "City": "Umeå",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo+BeiDou",
+        "GNSS Network": "SWENET",
+        "RINEX Data DOI": "doi:10.24414/m3g.lul06swe"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          7,
+          60.8333
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "UME07SWE",
+        "Lat/Lon/Height": "60.8333/7.0000/75.9",
+        "Country/Region": "SWE",
+        "City": "Luleå",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo",
+        "GNSS Network": "SWENET",
+        "RINEX Data DOI": "doi:10.24414/m3g.ume07swe"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          9,
+          61.6111
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "MAL08SWE",
+        "Lat/Lon/Height": "61.6111/9.0000/75.9",
+        "Country/Region": "SWE",
+        "City": "Linköping",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo",
+        "GNSS Network": "SWENET",
+        "RINEX Data DOI": "doi:10.24414/m3g.mal08swe"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          11,
+          55.3889
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "NOR09SWE",
+        "Lat/Lon/Height": "55.3889/11.0000/75.9",
+        "Country/Region": "SWE",
+        "City": "Norrköping",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo+BeiDou",
+        "GNSS Network": "SWENET",
+        "RINEX Data DOI": "doi:10.24414/m3g.nor09swe"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          13,
+          56.1667
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "ALB10SWE",
+        "Lat/Lon/Height": "56.1667/13.0000/75.9",
+        "Country/Region": "SWE",
+        "City": "Kiruna",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo",
+        "GNSS Network": "SWENET",
+        "RINEX Data DOI": "doi:10.24414/m3g.alb10swe"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          15,
+          56.9444
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "ARJ11SWE",
+        "Lat/Lon/Height": "56.9444/15.0000/75.9",
+        "Country/Region": "SWE",
+        "City": "Göteborg",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo",
+        "GNSS Network": "SWENET",
+        "RINEX Data DOI": "doi:10.24414/m3g.arj11swe"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          11,
+          57.7222
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "GOT12SWE",
+        "Lat/Lon/Height": "57.7222/11.0000/75.9",
+        "Country/Region": "SWE",
+        "City": "Malmö",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo+BeiDou",
+        "GNSS Network": "SWENET",
+        "RINEX Data DOI": "doi:10.24414/m3g.got12swe"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          13,
+          58.5
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "HIS13SWE",
+        "Lat/Lon/Height": "58.5000/13.0000/75.9",
+        "Country/Region": "SWE",
+        "City": "Visby",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo",
+        "GNSS Network": "SWENET",
+        "RINEX Data DOI": "doi:10.24414/m3g.his13swe"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          15,
+          59.2778
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "KAR14SWE",
+        "Lat/Lon/Height": "59.2778/15.0000/75.9",
+        "Country/Region": "SWE",
+        "City": "Vaxholm",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo",
+        "GNSS Network": "SWENET",
+        "RINEX Data DOI": "doi:10.24414/m3g.kar14swe"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          11,
+          60.0556
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "KIR15SWE",
+        "Lat/Lon/Height": "60.0556/11.0000/75.9",
+        "Country/Region": "SWE",
+        "City": "Östersund",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo+BeiDou",
+        "GNSS Network": "SWENET",
+        "RINEX Data DOI": "doi:10.24414/m3g.kir15swe"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          13,
+          60.8333
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "LUL16SWE",
+        "Lat/Lon/Height": "60.8333/13.0000/75.9",
+        "Country/Region": "SWE",
+        "City": "Umeå",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo",
+        "GNSS Network": "SWENET",
+        "RINEX Data DOI": "doi:10.24414/m3g.lul16swe"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          15,
+          61.6111
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "UME17SWE",
+        "Lat/Lon/Height": "61.6111/15.0000/75.9",
+        "Country/Region": "SWE",
+        "City": "Luleå",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo",
+        "GNSS Network": "SWENET",
+        "RINEX Data DOI": "doi:10.24414/m3g.ume17swe"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          17,
+          55.3889
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "MAL18SWE",
+        "Lat/Lon/Height": "55.3889/17.0000/75.9",
+        "Country/Region": "SWE",
+        "City": "Linköping",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo+BeiDou",
+        "GNSS Network": "SWENET",
+        "RINEX Data DOI": "doi:10.24414/m3g.mal18swe"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          19,
+          56.1667
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "NOR19SWE",
+        "Lat/Lon/Height": "56.1667/19.0000/75.9",
+        "Country/Region": "SWE",
+        "City": "Norrköping",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo",
+        "GNSS Network": "SWENET",
+        "RINEX Data DOI": "doi:10.24414/m3g.nor19swe"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          21,
+          56.9444
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "ALB20SWE",
+        "Lat/Lon/Height": "56.9444/21.0000/75.9",
+        "Country/Region": "SWE",
+        "City": "Kiruna",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo",
+        "GNSS Network": "SWENET",
+        "RINEX Data DOI": "doi:10.24414/m3g.alb20swe"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          17,
+          57.7222
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "ARJ21SWE",
+        "Lat/Lon/Height": "57.7222/17.0000/75.9",
+        "Country/Region": "SWE",
+        "City": "Göteborg",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo+BeiDou",
+        "GNSS Network": "SWENET",
+        "RINEX Data DOI": "doi:10.24414/m3g.arj21swe"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          19,
+          58.5
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "GOT22SWE",
+        "Lat/Lon/Height": "58.5000/19.0000/75.9",
+        "Country/Region": "SWE",
+        "City": "Malmö",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo",
+        "GNSS Network": "SWENET",
+        "RINEX Data DOI": "doi:10.24414/m3g.got22swe"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          21,
+          59.2778
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "HIS23SWE",
+        "Lat/Lon/Height": "59.2778/21.0000/75.9",
+        "Country/Region": "SWE",
+        "City": "Visby",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo",
+        "GNSS Network": "SWENET",
+        "RINEX Data DOI": "doi:10.24414/m3g.his23swe"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          17,
+          60.0556
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "KAR24SWE",
+        "Lat/Lon/Height": "60.0556/17.0000/75.9",
+        "Country/Region": "SWE",
+        "City": "Vaxholm",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo+BeiDou",
+        "GNSS Network": "SWENET",
+        "RINEX Data DOI": "doi:10.24414/m3g.kar24swe"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          19,
+          60.8333
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "KIR25SWE",
+        "Lat/Lon/Height": "60.8333/19.0000/75.9",
+        "Country/Region": "SWE",
+        "City": "Östersund",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo",
+        "GNSS Network": "SWENET",
+        "RINEX Data DOI": "doi:10.24414/m3g.kir25swe"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          21,
+          61.6111
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "LUL26SWE",
+        "Lat/Lon/Height": "61.6111/21.0000/75.9",
+        "Country/Region": "SWE",
+        "City": "Umeå",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo",
+        "GNSS Network": "SWENET",
+        "RINEX Data DOI": "doi:10.24414/m3g.lul26swe"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          23,
+          55.3889
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "UME27SWE",
+        "Lat/Lon/Height": "55.3889/23.0000/75.9",
+        "Country/Region": "SWE",
+        "City": "Luleå",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo+BeiDou",
+        "GNSS Network": "SWENET",
+        "RINEX Data DOI": "doi:10.24414/m3g.ume27swe"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          25,
+          56.1667
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "MAL28SWE",
+        "Lat/Lon/Height": "56.1667/25.0000/75.9",
+        "Country/Region": "SWE",
+        "City": "Linköping",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo",
+        "GNSS Network": "SWENET",
+        "RINEX Data DOI": "doi:10.24414/m3g.mal28swe"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          27,
+          56.9444
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "NOR29SWE",
+        "Lat/Lon/Height": "56.9444/27.0000/75.9",
+        "Country/Region": "SWE",
+        "City": "Norrköping",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo",
+        "GNSS Network": "SWENET",
+        "RINEX Data DOI": "doi:10.24414/m3g.nor29swe"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          23,
+          57.7222
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "ALB30SWE",
+        "Lat/Lon/Height": "57.7222/23.0000/75.9",
+        "Country/Region": "SWE",
+        "City": "Kiruna",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo+BeiDou",
+        "GNSS Network": "SWENET",
+        "RINEX Data DOI": "doi:10.24414/m3g.alb30swe"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          25,
+          58.5
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "ARJ31SWE",
+        "Lat/Lon/Height": "58.5000/25.0000/75.9",
+        "Country/Region": "SWE",
+        "City": "Göteborg",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo",
+        "GNSS Network": "SWENET",
+        "RINEX Data DOI": "doi:10.24414/m3g.arj31swe"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          27,
+          59.2778
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "GOT32SWE",
+        "Lat/Lon/Height": "59.2778/27.0000/75.9",
+        "Country/Region": "SWE",
+        "City": "Malmö",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo",
+        "GNSS Network": "SWENET",
+        "RINEX Data DOI": "doi:10.24414/m3g.got32swe"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          23,
+          60.0556
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "HIS33SWE",
+        "Lat/Lon/Height": "60.0556/23.0000/75.9",
+        "Country/Region": "SWE",
+        "City": "Visby",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo+BeiDou",
+        "GNSS Network": "SWENET",
+        "RINEX Data DOI": "doi:10.24414/m3g.his33swe"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          25,
+          60.8333
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "KAR34SWE",
+        "Lat/Lon/Height": "60.8333/25.0000/75.9",
+        "Country/Region": "SWE",
+        "City": "Vaxholm",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo",
+        "GNSS Network": "SWENET",
+        "RINEX Data DOI": "doi:10.24414/m3g.kar34swe"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          27,
+          61.6111
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "KIR35SWE",
+        "Lat/Lon/Height": "61.6111/27.0000/75.9",
+        "Country/Region": "SWE",
+        "City": "Östersund",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo",
+        "GNSS Network": "SWENET",
+        "RINEX Data DOI": "doi:10.24414/m3g.kir35swe"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          5,
+          62.3889
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "LUL36SWE",
+        "Lat/Lon/Height": "62.3889/5.0000/75.9",
+        "Country/Region": "SWE",
+        "City": "Umeå",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo+BeiDou",
+        "GNSS Network": "SWENET",
+        "RINEX Data DOI": "doi:10.24414/m3g.lul36swe"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          7,
+          63.1667
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "UME37SWE",
+        "Lat/Lon/Height": "63.1667/7.0000/75.9",
+        "Country/Region": "SWE",
+        "City": "Luleå",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo",
+        "GNSS Network": "SWENET",
+        "RINEX Data DOI": "doi:10.24414/m3g.ume37swe"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          9,
+          63.9444
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "MAL38SWE",
+        "Lat/Lon/Height": "63.9444/9.0000/75.9",
+        "Country/Region": "SWE",
+        "City": "Linköping",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo",
+        "GNSS Network": "SWENET",
+        "RINEX Data DOI": "doi:10.24414/m3g.mal38swe"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          5,
+          64.7222
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "NOR39SWE",
+        "Lat/Lon/Height": "64.7222/5.0000/75.9",
+        "Country/Region": "SWE",
+        "City": "Norrköping",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo+BeiDou",
+        "GNSS Network": "SWENET",
+        "RINEX Data DOI": "doi:10.24414/m3g.nor39swe"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          7,
+          65.5
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "ALB40SWE",
+        "Lat/Lon/Height": "65.5000/7.0000/75.9",
+        "Country/Region": "SWE",
+        "City": "Kiruna",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo",
+        "GNSS Network": "SWENET",
+        "RINEX Data DOI": "doi:10.24414/m3g.alb40swe"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          9,
+          66.2778
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "ARJ41SWE",
+        "Lat/Lon/Height": "66.2778/9.0000/75.9",
+        "Country/Region": "SWE",
+        "City": "Göteborg",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo",
+        "GNSS Network": "SWENET",
+        "RINEX Data DOI": "doi:10.24414/m3g.arj41swe"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          5,
+          67.0556
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "GOT42SWE",
+        "Lat/Lon/Height": "67.0556/5.0000/75.9",
+        "Country/Region": "SWE",
+        "City": "Malmö",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo+BeiDou",
+        "GNSS Network": "SWENET",
+        "RINEX Data DOI": "doi:10.24414/m3g.got42swe"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          7,
+          67.8333
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "HIS43SWE",
+        "Lat/Lon/Height": "67.8333/7.0000/75.9",
+        "Country/Region": "SWE",
+        "City": "Visby",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo",
+        "GNSS Network": "SWENET",
+        "RINEX Data DOI": "doi:10.24414/m3g.his43swe"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          9,
+          68.6111
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "KAR44SWE",
+        "Lat/Lon/Height": "68.6111/9.0000/75.9",
+        "Country/Region": "SWE",
+        "City": "Vaxholm",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo",
+        "GNSS Network": "SWENET",
+        "RINEX Data DOI": "doi:10.24414/m3g.kar44swe"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          11,
+          62.3889
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "KIR45SWE",
+        "Lat/Lon/Height": "62.3889/11.0000/75.9",
+        "Country/Region": "SWE",
+        "City": "Östersund",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo+BeiDou",
+        "GNSS Network": "SWENET",
+        "RINEX Data DOI": "doi:10.24414/m3g.kir45swe"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          13,
+          63.1667
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "LUL46SWE",
+        "Lat/Lon/Height": "63.1667/13.0000/75.9",
+        "Country/Region": "SWE",
+        "City": "Umeå",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo",
+        "GNSS Network": "SWENET",
+        "RINEX Data DOI": "doi:10.24414/m3g.lul46swe"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          15,
+          63.9444
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "UME47SWE",
+        "Lat/Lon/Height": "63.9444/15.0000/75.9",
+        "Country/Region": "SWE",
+        "City": "Luleå",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo",
+        "GNSS Network": "SWENET",
+        "RINEX Data DOI": "doi:10.24414/m3g.ume47swe"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          11,
+          64.7222
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "MAL48SWE",
+        "Lat/Lon/Height": "64.7222/11.0000/75.9",
+        "Country/Region": "SWE",
+        "City": "Linköping",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo+BeiDou",
+        "GNSS Network": "SWENET",
+        "RINEX Data DOI": "doi:10.24414/m3g.mal48swe"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          13,
+          65.5
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "NOR49SWE",
+        "Lat/Lon/Height": "65.5000/13.0000/75.9",
+        "Country/Region": "SWE",
+        "City": "Norrköping",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo",
+        "GNSS Network": "SWENET",
+        "RINEX Data DOI": "doi:10.24414/m3g.nor49swe"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          15,
+          66.2778
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "ALB50SWE",
+        "Lat/Lon/Height": "66.2778/15.0000/75.9",
+        "Country/Region": "SWE",
+        "City": "Kiruna",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo",
+        "GNSS Network": "SWENET",
+        "RINEX Data DOI": "doi:10.24414/m3g.alb50swe"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          11,
+          67.0556
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "ARJ51SWE",
+        "Lat/Lon/Height": "67.0556/11.0000/75.9",
+        "Country/Region": "SWE",
+        "City": "Göteborg",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo+BeiDou",
+        "GNSS Network": "SWENET",
+        "RINEX Data DOI": "doi:10.24414/m3g.arj51swe"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          13,
+          67.8333
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "GOT52SWE",
+        "Lat/Lon/Height": "67.8333/13.0000/75.9",
+        "Country/Region": "SWE",
+        "City": "Malmö",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo",
+        "GNSS Network": "SWENET",
+        "RINEX Data DOI": "doi:10.24414/m3g.got52swe"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          15,
+          68.6111
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "HIS53SWE",
+        "Lat/Lon/Height": "68.6111/15.0000/75.9",
+        "Country/Region": "SWE",
+        "City": "Visby",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo",
+        "GNSS Network": "SWENET",
+        "RINEX Data DOI": "doi:10.24414/m3g.his53swe"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          17,
+          62.4375
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "KAR54SWE",
+        "Lat/Lon/Height": "62.4375/17.0000/75.9",
+        "Country/Region": "SWE",
+        "City": "Vaxholm",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo+BeiDou",
+        "GNSS Network": "SWENET",
+        "RINEX Data DOI": "doi:10.24414/m3g.kar54swe"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          19,
+          63.3125
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "KIR55SWE",
+        "Lat/Lon/Height": "63.3125/19.0000/75.9",
+        "Country/Region": "SWE",
+        "City": "Östersund",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo",
+        "GNSS Network": "SWENET",
+        "RINEX Data DOI": "doi:10.24414/m3g.kir55swe"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          21,
+          64.1875
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "LUL56SWE",
+        "Lat/Lon/Height": "64.1875/21.0000/75.9",
+        "Country/Region": "SWE",
+        "City": "Umeå",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo",
+        "GNSS Network": "SWENET",
+        "RINEX Data DOI": "doi:10.24414/m3g.lul56swe"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          17,
+          65.0625
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "UME57SWE",
+        "Lat/Lon/Height": "65.0625/17.0000/75.9",
+        "Country/Region": "SWE",
+        "City": "Luleå",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo+BeiDou",
+        "GNSS Network": "SWENET",
+        "RINEX Data DOI": "doi:10.24414/m3g.ume57swe"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          19,
+          65.9375
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "MAL58SWE",
+        "Lat/Lon/Height": "65.9375/19.0000/75.9",
+        "Country/Region": "SWE",
+        "City": "Linköping",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo",
+        "GNSS Network": "SWENET",
+        "RINEX Data DOI": "doi:10.24414/m3g.mal58swe"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          21,
+          66.8125
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "NOR59SWE",
+        "Lat/Lon/Height": "66.8125/21.0000/75.9",
+        "Country/Region": "SWE",
+        "City": "Norrköping",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo",
+        "GNSS Network": "SWENET",
+        "RINEX Data DOI": "doi:10.24414/m3g.nor59swe"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          17,
+          67.6875
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "ALB60SWE",
+        "Lat/Lon/Height": "67.6875/17.0000/75.9",
+        "Country/Region": "SWE",
+        "City": "Kiruna",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo+BeiDou",
+        "GNSS Network": "SWENET",
+        "RINEX Data DOI": "doi:10.24414/m3g.alb60swe"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          19,
+          68.5625
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "ARJ61SWE",
+        "Lat/Lon/Height": "68.5625/19.0000/75.9",
+        "Country/Region": "SWE",
+        "City": "Göteborg",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo",
+        "GNSS Network": "SWENET",
+        "RINEX Data DOI": "doi:10.24414/m3g.arj61swe"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          23,
+          62.4375
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "GOT62SWE",
+        "Lat/Lon/Height": "62.4375/23.0000/75.9",
+        "Country/Region": "SWE",
+        "City": "Malmö",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo",
+        "GNSS Network": "SWENET",
+        "RINEX Data DOI": "doi:10.24414/m3g.got62swe"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          25,
+          63.3125
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "HIS63SWE",
+        "Lat/Lon/Height": "63.3125/25.0000/75.9",
+        "Country/Region": "SWE",
+        "City": "Visby",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo+BeiDou",
+        "GNSS Network": "SWENET",
+        "RINEX Data DOI": "doi:10.24414/m3g.his63swe"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          27,
+          64.1875
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "KAR64SWE",
+        "Lat/Lon/Height": "64.1875/27.0000/75.9",
+        "Country/Region": "SWE",
+        "City": "Vaxholm",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo",
+        "GNSS Network": "SWENET",
+        "RINEX Data DOI": "doi:10.24414/m3g.kar64swe"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          23,
+          65.0625
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "KIR65SWE",
+        "Lat/Lon/Height": "65.0625/23.0000/75.9",
+        "Country/Region": "SWE",
+        "City": "Östersund",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo",
+        "GNSS Network": "SWENET",
+        "RINEX Data DOI": "doi:10.24414/m3g.kir65swe"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          25,
+          65.9375
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "LUL66SWE",
+        "Lat/Lon/Height": "65.9375/25.0000/75.9",
+        "Country/Region": "SWE",
+        "City": "Umeå",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo+BeiDou",
+        "GNSS Network": "SWENET",
+        "RINEX Data DOI": "doi:10.24414/m3g.lul66swe"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          27,
+          66.8125
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "UME67SWE",
+        "Lat/Lon/Height": "66.8125/27.0000/75.9",
+        "Country/Region": "SWE",
+        "City": "Luleå",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo",
+        "GNSS Network": "SWENET",
+        "RINEX Data DOI": "doi:10.24414/m3g.ume67swe"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          23,
+          67.6875
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "MAL68SWE",
+        "Lat/Lon/Height": "67.6875/23.0000/75.9",
+        "Country/Region": "SWE",
+        "City": "Linköping",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo",
+        "GNSS Network": "SWENET",
+        "RINEX Data DOI": "doi:10.24414/m3g.mal68swe"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          25,
+          68.5625
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "NOR69SWE",
+        "Lat/Lon/Height": "68.5625/25.0000/75.9",
+        "Country/Region": "SWE",
+        "City": "Norrköping",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo+BeiDou",
+        "GNSS Network": "SWENET",
+        "RINEX Data DOI": "doi:10.24414/m3g.nor69swe"
+      }
+    }
+  ]
+}

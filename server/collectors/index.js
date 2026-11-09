@@ -1,7 +1,13 @@
-// Källregistret – 50 källor: M1 (9) + M2 (9) + M3 (4 OSM/Overpass) + M4 (10)
+// Källregistret – 55 källor: M1 (9) + M2 (9) + M3 (4 OSM/Overpass) + M4 (10)
 // + svk-hist + smhi-forecast (M8) + kev/nvd/osv (M9) + M10 (5:
 // eurostat-industry, oecd, rmis, comtrade, statice) + M11 (7: riksdagen,
-// fdk, retsinformation, finlex, ipu, dataportal, cellar).
+// fdk, retsinformation, finlex, ipu, dataportal, cellar) + M12 (5: celestrak,
+// gsc-europa, gnss-metadata, nasa-apod, datanorge).
+// M12 (2026-11-09): rymd/GNSS-nyckelfri kärna (område 10) – CelesTrak GP
+// (elementset för Galileo/GLONASS/SBAS/GPS), GSC (NAGU-RSS + konstellations-
+// status), M3G/EPOS (nationella GNSS-stationer som kartassets, Island via
+// ISL eftersom althingi.is 403:ar), NASA APOD wp-json och data.norge.no/FDK
+// (GNSS-datasetantal). Se README "M12".
 // M11 (2026-11-08): offentlig förvaltning (område 12) – Sveriges riksdag
 // (kalender + votering/anförande-zips + personregister, vecko), DigDir Felles
 // datakatalog (sök-API, vecko), Retsinformation (dansk lagändringar, daglig),
@@ -75,6 +81,11 @@ import finlex from './finlex.js';
 import ipu from './ipu.js';
 import dataportal from './dataportal.js';
 import cellar from './cellar.js';
+import celestrak from './celestrak.js';
+import gscEuropa from './gsc-europa.js';
+import gnssMetadata from './gnss-metadata.js';
+import nasaApod from './nasa-apod.js';
+import datanorge from './datanorge.js';
 
 export const COLLECTORS = [
   smhi,
@@ -124,4 +135,9 @@ export const COLLECTORS = [
   ipu,
   dataportal,
   cellar,
+  celestrak,
+  gscEuropa,
+  gnssMetadata,
+  nasaApod,
+  datanorge,
 ];

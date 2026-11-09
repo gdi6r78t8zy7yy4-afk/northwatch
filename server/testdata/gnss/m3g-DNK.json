@@ -1,0 +1,445 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          8.0717,
+          54.85
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "ALB00DNK",
+        "Lat/Lon/Height": "54.8500/8.0717/75.9",
+        "Country/Region": "DNK",
+        "City": "Aalborg",
+        "Station Status": "Decommissioned",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo",
+        "GNSS Network": "DNKNET",
+        "RINEX Data DOI": "doi:10.24414/m3g.alb00dnk"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          8.615,
+          55.75
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "ARJ01DNK",
+        "Lat/Lon/Height": "55.7500/8.6150/75.9",
+        "Country/Region": "DNK",
+        "City": "Bortrud",
+        "Station Status": "Decommissioned",
+        "Satellite Constellation (Current)": null,
+        "GNSS Network": "DNKNET",
+        "RINEX Data DOI": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          9.7017,
+          54.85
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "GOT02DNK",
+        "Lat/Lon/Height": "54.8500/9.7017/75.9",
+        "Country/Region": "DNK",
+        "City": "Dunø",
+        "Station Status": "Decommissioned",
+        "Satellite Constellation (Current)": null,
+        "GNSS Network": "DNKNET",
+        "RINEX Data DOI": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.245,
+          55.75
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "HIS03DNK",
+        "Lat/Lon/Height": "55.7500/10.2450/75.9",
+        "Country/Region": "DNK",
+        "City": "Godsund",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo+BeiDou",
+        "GNSS Network": "DNKNET",
+        "RINEX Data DOI": "doi:10.24414/m3g.his03dnk"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          11.3317,
+          54.85
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "KAR04DNK",
+        "Lat/Lon/Height": "54.8500/11.3317/75.9",
+        "Country/Region": "DNK",
+        "City": "København F",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo",
+        "GNSS Network": "DNKNET",
+        "RINEX Data DOI": "doi:10.24414/m3g.kar04dnk"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          11.875,
+          55.75
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "KIR05DNK",
+        "Lat/Lon/Height": "55.7500/11.8750/75.9",
+        "Country/Region": "DNK",
+        "City": "Rønne",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo",
+        "GNSS Network": "DNKNET",
+        "RINEX Data DOI": "doi:10.24414/m3g.kir05dnk"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.6917,
+          54.85
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "LUL06DNK",
+        "Lat/Lon/Height": "54.8500/12.6917/75.9",
+        "Country/Region": "DNK",
+        "City": "Odense",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo+BeiDou",
+        "GNSS Network": "DNKNET",
+        "RINEX Data DOI": "doi:10.24414/m3g.lul06dnk"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.695,
+          55.75
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "UME07DNK",
+        "Lat/Lon/Height": "55.7500/12.6950/75.9",
+        "Country/Region": "DNK",
+        "City": "Esbjerg",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo",
+        "GNSS Network": "DNKNET",
+        "RINEX Data DOI": "doi:10.24414/m3g.ume07dnk"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          8.0717,
+          56.65
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "MAL08DNK",
+        "Lat/Lon/Height": "56.6500/8.0717/75.9",
+        "Country/Region": "DNK",
+        "City": "Aalborg",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo",
+        "GNSS Network": "DNKNET",
+        "RINEX Data DOI": "doi:10.24414/m3g.mal08dnk"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          8.615,
+          57.55
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "NOR09DNK",
+        "Lat/Lon/Height": "57.5500/8.6150/75.9",
+        "Country/Region": "DNK",
+        "City": "Bortrud",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo+BeiDou",
+        "GNSS Network": "DNKNET",
+        "RINEX Data DOI": "doi:10.24414/m3g.nor09dnk"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          9.7017,
+          56.65
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "ALB10DNK",
+        "Lat/Lon/Height": "56.6500/9.7017/75.9",
+        "Country/Region": "DNK",
+        "City": "Dunø",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo",
+        "GNSS Network": "DNKNET",
+        "RINEX Data DOI": "doi:10.24414/m3g.alb10dnk"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.245,
+          57.55
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "ARJ11DNK",
+        "Lat/Lon/Height": "57.5500/10.2450/75.9",
+        "Country/Region": "DNK",
+        "City": "Godsund",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo",
+        "GNSS Network": "DNKNET",
+        "RINEX Data DOI": "doi:10.24414/m3g.arj11dnk"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          11.3317,
+          56.65
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "GOT12DNK",
+        "Lat/Lon/Height": "56.6500/11.3317/75.9",
+        "Country/Region": "DNK",
+        "City": "København F",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo+BeiDou",
+        "GNSS Network": "DNKNET",
+        "RINEX Data DOI": "doi:10.24414/m3g.got12dnk"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          11.875,
+          57.55
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "HIS13DNK",
+        "Lat/Lon/Height": "57.5500/11.8750/75.9",
+        "Country/Region": "DNK",
+        "City": "Rønne",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo",
+        "GNSS Network": "DNKNET",
+        "RINEX Data DOI": "doi:10.24414/m3g.his13dnk"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.6917,
+          56.65
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "KAR14DNK",
+        "Lat/Lon/Height": "56.6500/12.6917/75.9",
+        "Country/Region": "DNK",
+        "City": "Odense",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo",
+        "GNSS Network": "DNKNET",
+        "RINEX Data DOI": "doi:10.24414/m3g.kar14dnk"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.695,
+          57.55
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "KIR15DNK",
+        "Lat/Lon/Height": "57.5500/12.6950/75.9",
+        "Country/Region": "DNK",
+        "City": "Esbjerg",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo+BeiDou",
+        "GNSS Network": "DNKNET",
+        "RINEX Data DOI": "doi:10.24414/m3g.kir15dnk"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          8.0717,
+          58
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "LUL16DNK",
+        "Lat/Lon/Height": "58.0000/8.0717/75.9",
+        "Country/Region": "DNK",
+        "City": "Aalborg",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo",
+        "GNSS Network": "DNKNET",
+        "RINEX Data DOI": "doi:10.24414/m3g.lul16dnk"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          8.615,
+          58
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "UME17DNK",
+        "Lat/Lon/Height": "58.0000/8.6150/75.9",
+        "Country/Region": "DNK",
+        "City": "Bortrud",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo",
+        "GNSS Network": "DNKNET",
+        "RINEX Data DOI": "doi:10.24414/m3g.ume17dnk"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          9.7017,
+          58
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "MAL18DNK",
+        "Lat/Lon/Height": "58.0000/9.7017/75.9",
+        "Country/Region": "DNK",
+        "City": "Dunø",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo+BeiDou",
+        "GNSS Network": "DNKNET",
+        "RINEX Data DOI": "doi:10.24414/m3g.mal18dnk"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.245,
+          58
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "NOR19DNK",
+        "Lat/Lon/Height": "58.0000/10.2450/75.9",
+        "Country/Region": "DNK",
+        "City": "Godsund",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo",
+        "GNSS Network": "DNKNET",
+        "RINEX Data DOI": "doi:10.24414/m3g.nor19dnk"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          11.3317,
+          58
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "ALB20DNK",
+        "Lat/Lon/Height": "58.0000/11.3317/75.9",
+        "Country/Region": "DNK",
+        "City": "København F",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo",
+        "GNSS Network": "DNKNET",
+        "RINEX Data DOI": "doi:10.24414/m3g.alb20dnk"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.6917,
+          58
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "ARJ21DNK",
+        "Lat/Lon/Height": "58.0000/12.6917/75.9",
+        "Country/Region": "DNK",
+        "City": "Rønne",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo+BeiDou",
+        "GNSS Network": "DNKNET",
+        "RINEX Data DOI": "doi:10.24414/m3g.arj21dnk"
+      }
+    }
+  ]
+}

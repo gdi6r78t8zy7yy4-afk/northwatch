@@ -38,7 +38,7 @@ export const AREAS = [
     gaps: 'Inga driftstörningsflöden; centralbanker: SE via Riksbankens öppna API-katalog (datagatewayns operationer ej publikt upptäckbara)' },
   { id: 10, slug: 'gnss', name: 'Rymd, navigation och positionering', short: 'GNSS/Rymd', geo: true,
     scope: 'GNSS/GPS-störningar, satellitkom, navigationsvarningar, tidssynk',
-    gaps: 'Allt PORTAL_ONLY/P3; NOAA SWPC är global källa' },
+    gaps: 'M12a nyckelfri kärna (NOAA, CelesTrak, GSC, M3G/EPOS, APOD, data.norge.no). Återstår nyckelkrävande: Space-Track, ESA SWE HAPI, SWEPOS RINEX, FINPOS; DK RINEX på FTPS (ingen stöd i Node-fetch); althingi.is 403 → Island via M3G ISL' },
   { id: 11, slug: 'miljo', name: 'Miljö, naturhändelser och klimatpåverkan', short: 'Miljö/Väder', geo: true,
     scope: 'Vädervarningar, storm, skogsbrand, skred, jordbävning, vulkan, havsnivå, nederbörd',
     gaps: 'Skogsbrand/skred saknas som egen källa. IS via Vedur (jordbävning/vulkan/väder/CAP); FI: FMI ej tagit upp (öppet WFS bara ofiltrerade sparade frågor – 43 MB+/grib2-referenser); CDS/ERA5 kräver token' },

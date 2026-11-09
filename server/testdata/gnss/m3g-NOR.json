@@ -1,0 +1,505 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.2083,
+          57.8333
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "ALB00NOR",
+        "Lat/Lon/Height": "57.8333/4.2083/75.9",
+        "Country/Region": "NOR",
+        "City": "Bergen",
+        "Station Status": "Decommissioned",
+        "Satellite Constellation (Current)": null,
+        "GNSS Network": "NORNET",
+        "RINEX Data DOI": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          6.625,
+          59.5
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "ARJ01NOR",
+        "Lat/Lon/Height": "59.5000/6.6250/75.9",
+        "Country/Region": "NOR",
+        "City": "Dombås",
+        "Station Status": "Decommissioned",
+        "Satellite Constellation (Current)": null,
+        "GNSS Network": "NORNET",
+        "RINEX Data DOI": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          9.0417,
+          61.1667
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "GOT02NOR",
+        "Lat/Lon/Height": "61.1667/9.0417/75.9",
+        "Country/Region": "NOR",
+        "City": "Henningsvær",
+        "Station Status": "Decommissioned",
+        "Satellite Constellation (Current)": null,
+        "GNSS Network": "NORNET",
+        "RINEX Data DOI": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          11.4583,
+          58.25
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "HIS03NOR",
+        "Lat/Lon/Height": "58.2500/11.4583/75.9",
+        "Country/Region": "NOR",
+        "City": "Kråkerøy",
+        "Station Status": "Decommissioned",
+        "Satellite Constellation (Current)": null,
+        "GNSS Network": "NORNET",
+        "RINEX Data DOI": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          13.875,
+          60.75
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "KAR04NOR",
+        "Lat/Lon/Height": "60.7500/13.8750/75.9",
+        "Country/Region": "NOR",
+        "City": "Oslo",
+        "Station Status": "Decommissioned",
+        "Satellite Constellation (Current)": null,
+        "GNSS Network": "NORNET",
+        "RINEX Data DOI": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          18.7083,
+          58.25
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "KIR05NOR",
+        "Lat/Lon/Height": "58.2500/18.7083/75.9",
+        "Country/Region": "NOR",
+        "City": "Trondheim",
+        "Station Status": "Decommissioned",
+        "Satellite Constellation (Current)": null,
+        "GNSS Network": "NORNET",
+        "RINEX Data DOI": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          21.125,
+          60.75
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "LUL06NOR",
+        "Lat/Lon/Height": "60.7500/21.1250/75.9",
+        "Country/Region": "NOR",
+        "City": "Tolfsfjord",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo+BeiDou",
+        "GNSS Network": "NORNET",
+        "RINEX Data DOI": "doi:10.24414/m3g.lul06nor"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          25.9583,
+          58.25
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "UME07NOR",
+        "Lat/Lon/Height": "58.2500/25.9583/75.9",
+        "Country/Region": "NOR",
+        "City": "Hammerfest",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo",
+        "GNSS Network": "NORNET",
+        "RINEX Data DOI": "doi:10.24414/m3g.ume07nor"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          28.375,
+          60.75
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "MAL08NOR",
+        "Lat/Lon/Height": "60.7500/28.3750/75.9",
+        "Country/Region": "NOR",
+        "City": "Bergen",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo",
+        "GNSS Network": "NORNET",
+        "RINEX Data DOI": "doi:10.24414/m3g.mal08nor"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.2083,
+          63.25
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "NOR09NOR",
+        "Lat/Lon/Height": "63.2500/4.2083/75.9",
+        "Country/Region": "NOR",
+        "City": "Dombås",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo+BeiDou",
+        "GNSS Network": "NORNET",
+        "RINEX Data DOI": "doi:10.24414/m3g.nor09nor"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          6.625,
+          65.75
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "ALB10NOR",
+        "Lat/Lon/Height": "65.7500/6.6250/75.9",
+        "Country/Region": "NOR",
+        "City": "Henningsvær",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo",
+        "GNSS Network": "NORNET",
+        "RINEX Data DOI": "doi:10.24414/m3g.alb10nor"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          11.4583,
+          63.25
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "ARJ11NOR",
+        "Lat/Lon/Height": "63.2500/11.4583/75.9",
+        "Country/Region": "NOR",
+        "City": "Kråkerøy",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo",
+        "GNSS Network": "NORNET",
+        "RINEX Data DOI": "doi:10.24414/m3g.arj11nor"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          13.875,
+          65.75
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "GOT12NOR",
+        "Lat/Lon/Height": "65.7500/13.8750/75.9",
+        "Country/Region": "NOR",
+        "City": "Oslo",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo+BeiDou",
+        "GNSS Network": "NORNET",
+        "RINEX Data DOI": "doi:10.24414/m3g.got12nor"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          18.7083,
+          63.25
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "HIS13NOR",
+        "Lat/Lon/Height": "63.2500/18.7083/75.9",
+        "Country/Region": "NOR",
+        "City": "Trondheim",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo",
+        "GNSS Network": "NORNET",
+        "RINEX Data DOI": "doi:10.24414/m3g.his13nor"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          21.125,
+          65.75
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "KAR14NOR",
+        "Lat/Lon/Height": "65.7500/21.1250/75.9",
+        "Country/Region": "NOR",
+        "City": "Tolfsfjord",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo",
+        "GNSS Network": "NORNET",
+        "RINEX Data DOI": "doi:10.24414/m3g.kar14nor"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          25.9583,
+          63.25
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "KIR15NOR",
+        "Lat/Lon/Height": "63.2500/25.9583/75.9",
+        "Country/Region": "NOR",
+        "City": "Hammerfest",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo+BeiDou",
+        "GNSS Network": "NORNET",
+        "RINEX Data DOI": "doi:10.24414/m3g.kir15nor"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          28.375,
+          65.75
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "LUL16NOR",
+        "Lat/Lon/Height": "65.7500/28.3750/75.9",
+        "Country/Region": "NOR",
+        "City": "Bergen",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo",
+        "GNSS Network": "NORNET",
+        "RINEX Data DOI": "doi:10.24414/m3g.lul16nor"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.2083,
+          68.25
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "UME17NOR",
+        "Lat/Lon/Height": "68.2500/4.2083/75.9",
+        "Country/Region": "NOR",
+        "City": "Dombås",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo",
+        "GNSS Network": "NORNET",
+        "RINEX Data DOI": "doi:10.24414/m3g.ume17nor"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          6.625,
+          70.75
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "MAL18NOR",
+        "Lat/Lon/Height": "70.7500/6.6250/75.9",
+        "Country/Region": "NOR",
+        "City": "Henningsvær",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo+BeiDou",
+        "GNSS Network": "NORNET",
+        "RINEX Data DOI": "doi:10.24414/m3g.mal18nor"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          11.4583,
+          68.25
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "NOR19NOR",
+        "Lat/Lon/Height": "68.2500/11.4583/75.9",
+        "Country/Region": "NOR",
+        "City": "Kråkerøy",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo",
+        "GNSS Network": "NORNET",
+        "RINEX Data DOI": "doi:10.24414/m3g.nor19nor"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          13.875,
+          70.75
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "ALB20NOR",
+        "Lat/Lon/Height": "70.7500/13.8750/75.9",
+        "Country/Region": "NOR",
+        "City": "Oslo",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo",
+        "GNSS Network": "NORNET",
+        "RINEX Data DOI": "doi:10.24414/m3g.alb20nor"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          18.7083,
+          68.25
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "ARJ21NOR",
+        "Lat/Lon/Height": "68.2500/18.7083/75.9",
+        "Country/Region": "NOR",
+        "City": "Trondheim",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo+BeiDou",
+        "GNSS Network": "NORNET",
+        "RINEX Data DOI": "doi:10.24414/m3g.arj21nor"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          21.125,
+          70.75
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "GOT22NOR",
+        "Lat/Lon/Height": "70.7500/21.1250/75.9",
+        "Country/Region": "NOR",
+        "City": "Tolfsfjord",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo",
+        "GNSS Network": "NORNET",
+        "RINEX Data DOI": "doi:10.24414/m3g.got22nor"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          25.9583,
+          68.25
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "HIS23NOR",
+        "Lat/Lon/Height": "68.2500/25.9583/75.9",
+        "Country/Region": "NOR",
+        "City": "Hammerfest",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo",
+        "GNSS Network": "NORNET",
+        "RINEX Data DOI": "doi:10.24414/m3g.his23nor"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          28.375,
+          70.75
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "KAR24NOR",
+        "Lat/Lon/Height": "70.7500/28.3750/75.9",
+        "Country/Region": "NOR",
+        "City": "Bergen",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo+BeiDou",
+        "GNSS Network": "NORNET",
+        "RINEX Data DOI": "doi:10.24414/m3g.kar24nor"
+      }
+    }
+  ]
+}

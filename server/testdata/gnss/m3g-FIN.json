@@ -1,0 +1,485 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          20.9667,
+          59.9417
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "ALB00FIN",
+        "Lat/Lon/Height": "59.9417/20.9667/75.9",
+        "Country/Region": "FIN",
+        "City": "Espoo",
+        "Station Status": "Decommissioned",
+        "Satellite Constellation (Current)": null,
+        "GNSS Network": "FINNET",
+        "RINEX Data DOI": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          22.9,
+          60.825
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "ARJ01FIN",
+        "Lat/Lon/Height": "60.8250/22.9000/75.9",
+        "Country/Region": "FIN",
+        "City": "Hämeenlinna",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS",
+        "GNSS Network": "FINNET",
+        "RINEX Data DOI": "doi:10.24414/m3g.arj01fin"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.8333,
+          61.7083
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "GOT02FIN",
+        "Lat/Lon/Height": "61.7083/24.8333/75.9",
+        "Country/Region": "FIN",
+        "City": "Helsingfors",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS",
+        "GNSS Network": "FINNET",
+        "RINEX Data DOI": "doi:10.24414/m3g.got02fin"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          20.9667,
+          62.5917
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "HIS03FIN",
+        "Lat/Lon/Height": "62.5917/20.9667/75.9",
+        "Country/Region": "FIN",
+        "City": "Joensuu",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS",
+        "GNSS Network": "FINNET",
+        "RINEX Data DOI": "doi:10.24414/m3g.his03fin"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          22.9,
+          63.475
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "KAR04FIN",
+        "Lat/Lon/Height": "63.4750/22.9000/75.9",
+        "Country/Region": "FIN",
+        "City": "Umeå Syd",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo",
+        "GNSS Network": "FINNET",
+        "RINEX Data DOI": "doi:10.24414/m3g.kar04fin"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.8333,
+          64.3583
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "KIR05FIN",
+        "Lat/Lon/Height": "64.3583/24.8333/75.9",
+        "Country/Region": "FIN",
+        "City": "Rovaniemi",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo",
+        "GNSS Network": "FINNET",
+        "RINEX Data DOI": "doi:10.24414/m3g.kir05fin"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          26.7667,
+          59.9417
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "LUL06FIN",
+        "Lat/Lon/Height": "59.9417/26.7667/75.9",
+        "Country/Region": "FIN",
+        "City": "Tampere",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo+BeiDou",
+        "GNSS Network": "FINNET",
+        "RINEX Data DOI": "doi:10.24414/m3g.lul06fin"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          28.7,
+          60.825
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "UME07FIN",
+        "Lat/Lon/Height": "60.8250/28.7000/75.9",
+        "Country/Region": "FIN",
+        "City": "Oulu",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo",
+        "GNSS Network": "FINNET",
+        "RINEX Data DOI": "doi:10.24414/m3g.ume07fin"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          30.6333,
+          61.7083
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "MAL08FIN",
+        "Lat/Lon/Height": "61.7083/30.6333/75.9",
+        "Country/Region": "FIN",
+        "City": "Espoo",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo",
+        "GNSS Network": "FINNET",
+        "RINEX Data DOI": "doi:10.24414/m3g.mal08fin"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          26.7667,
+          62.5917
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "NOR09FIN",
+        "Lat/Lon/Height": "62.5917/26.7667/75.9",
+        "Country/Region": "FIN",
+        "City": "Hämeenlinna",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo+BeiDou",
+        "GNSS Network": "FINNET",
+        "RINEX Data DOI": "doi:10.24414/m3g.nor09fin"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          28.7,
+          63.475
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "ALB10FIN",
+        "Lat/Lon/Height": "63.4750/28.7000/75.9",
+        "Country/Region": "FIN",
+        "City": "Helsingfors",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo",
+        "GNSS Network": "FINNET",
+        "RINEX Data DOI": "doi:10.24414/m3g.alb10fin"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          30.6333,
+          64.3583
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "ARJ11FIN",
+        "Lat/Lon/Height": "64.3583/30.6333/75.9",
+        "Country/Region": "FIN",
+        "City": "Joensuu",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo",
+        "GNSS Network": "FINNET",
+        "RINEX Data DOI": "doi:10.24414/m3g.arj11fin"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          20.9667,
+          65.2417
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "GOT12FIN",
+        "Lat/Lon/Height": "65.2417/20.9667/75.9",
+        "Country/Region": "FIN",
+        "City": "Umeå Syd",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo+BeiDou",
+        "GNSS Network": "FINNET",
+        "RINEX Data DOI": "doi:10.24414/m3g.got12fin"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          22.9,
+          66.125
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "HIS13FIN",
+        "Lat/Lon/Height": "66.1250/22.9000/75.9",
+        "Country/Region": "FIN",
+        "City": "Rovaniemi",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo",
+        "GNSS Network": "FINNET",
+        "RINEX Data DOI": "doi:10.24414/m3g.his13fin"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.8333,
+          67.0083
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "KAR14FIN",
+        "Lat/Lon/Height": "67.0083/24.8333/75.9",
+        "Country/Region": "FIN",
+        "City": "Tampere",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo",
+        "GNSS Network": "FINNET",
+        "RINEX Data DOI": "doi:10.24414/m3g.kar14fin"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          20.9667,
+          67.8917
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "KIR15FIN",
+        "Lat/Lon/Height": "67.8917/20.9667/75.9",
+        "Country/Region": "FIN",
+        "City": "Oulu",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo+BeiDou",
+        "GNSS Network": "FINNET",
+        "RINEX Data DOI": "doi:10.24414/m3g.kir15fin"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          22.9,
+          68.775
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "LUL16FIN",
+        "Lat/Lon/Height": "68.7750/22.9000/75.9",
+        "Country/Region": "FIN",
+        "City": "Espoo",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo",
+        "GNSS Network": "FINNET",
+        "RINEX Data DOI": "doi:10.24414/m3g.lul16fin"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.8333,
+          69.6583
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "UME17FIN",
+        "Lat/Lon/Height": "69.6583/24.8333/75.9",
+        "Country/Region": "FIN",
+        "City": "Hämeenlinna",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo",
+        "GNSS Network": "FINNET",
+        "RINEX Data DOI": "doi:10.24414/m3g.ume17fin"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          26.7667,
+          65.2417
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "MAL18FIN",
+        "Lat/Lon/Height": "65.2417/26.7667/75.9",
+        "Country/Region": "FIN",
+        "City": "Helsingfors",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo+BeiDou",
+        "GNSS Network": "FINNET",
+        "RINEX Data DOI": "doi:10.24414/m3g.mal18fin"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          28.7,
+          66.125
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "NOR19FIN",
+        "Lat/Lon/Height": "66.1250/28.7000/75.9",
+        "Country/Region": "FIN",
+        "City": "Joensuu",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo",
+        "GNSS Network": "FINNET",
+        "RINEX Data DOI": "doi:10.24414/m3g.nor19fin"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          30.6333,
+          67.0083
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "ALB20FIN",
+        "Lat/Lon/Height": "67.0083/30.6333/75.9",
+        "Country/Region": "FIN",
+        "City": "Umeå Syd",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo",
+        "GNSS Network": "FINNET",
+        "RINEX Data DOI": "doi:10.24414/m3g.alb20fin"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          26.7667,
+          67.8917
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "ARJ21FIN",
+        "Lat/Lon/Height": "67.8917/26.7667/75.9",
+        "Country/Region": "FIN",
+        "City": "Rovaniemi",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo+BeiDou",
+        "GNSS Network": "FINNET",
+        "RINEX Data DOI": "doi:10.24414/m3g.arj21fin"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          28.7,
+          68.775
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "GOT22FIN",
+        "Lat/Lon/Height": "68.7750/28.7000/75.9",
+        "Country/Region": "FIN",
+        "City": "Tampere",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo",
+        "GNSS Network": "FINNET",
+        "RINEX Data DOI": "doi:10.24414/m3g.got22fin"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          30.6333,
+          69.6583
+        ]
+      },
+      "properties": {
+        "GNSS Station ID": "HIS23FIN",
+        "Lat/Lon/Height": "69.6583/30.6333/75.9",
+        "Country/Region": "FIN",
+        "City": "Oulu",
+        "Station Status": "Active",
+        "Satellite Constellation (Current)": "GPS+GLONASS+Galileo",
+        "GNSS Network": "FINNET",
+        "RINEX Data DOI": "doi:10.24414/m3g.his23fin"
+      }
+    }
+  ]
+}

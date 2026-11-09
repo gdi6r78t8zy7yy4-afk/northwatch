@@ -48,6 +48,7 @@ const TYPE_COLORS = {
   flowmatning: '#ffd166',
   station: '#ff79b0',
   kamera: '#9be564',
+  'gnss-station': '#7fd8ff',
 };
 
 const TYPE_LABELS = {
@@ -61,6 +62,7 @@ const TYPE_LABELS = {
   flowmatning: 'Flödesmätare (Trafikverket)',
   station: 'Järnvägsstation (Trafikverket)',
   kamera: 'Speedkamera (Trafikverket)',
+  'gnss-station': 'GNSS-station (M3G / EPOS)',
 };
 
 const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -391,9 +393,10 @@ export default function MapPanel({
   const hasFlowmatning = assets.some(a => a.type === 'flowmatning');
   const hasStation = assets.some(a => a.type === 'station');
   const hasKamera = assets.some(a => a.type === 'kamera');
+  const hasGnss = assets.some(a => a.type === 'gnss-station');
   const hasEvents = events.length > 0;
   const empty = !hasIx && !hasOsm && !hasFlow && !hasFartyg && !hasFlowmatning
-    && !hasStation && !hasKamera && !hasEvents;
+    && !hasStation && !hasKamera && !hasGnss && !hasEvents;
 
   return (
     <div className="card">
@@ -468,6 +471,7 @@ export default function MapPanel({
         {hasFlowmatning && <span><i className="pt" style={{ background: TYPE_COLORS.flowmatning }} />Flödesmätare (topp 25)</span>}
         {hasStation && <span><i className="pt" style={{ background: TYPE_COLORS.station }} />Järnvägsstation</span>}
         {hasKamera && <span><i className="pt" style={{ background: TYPE_COLORS.kamera }} />Speedkamera (huvudvägar)</span>}
+        {hasGnss && <span><i className="pt" style={{ background: TYPE_COLORS['gnss-station'] }} />GNSS-station (M3G)</span>}
         {hasEvents && <span><i style={{ background: '#ff5b66' }} />Trafikhändelse</span>}
       </div>
       {wx && (

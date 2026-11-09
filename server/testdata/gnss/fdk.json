@@ -1,0 +1,74 @@
+{
+  "gnss": {
+    "hits": [
+      {
+        "id": "uuid-gnss",
+        "title": "GNSS dataset",
+        "organizationName": "Kartverket"
+      }
+    ],
+    "aggregations": {
+      "openData": [
+        {
+          "key": "true",
+          "count": 3
+        },
+        {
+          "key": "false",
+          "count": 0
+        }
+      ],
+      "accessRights": [
+        {
+          "key": "PUBLIC",
+          "count": 3
+        },
+        {
+          "key": "Restricted",
+          "count": 0
+        }
+      ]
+    },
+    "page": {
+      "totalElements": 3,
+      "size": 1,
+      "numberOfElements": 1
+    }
+  },
+  "posisjonering": {
+    "hits": [
+      {
+        "id": "uuid-posisjonering",
+        "title": "POSISJONERING dataset",
+        "organizationName": "Kartverket"
+      }
+    ],
+    "aggregations": {
+      "openData": [
+        {
+          "key": "true",
+          "count": 3
+        },
+        {
+          "key": "false",
+          "count": 0
+        }
+      ],
+      "accessRights": [
+        {
+          "key": "PUBLIC",
+          "count": 1
+        },
+        {
+          "key": "Restricted",
+          "count": 0
+        }
+      ]
+    },
+    "page": {
+      "totalElements": 1,
+      "size": 1,
+      "numberOfElements": 1
+    }
+  }
+}

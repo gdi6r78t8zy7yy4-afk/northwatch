@@ -12,6 +12,7 @@ import CyberOsvPanel from '../components/CyberOsvPanel.jsx';
 import CyberPrioritizedPanel from '../components/CyberPrioritizedPanel.jsx';
 import IndustryView from '../components/IndustryView.jsx';
 import ForvaltningView from '../components/ForvaltningView.jsx';
+import GnssView from '../components/GnssView.jsx';
 
 export default function DashboardPage({ country }) {
   const { id } = useParams();
@@ -149,7 +150,14 @@ export default function DashboardPage({ country }) {
         />
       )}
 
-      {area.id === 12 ? (
+      {area.id === 10 ? (
+        // M12: GNSS/rymd (område 10) – GNSS-index per land (tillgänglighet/
+        // stabilitet/varningstäthet/täckning) + per-källa-widgeter (NOAA,
+        // CelesTrak, GSC Europa, M3G/EPOS, data.norge.no, APOD) samt en
+        // korrelationspanel (rymdväder × NAGU). Stationerna visas i MapPanel
+        // ovan. ERSÄTTER de generiska tabellerna.
+        <GnssView country={country} />
+      ) : area.id === 12 ? (
         // M11: offentlig förvaltning (område 12) – Förvaltningsindex per land
         // (aktivitet/kontinuitet/observerbarhet) + per-källa-widgeter
         // (Riksdagen, FDK, Retsinformation, Finlex, IPU, data.europa.eu,

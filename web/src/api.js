@@ -91,3 +91,14 @@ export const fetchForvaltningStatus = (country = 'NORDIC') =>
   getRaw(`/api/forvaltning/status?country=${encodeURIComponent(country)}`);
 export const fetchForvaltningData = (country = 'NORDIC') =>
   getRaw(`/api/forvaltning/data?country=${encodeURIComponent(country)}`);
+
+// M12: GNSS/rymd (område 10) – GNSS-index + underliggande records per källa,
+// via backend /api/gnss/*. Samma modell som /api/industry/* och
+// /api/forvaltning/*: country = SE/NO/DK/FI/IS för landsvy, NORDIC (eller ALL)
+// för sammanfattningen. /correlation är async (valfri LLM-berikelse i
+// backenden) och pollas av sin egen panel.
+export const fetchGnssStatus = (country = 'NORDIC') =>
+  getRaw(`/api/gnss/status?country=${encodeURIComponent(country)}`);
+export const fetchGnssData = (country = 'NORDIC') =>
+  getRaw(`/api/gnss/data?country=${encodeURIComponent(country)}`);
+export const fetchGnssCorrelation = () => getRaw('/api/gnss/correlation');
