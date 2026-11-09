@@ -1,0 +1,47 @@
+[
+  {
+    "anforande": {
+      "talare": "A. Andersson",
+      "parti": "S",
+      "dok_titel": "Motion 2026/27:12",
+      "anforande_nummer": 1,
+      "kanal": "Plenarie"
+    }
+  },
+  {
+    "anforande": {
+      "talare": "D. Dahl",
+      "parti": "M",
+      "dok_titel": "Motion 2026/27:12",
+      "anforande_nummer": 2,
+      "kanal": "Plenarie"
+    }
+  },
+  {
+    "anforande": {
+      "talare": "B. Björk",
+      "parti": "MP",
+      "dok_titel": "Prop 2026/27:45",
+      "anforande_nummer": 3,
+      "kanal": "Plenarie"
+    }
+  },
+  {
+    "anforande": {
+      "talare": "G. Gustafsson",
+      "parti": "C",
+      "dok_titel": "Prop 2026/27:45",
+      "anforande_nummer": 4,
+      "kanal": "Plenarie"
+    }
+  },
+  {
+    "anforande": {
+      "talare": "I. Ilmarinen",
+      "parti": "V",
+      "dok_titel": "Motion 2026/27:88",
+      "anforande_nummer": 5,
+      "kanal": "Skärmar"
+    }
+  }
+]

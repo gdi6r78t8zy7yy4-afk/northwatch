@@ -304,6 +304,21 @@ tr.detail-row > td { background: var(--mut-bg); padding: 10px 12px; font-size: 1
 .neg { color: var(--err); }
 .pos { color: var(--ok); }
 
+/* M11: förvaltningspaneler (område 12) – indexlabels + händelserader */
+.fv-hog { color: var(--ok); background: var(--ok-bg); }
+.fv-stab { color: var(--accent); background: var(--mut-bg); }
+.fv-opp { color: var(--warn); background: var(--warn-bg); }
+.fv-svag { color: var(--err); background: var(--err-bg); }
+.fv-unknown { color: var(--mut); background: var(--none-bg); }
+.fv-events { display: flex; flex-direction: column; gap: 4px; margin: 8px 0; }
+.fv-event {
+  display: flex; align-items: baseline; gap: 8px; font-size: 12px;
+  border: 1px solid var(--bd); border-left: 3px solid var(--accent);
+  border-radius: 6px; padding: 5px 8px;
+}
+.fv-section-head { margin: 10px 0 6px; }
+.fv-section-head h3 { font-size: 13px; margin: 0 0 2px; }
+
 /* Hybrid energy dashboard */
 .energy-page { color:var(--tx); }
 .energy-heading { display:flex; align-items:flex-start; justify-content:space-between; gap:18px; margin:4px 0 14px; }

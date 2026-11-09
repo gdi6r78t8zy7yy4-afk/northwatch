@@ -17,6 +17,7 @@ import { apiForecastMeta, apiForecastPoint, apiForecastGrid, apiForecastGridCoor
 import { apiCyberNvd, apiCyberKev, apiCyberOsv, apiCyberPrioritized, apiCyberOverview } from './lib/cyber.js';
 import { buildEnergyOverview } from './lib/energy.js';
 import { industryStatus, industryData } from './lib/industry.js';
+import { forvaltningStatus, forvaltningData } from './lib/forvaltning.js';
 import { parseEnergyRange, buildEnergyHistory, buildEnergyAnalysis } from './lib/energy-insights.js';
 
 for (const c of COLLECTORS) registerSource(c);
@@ -142,6 +143,21 @@ const routes = {
     const country = (u.searchParams.get('country') || 'NORDIC').toUpperCase();
     const srcs = areaSources(7).map(s => ({ ...s, status: sourceStatus(s) }));
     return { generatedAt: now(), country, ...industryData(country, srcs) };
+  },
+
+  // M11: förvaltningsstatus (område 12) – synkron, beräknad ur kollektornas
+  // records (lib/forvaltning.js). /status ger Förvaltningsindex + drivfaktorer
+  // per land eller NORDIC; /data ger records + källstatus för panelerna.
+  '/api/forvaltning/status': u => {
+    const country = (u.searchParams.get('country') || 'NORDIC').toUpperCase();
+    const recs = areaSources(12).flatMap(s => s.records);
+    return { generatedAt: now(), ...forvaltningStatus(country, recs) };
+  },
+
+  '/api/forvaltning/data': u => {
+    const country = (u.searchParams.get('country') || 'NORDIC').toUpperCase();
+    const srcs = areaSources(12).map(s => ({ ...s, status: sourceStatus(s) }));
+    return { generatedAt: now(), country, ...forvaltningData(country, srcs) };
   },
 };
 

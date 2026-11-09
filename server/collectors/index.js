@@ -1,6 +1,13 @@
-// Källregistret – 43 källor: M1 (9) + M2 (9) + M3 (4 OSM/Overpass) + M4 (10)
+// Källregistret – 50 källor: M1 (9) + M2 (9) + M3 (4 OSM/Overpass) + M4 (10)
 // + svk-hist + smhi-forecast (M8) + kev/nvd/osv (M9) + M10 (5:
-// eurostat-industry, oecd, rmis, comtrade, statice).
+// eurostat-industry, oecd, rmis, comtrade, statice) + M11 (7: riksdagen,
+// fdk, retsinformation, finlex, ipu, dataportal, cellar).
+// M11 (2026-11-08): offentlig förvaltning (område 12) – Sveriges riksdag
+// (kalender + votering/anförande-zips + personregister, vecko), DigDir Felles
+// datakatalog (sök-API, vecko), Retsinformation (dansk lagändringar, daglig),
+// Finlex (finländsk lagsättning via AKN-URI, vecko), IPU Parline (parlament
+// som 5-länders bas, vecko), data.europa.eu hub-sök (månad) och EUR-Lex/Cellar
+// SPARQL CELEX-räkning (månad). Se README "M11".
 // M10 (2026-11-07): industri-/tillverkningsområdet (7) – Eurostat SDMX 2.1
 // (sju flöden, CC-drivena keyqueries), OECD stålkapacitet (SDMX CSV),
 // JRC RMIS/EU CRMs (kritiska råvaror), UN Comtrade (preview eller gratisnyckel
@@ -61,6 +68,13 @@ import oecd from './oecd.js';
 import rmis from './rmis.js';
 import comtrade from './comtrade.js';
 import statice from './statice.js';
+import riksdagen from './riksdagen.js';
+import fdk from './fdk.js';
+import retsinformation from './retsinformation.js';
+import finlex from './finlex.js';
+import ipu from './ipu.js';
+import dataportal from './dataportal.js';
+import cellar from './cellar.js';
 
 export const COLLECTORS = [
   smhi,
@@ -103,4 +117,11 @@ export const COLLECTORS = [
   rmis,
   comtrade,
   statice,
+  riksdagen,
+  fdk,
+  retsinformation,
+  finlex,
+  ipu,
+  dataportal,
+  cellar,
 ];

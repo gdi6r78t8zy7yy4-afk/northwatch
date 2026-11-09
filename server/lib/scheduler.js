@@ -3,6 +3,11 @@
 // tjänster samtidigt vid uppstart.
 import { setResult, setError, setNoKey, state } from './store.js';
 
+// setTimeout kan inte representera mer än 2^31-1 ms; Node clampar annars
+// tiden till 1 ms och källan pollaras back-to-back i stället för med sin
+// takt. Månadstakter (2 592 000 s) kläms därför till ~24,9 d.
+const MAX_TIMEOUT_MS = 2147483647;
+
 async function run(c) {
   const s = state.sources.get(c.id);
   // need kan vara ett env-namn eller en lista (svk.js/svk-hist.js har varsin
@@ -25,7 +30,8 @@ export function startScheduler(collectors) {
   collectors.forEach((c, i) => {
     setTimeout(() => {
       run(c);
-      const loop = () => { run(c).finally(() => setTimeout(loop, c.every * 1000)); };
+      const delay = Math.min(c.every * 1000, MAX_TIMEOUT_MS);
+      const loop = () => { run(c).finally(() => setTimeout(loop, delay)); };
       setTimeout(loop, 25000);
     }, Math.min(i * 2000, 20000));
   });

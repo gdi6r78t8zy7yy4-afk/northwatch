@@ -1,0 +1,288 @@
+{
+  "SE": {
+    "parliament": {
+      "data": [
+        {
+          "type": "parliaments",
+          "id": "SE",
+          "attributes": {
+            "num_laws_adopt_parliament_per_year": [
+              { "value": 608, "date_from": "2020-01-01", "missing_reason": null, "annotation": null }
+            ],
+            "num_permanent_staff": [
+              { "value": 697, "date_from": "2020-01-01", "missing_reason": null, "annotation": null }
+            ]
+          }
+        }
+      ],
+      "meta": { "total": 1 }
+    },
+    "chamber": {
+      "data": [
+        {
+          "type": "chambers",
+          "id": "SE-LC01",
+          "attributes": {
+            "current_members_number": [
+              { "value": 349, "date_from": "2022-10-01", "missing_reason": null, "annotation": null }
+            ],
+            "current_women_number": [
+              { "value": 162, "date_from": "2022-10-01", "missing_reason": null, "annotation": null }
+            ],
+            "groups_number": [
+              { "value": 8, "date_from": "2022-10-01", "missing_reason": null, "annotation": null }
+            ],
+            "last_election": [
+              { "value": "2022-09-18", "date_from": "2022-09-18", "missing_reason": null, "annotation": null }
+            ]
+          }
+        }
+      ],
+      "meta": { "total": 1 }
+    },
+    "elections": {
+      "data": [
+        { "type": "elections", "id": "SE-LC01-E1998", "attributes": { "election_date": [{ "value": "1998-09-20" }] } },
+        { "type": "elections", "id": "SE-LC01-E2006", "attributes": { "election_date": [{ "value": "2006-09-17" }] } },
+        { "type": "elections", "id": "SE-LC01-E2014", "attributes": { "election_date": [{ "value": "2014-09-14" }] } },
+        { "type": "elections", "id": "SE-LC01-E2018", "attributes": { "election_date": [{ "value": "2018-09-09" }] } },
+        { "type": "elections", "id": "SE-LC01-E2022", "attributes": { "election_date": [{ "value": "2022-09-18" }] } }
+      ],
+      "meta": { "total": 5 }
+    },
+    "parties": {
+      "data": [
+        {
+          "political_party_code": "SE1",
+          "party_name": "Första partiet",
+          "political_party_country": "SE"
+        }
+      ],
+      "meta": { "total": 10 }
+    }
+  },
+  "NO": {
+    "parliament": {
+      "data": [
+        {
+          "type": "parliaments",
+          "id": "NO",
+          "attributes": {
+            "num_laws_adopt_parliament_per_year": [
+              { "value": 93, "date_from": "2020-01-01", "missing_reason": null, "annotation": null }
+            ],
+            "num_permanent_staff": [
+              { "value": 530, "date_from": "2020-01-01", "missing_reason": null, "annotation": null }
+            ]
+          }
+        }
+      ],
+      "meta": { "total": 1 }
+    },
+    "chamber": {
+      "data": [
+        {
+          "type": "chambers",
+          "id": "NO-LC01",
+          "attributes": {
+            "current_members_number": [
+              { "value": 169, "date_from": "2021-10-01", "missing_reason": null, "annotation": null }
+            ],
+            "current_women_number": [
+              { "value": 72, "date_from": "2021-10-01", "missing_reason": null, "annotation": null }
+            ],
+            "groups_number": [
+              { "value": 9, "date_from": "2021-10-01", "missing_reason": null, "annotation": null }
+            ],
+            "last_election": [
+              { "value": "2021-09-13", "date_from": "2021-09-13", "missing_reason": null, "annotation": null }
+            ]
+          }
+        }
+      ],
+      "meta": { "total": 1 }
+    },
+    "elections": {
+      "data": [
+        { "type": "elections", "id": "NO-LC01-E2013", "attributes": { "election_date": [{ "value": "2013-09-09" }] } },
+        { "type": "elections", "id": "NO-LC01-E2017", "attributes": { "election_date": [{ "value": "2017-09-11" }] } },
+        { "type": "elections", "id": "NO-LC01-E2021", "attributes": { "election_date": [{ "value": "2021-09-13" }] } }
+      ],
+      "meta": { "total": 3 }
+    },
+    "parties": {
+      "data": [],
+      "meta": { "total": 0 }
+    }
+  },
+  "DK": {
+    "parliament": {
+      "data": [
+        {
+          "type": "parliaments",
+          "id": "DK",
+          "attributes": {
+            "num_laws_adopt_parliament_per_year": [
+              { "value": 210, "date_from": "2020-01-01", "missing_reason": null, "annotation": null }
+            ],
+            "num_permanent_staff": [
+              { "value": 1000, "date_from": "2020-01-01", "missing_reason": null, "annotation": null }
+            ]
+          }
+        }
+      ],
+      "meta": { "total": 1 }
+    },
+    "chamber": {
+      "data": [
+        {
+          "type": "chambers",
+          "id": "DK-LC01",
+          "attributes": {
+            "current_members_number": [
+              { "value": 179, "date_from": "2022-11-15", "missing_reason": null, "annotation": null }
+            ],
+            "current_women_number": [
+              { "value": 89, "date_from": "2022-11-15", "missing_reason": null, "annotation": null }
+            ],
+            "groups_number": [
+              { "value": 10, "date_from": "2022-11-15", "missing_reason": null, "annotation": null }
+            ],
+            "last_election": [
+              { "value": "2022-11-13", "date_from": "2022-11-13", "missing_reason": null, "annotation": null }
+            ]
+          }
+        }
+      ],
+      "meta": { "total": 1 }
+    },
+    "elections": {
+      "data": [
+        { "type": "elections", "id": "DK-LC01-E2019", "attributes": { "election_date": [{ "value": "2019-06-03" }] } },
+        { "type": "elections", "id": "DK-LC01-E2022", "attributes": { "election_date": [{ "value": "2022-11-13" }] } }
+      ],
+      "meta": { "total": 2 }
+    },
+    "parties": {
+      "data": [
+        {
+          "political_party_code": "DK1",
+          "party_name": "Første parti",
+          "political_party_country": "DK"
+        }
+      ],
+      "meta": { "total": 8 }
+    }
+  },
+  "FI": {
+    "parliament": {
+      "data": [
+        {
+          "type": "parliaments",
+          "id": "FI",
+          "attributes": {
+            "num_laws_adopt_parliament_per_year": [
+              { "value": 300, "date_from": "2020-01-01", "missing_reason": null, "annotation": null }
+            ],
+            "num_permanent_staff": [
+              { "value": 1400, "date_from": "2020-01-01", "missing_reason": null, "annotation": null }
+            ]
+          }
+        }
+      ],
+      "meta": { "total": 1 }
+    },
+    "chamber": {
+      "data": [
+        {
+          "type": "chambers",
+          "id": "FI-LC01",
+          "attributes": {
+            "current_members_number": [
+              { "value": 200, "date_from": "2023-05-01", "missing_reason": null, "annotation": null }
+            ],
+            "current_women_number": [
+              { "value": 97, "date_from": "2023-05-01", "missing_reason": null, "annotation": null }
+            ],
+            "groups_number": [
+              { "value": 10, "date_from": "2023-05-01", "missing_reason": null, "annotation": null }
+            ],
+            "last_election": [
+              { "value": "2023-04-02", "date_from": "2023-04-02", "missing_reason": null, "annotation": null }
+            ]
+          }
+        }
+      ],
+      "meta": { "total": 1 }
+    },
+    "elections": {
+      "data": [
+        { "type": "elections", "id": "FI-LC01-E2019", "attributes": { "election_date": [{ "value": "2019-04-03" }] } },
+        { "type": "elections", "id": "FI-LC01-E2023", "attributes": { "election_date": [{ "value": "2023-04-02" }] } }
+      ],
+      "meta": { "total": 2 }
+    },
+    "parties": {
+      "data": [
+        {
+          "political_party_code": "FI1",
+          "party_name": "Ensimmäinen puolue",
+          "political_party_country": "FI"
+        }
+      ],
+      "meta": { "total": 8 }
+    }
+  },
+  "IS": {
+    "parliament": {
+      "data": [
+        {
+          "type": "parliaments",
+          "id": "IS",
+          "attributes": {
+            "num_laws_adopt_parliament_per_year": [
+              { "value": 40, "date_from": "2020-01-01", "missing_reason": null, "annotation": null }
+            ],
+            "num_permanent_staff": [
+              { "value": 170, "date_from": "2020-01-01", "missing_reason": null, "annotation": null }
+            ]
+          }
+        }
+      ],
+      "meta": { "total": 1 }
+    },
+    "chamber": {
+      "data": [
+        {
+          "type": "chambers",
+          "id": "IS-LC01",
+          "attributes": {
+            "current_members_number": [
+              { "value": 63, "date_from": "2024-10-01", "missing_reason": null, "annotation": null }
+            ],
+            "current_women_number": [
+              { "value": 28, "date_from": "2024-10-01", "missing_reason": null, "annotation": null }
+            ],
+            "groups_number": [
+              { "value": 7, "date_from": "2024-10-01", "missing_reason": null, "annotation": null }
+            ],
+            "last_election": [
+              { "value": "2024-09-15", "date_from": "2024-09-15", "missing_reason": null, "annotation": null }
+            ]
+          }
+        }
+      ],
+      "meta": { "total": 1 }
+    },
+    "elections": {
+      "data": [
+        { "type": "elections", "id": "IS-LC01-E2021", "attributes": { "election_date": [{ "value": "2021-09-25" }] } },
+        { "type": "elections", "id": "IS-LC01-E2024", "attributes": { "election_date": [{ "value": "2024-09-15" }] } }
+      ],
+      "meta": { "total": 2 }
+    },
+    "parties": {
+      "data": []
+    }
+  }
+}

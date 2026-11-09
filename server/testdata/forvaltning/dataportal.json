@@ -1,0 +1,137 @@
+{
+  "se": {
+    "total": 25085,
+    "recent": 1161,
+    "samples": [
+      {
+        "id": "se-ds-0001",
+        "title": {
+          "sv": "Folkmängd och befolkning i Sverige",
+          "en": "Population of Sweden"
+        },
+        "modified": "2026-11-05T10:00:00Z",
+        "catalog": {
+          "id": "scb-catalog",
+          "name": "SCB statistik"
+        }
+      },
+      {
+        "id": "se-ds-0002",
+        "title": "Regionala produktions- och inkomstkonton",
+        "modified": "2026-11-02T08:00:00Z",
+        "catalog": {
+          "id": "eur-regs",
+          "name": "Europeiska regionala konton"
+        }
+      }
+    ]
+  },
+  "no": {
+    "total": 9559,
+    "recent": 312,
+    "samples": [
+      {
+        "id": "no-ds-0001",
+        "title": {
+          "nb": "Befolkning og befolkningsutvikling",
+          "en": "Population and population development"
+        },
+        "modified": "2026-11-04T09:00:00Z",
+        "catalog": {
+          "id": "ssb-catalog",
+          "name": "SSB statistikk"
+        }
+      },
+      {
+        "id": "no-ds-0002",
+        "title": "Næringsstrukturen i Norge",
+        "modified": "2026-11-01T12:00:00Z",
+        "catalog": {
+          "id": "ssb-catalog",
+          "name": "SSB statistikk"
+        }
+      }
+    ]
+  },
+  "dk": {
+    "total": 3707,
+    "recent": 98,
+    "samples": [
+      {
+        "id": "dk-ds-0001",
+        "title": {
+          "da": "Befolkning i Danmark",
+          "en": "Population in Denmark"
+        },
+        "modified": "2026-11-03T07:30:00Z",
+        "catalog": {
+          "id": "dst-catalog",
+          "name": "Danmarks Statistik"
+        }
+      },
+      {
+        "id": "dk-ds-0002",
+        "title": "Regionalnationalregnskaber",
+        "modified": "2026-10-30T11:00:00Z",
+        "catalog": {
+          "id": "dst-catalog",
+          "name": "Danmarks Statistik"
+        }
+      }
+    ]
+  },
+  "fi": {
+    "total": 2959,
+    "recent": 45,
+    "samples": [
+      {
+        "id": "fi-ds-0001",
+        "title": {
+          "fi": "Väestö ja väestökehitys",
+          "en": "Population and population development"
+        },
+        "modified": "2026-11-02T14:00:00Z",
+        "catalog": {
+          "id": "statsfin-catalog",
+          "name": "Tilastokeskus"
+        }
+      },
+      {
+        "id": "fi-ds-0002",
+        "title": "Alueelliset tilinpuitekirjat",
+        "modified": "2026-10-29T16:00:00Z",
+        "catalog": {
+          "id": "statsfin-catalog",
+          "name": "Tilastokeskus"
+        }
+      }
+    ]
+  },
+  "is": {
+    "total": 611,
+    "recent": 3,
+    "samples": [
+      {
+        "id": "is-ds-0001",
+        "title": {
+          "is": "Íbúafjöldi Íslands",
+          "en": "Population of Iceland"
+        },
+        "modified": "2026-11-01T06:00:00Z",
+        "catalog": {
+          "id": "hstat-catalog",
+          "name": "Hagstofa Íslands"
+        }
+      },
+      {
+        "id": "is-ds-0002",
+        "title": "Hagstjórnunarfrjálslyktir",
+        "modified": "2026-10-25T09:30:00Z",
+        "catalog": {
+          "id": "hstat-catalog",
+          "name": "Hagstofa Íslands"
+        }
+      }
+    ]
+  }
+}

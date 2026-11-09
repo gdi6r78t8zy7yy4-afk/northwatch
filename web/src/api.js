@@ -83,3 +83,11 @@ export const fetchIndustryStatus = (country = 'NORDIC') =>
   getRaw(`/api/industry/status?country=${encodeURIComponent(country)}`);
 export const fetchIndustryData = (country = 'NORDIC') =>
   getRaw(`/api/industry/data?country=${encodeURIComponent(country)}`);
+
+// M11: offentlig förvaltning (område 12) – Förvaltningsindex + underliggande
+// records, via backend /api/forvaltning/*. Samma modell som /api/industry/*:
+// country = SE/NO/DK/FI/IS för landsvy, NORDIC (eller ALL) för sammanfattning.
+export const fetchForvaltningStatus = (country = 'NORDIC') =>
+  getRaw(`/api/forvaltning/status?country=${encodeURIComponent(country)}`);
+export const fetchForvaltningData = (country = 'NORDIC') =>
+  getRaw(`/api/forvaltning/data?country=${encodeURIComponent(country)}`);

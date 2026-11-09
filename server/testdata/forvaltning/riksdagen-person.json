@@ -1,0 +1,12 @@
+[
+  { "status": "Tjänstgörande riksdagsledamot", "kon": "kvinna", "parti": "S", "namn": "A. Andersson" },
+  { "status": "Tjänstgörande riksdagsledamot", "kon": "man", "parti": "S", "namn": "H. Hagman" },
+  { "status": "Tjänstgörande riksdagsledamot", "kon": "kvinna", "parti": "MP", "namn": "B. Björk" },
+  { "status": "Tjänstgörande riksdagsledamot", "kon": "man", "parti": "L", "namn": "C. Chen" },
+  { "status": "Tjänstgörande riksdagsledamot", "kon": "kvinna", "parti": "C", "namn": "G. Gustafsson" },
+  { "status": "Tjänstgörande riksdagsledamot", "kon": "man", "parti": "M", "namn": "D. Dahl" },
+  { "status": "Tidigare riksdagsledamot", "kon": "kvinna", "parti": "S", "namn": "J. Johansson" },
+  { "status": "Tidigare riksdagsledamot", "kon": "man", "parti": "M", "namn": "K. Karlsson" },
+  { "status": "Tidigare riksdagsledamot", "kon": "man", "parti": "KD", "namn": "E. Eklund" },
+  { "status": "Död", "kon": "kvinna", "parti": "L", "namn": "L. Lindqvist" }
+]

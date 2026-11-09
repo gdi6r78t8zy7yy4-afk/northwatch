@@ -1,0 +1,70 @@
+[
+  {
+    "akn_uri": "http://data.finlex.fi/fi/act/statute/2025/301/fin@",
+    "status": "NEW"
+  },
+  {
+    "akn_uri": "http://data.finlex.fi/fi/act/statute/2025/301/swe@",
+    "status": "NEW"
+  },
+  {
+    "akn_uri": "http://data.finlex.fi/fi/act/statute/2025/302/fin@",
+    "status": "NEW"
+  },
+  {
+    "akn_uri": "http://data.finlex.fi/fi/act/statute/2025/302/swe@",
+    "status": "NEW"
+  },
+  {
+    "akn_uri": "http://data.finlex.fi/fi/act/statute/2025/303/fin@",
+    "status": "NEW"
+  },
+  {
+    "akn_uri": "http://data.finlex.fi/fi/act/statute/2025/303/swe@",
+    "status": "NEW"
+  },
+  {
+    "akn_uri": "http://data.finlex.fi/fi/act/statute/2025/304/fin@",
+    "status": "NEW"
+  },
+  {
+    "akn_uri": "http://data.finlex.fi/fi/act/statute/2025/305/fin@",
+    "status": "NEW"
+  },
+  {
+    "akn_uri": "http://data.finlex.fi/fi/act/statute/2025/306/fin@",
+    "status": "NEW"
+  },
+  {
+    "akn_uri": "http://data.finlex.fi/fi/act/statute/2025/401/fin@",
+    "status": "MODIFIED"
+  },
+  {
+    "akn_uri": "http://data.finlex.fi/fi/act/statute/2025/401/swe@",
+    "status": "MODIFIED"
+  },
+  {
+    "akn_uri": "http://data.finlex.fi/fi/act/statute/2025/402/fin@",
+    "status": "MODIFIED"
+  },
+  {
+    "akn_uri": "http://data.finlex.fi/fi/act/statute/2025/402/swe@",
+    "status": "MODIFIED"
+  },
+  {
+    "akn_uri": "http://data.finlex.fi/fi/act/statute/2025/403/fin@",
+    "status": "MODIFIED"
+  },
+  {
+    "akn_uri": "http://data.finlex.fi/fi/act/statute/2025/403/swe@",
+    "status": "MODIFIED"
+  },
+  {
+    "akn_uri": "http://data.finlex.fi/fi/act/statute/2025/404/fin@",
+    "status": "MODIFIED"
+  },
+  {
+    "akn_uri": "http://data.finlex.fi/fi/act/statute/2025/404/swe@",
+    "status": "MODIFIED"
+  }
+]

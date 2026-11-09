@@ -186,7 +186,7 @@ asset  { t:'a', area, country, source, type, name, id?, geometry, attrs?, update
   källa + källstatus för per-källa-panelerna; landsvy inkluderar även NORDIC-records
   (t.ex. RMIS-importberoendelarm som gäller hela blocket)
 
-## Källor (41 st)
+## Källor (48 st)
 
 | Källa | Område | Status |
 |-------|--------|--------|
@@ -232,6 +232,13 @@ asset  { t:'a', area, country, source, type, name, id?, geometry, attrs?, update
 | JRC RMIS / EU CRMs (kritiska råvaror) | 7 Industri (Nordiskt) | ok – nyckelfri; materialkatalogen (36 råvaror), EU-importberoende (händelser vid ≥50 %, high vid ≥80 %), nordisk leverans/utvinning till EU, nordiska reservor, MCI per land, CRMA-ambitioner; verifierat live 2026-11-07 |
 | UN Comtrade (varuhandel) | 7 Industri (Nordiskt) | ok – preview-läge nyckelfri (hårt rate-limited → 4 s paus, `COMTRADE_PREVIEW_DELAY_MS`); `COMTRADE_API_KEY` (gratis, comtradeplus.un.org, ~500 anrop/dag) ger fullt data-API. Båda querystring-baserade (API-dokumentation: comtradeplus.un.org/ApiDocs); keyed svaret väljs på den unika raden `motCode=0 && partner2Code=0` (totalraden, klientsida); export/import per land, senaste genomförda år, USD, partner=världen; bägge lägen verifierade live 2026-11-08 |
 | Statistics Iceland (Hagstofan, pxwebapi v1) | 7 Industri (IS) | ok – nyckelfri; varuhandel UTA06002 (exports/imports fob, cif, balans, mISK, månad); 429 vid <8 s → 9 s paus (`STATICE_DELAY_MS`); ingen aktuell industriproduktionstabell (IDN01000 avslutad 2018) → produktion via Eurostat; verifierat live 2026-11-07 |
+| Sveriges riksdag (data.riksdagen.se) | 12 Förvaltning (SE) | ok – nyckelfri (ange alltid Sveriges riksdag som källa); fyra veckovisa flöden: kammarkalendern (JSON, ~85 händelser), `votering-<kammarår>.json.zip` + `anforande-<kammarår>.json.zip` (rullande kammarårsfönster), `person.json.zip` (historiskt register); zipsens UTF-8-filnamn läses av egen nollberoendeläsare (`lib/zip.js`); subflödesfel → "hämtfel"-record (null); verifierat live 2026-11-08 |
+| DigDir Felles datakatalog (search.api.fellesdatakatalog.digdir.no) | 12 Förvaltning (NO) | ok – nyckelfri, CC0; söks-API:t (officiellt internt/instabilt, 10 rpm → 6 s takt, `FDK_DELAY_MS`): `page.totalElements` = sant antal, filter `lastXDaysModified`/`lastXDays`, `aggregations.openData` → öppna andel (98,6 %); veckohämtning, 5 frågor; verifierat live 2026-11-08 |
+| Retsinformation (api.retsinformation.dk) | 12 Förvaltning (DK) | ok – nyckelfri; `GET /v1/Documents?date=YYYY-MM-DD` (max 10 dagar bakåt, klippad 03:00), sju explicita anrop med 1,2 s takt (`RTI_DELAY_MS`); veckodagar ~100–150 dokument/dag, helger normalt tomma = data (value 0), ej fel; instabilt API (non-JSON/tom kropp på slumpmässiga datum) → 3 försök per dag med progressiv paus, kvarvarande fel → "hämtfel"-record + delvis totalt; daglig hämtning; verifierat live 2026-11-08/09 |
+| Finlex avoindata (opendata.finlex.fi) | 12 Förvaltning (FI) | ok – nyckelfri (User-Agent krävs); AKN-lista med ETTRABASERAD paginering (page=0 → 400) utan totalt antal → räkna genom paginering (`FINLEX_MAX_PAGES`, "(estimat)" vid tak); samma lag per språkversion (`fin@`/`swe@`) → avdubbling på lagenr; 429 (fönster efter ~180–200 snabba anrop) → progressiv backoff, kumulativt 5/15/30 s, bevarat delvis totalt "(estimat)"; veckohämtning (löpande år YTD + föregående år); rättspraxis/HE/AS saknas som API; verifierat live 2026-11-08/09 |
+| IPU Parline (api.data.ipu.org) | 12 Förvaltning (Nordiskt) | ok – nyckelfri, CC BY-NC-SA 4.0 (källtillkännagivande gäller); bar query-parametrar ignoreras → `filter=<fält>:<op>:<värde>`; attribut är tidsserier → sist icke-nulla värde; val hämtas alla (stigande ordning) → senaste valet; IS saknar party-record (`meta.total` saknas); veckohämtning, 20 anrop med 1 s takt (`IPU_DELAY_MS`); verifierat live 2026-11-08 |
+| data.europa.eu Data Portal (hub-sök) | 12 Förvaltning (Nordiskt) | ok – nyckelfri; landfilter via `facets={"country":[…]}` (JSON-string) + `filters=dataset`, `countOnly=true` → billiga räkningar, `minDate`+`dateType=modified` = uppdaterade ≤30 d; 3 anrop/land (total, ≤30 d, 3 nyaste som händelser); IS via EFTA-kataloger i portalen; månadshämtning; verifierat live 2026-11-08 |
+| EUR-Lex / Cellar SPARQL (publications.europa.eu) | 12 Förvaltning (Nordiskt) | ok – nyckelfri, fri återanvändning med källa; publikt SPARQL-slutpunkt (`FILTER REGEX` på CELEX – Virtuoso saknar glob); CELEX `32YYYY` = EU-rättsliga handlingar från år YYYY (L direktiv / R förordningar / D beslut); fyra räkningar (YTD + per typ); månadshämtning; verifierat live 2026-11-08 |
 
 OSM-källorna köas internt (den publika instansen 429:ar vid samtidighet) och återförs med
 backoff. Vid fortgående nätverksmisse återanvänds den senaste diskcachen och källan
@@ -259,7 +266,7 @@ schema-noteringar finns i respektive kollektors headerkommentar.
 | 15 | NO · 3 Transport | Statens vegvesen (DATEX II) | Ej tagits upp – DATEX-II-endpointen svarar 401 (ingen dokumenterad öppen åtkomst) |
 | 19 | NO · 4 Vatten | NVE (hydrologi) | Tagits upp (M4) – `nve` HydAPI: vattenstånd per station; kräver gratis `NVE_API_KEY` |
 | 21 | NO · 7 Industri | Statistics Norway / SSB | Tagits upp (M4) – `ssb`: tabell 08864 (utrikeshandel i varor, månad) |
-| 25 | NO · 12 Förvaltning | DSB / data.norge.no | Ej tagits upp – data.norge.no är enbart datakatalog (inga endpoints); DSB är operatör utan öppen data-API |
+| 25 | NO · 12 Förvaltning | DSB / data.norge.no | Tagits upp (M11) – data.norge.no = DigDir:s Felles datakatalog (`fdk`: söks-API, CC0). DSB ej: operatör utan öppen data-API. Området täcks även av riksdagen (SE), Retsinformation (DK), Finlex (FI) samt IPU + data.europa.eu + EUR-Lex (5 länder); se "Förvaltning (M11, område 12)" |
 | 34 | DK · 7 Industri | Statistics Denmark | Ej tagits upp – `api.stats.dk` TLS-mellanhänt från testnätet (ej API-brist); kan återverifieras från annat nät |
 | 40 | FI · 3 Transport | Fintraffic/Digitraffic (väg, järnväg, sjö) | Tagits upp – väg (M1) `digitraffic`; M4: `digitraffic-rail` (Rata: förseningar + tågbestånd) och `digitraffic-marine` (Meri: AIS, 6 hamncirklar, fartygslager på kartan) |
 | 41 | FI · 11 Miljö | FMI (WFS/WMS) | Ej tagits upp – öppet WFS är bara ofiltrerade sparade frågor (43 MB+- svar / grib2-referenser; inget rent JS-dekoderingsbibliotek för grib2 i projektets beroendeprofil) |
@@ -539,6 +546,157 @@ land + NORDIC) + webbtest
 koppling; `DashboardPage.test.jsx` – område 7 grenar, övriga områden rör aldrig
 `/api/industry/*`).
 
+## Förvaltning (M11, område 12)
+
+Per-källa-widgeter + beräknat Förvaltningsindex per land. Landsvyn (SE/NO/DK/FI/IS)
+visar landets nationella källa + gemensamma paneler (IS saknar nationell källa →
+luckkort); den nordiska vyn (NORDIC/ALL) visar sammanfattning – poäng, komponenter,
+per-land-tabell – samtliga sju källor och luckkort. Sju källor: Sveriges riksdag
+(SE), DigDir:s Felles datakatalog (NO), Retsinformation (DK), Finlex (FI) och tre
+gemensamma baser – IPU Parline (parlamenten som 5-länders bas), data.europa.eu
+(öppna dataset per land) och EUR-Lex/Cellar (EU:s rättsliga produktion). Analysen
+är en ren funktion (`lib/forvaltning.js`) som deriverar poängen ur `store.js`-records
+vid varan `/api/forvaltning/*`-slagning – ingen källhämtning, ingen cache.
+
+**Statusmodell (0–100 per land, viktat snitt av tre komponenter;
+`saknad källa` → saknad komponent → vikterna renormaliseras över de övriga,
+M10-modellen):**
+
+| Komponent | Vikt | Indata (per källa, 0–1-vara) | Formel (clampad 0–100) |
+|-----------|------|------------------------------|------------------------|
+| Aktivitet | 0.4 | Per-källa aktivitetsmätare (begränsade/log-skalor) | snitt över tillgängliga källor ×100 |
+| Kontinuitet | 0.3 | Institutionerna pågår – aktuella mandat/sessioner, pågående flöden | snitt ×100, därefter × **datafreshness**: 1 inom källans takt → linjärt 0 vid 3× takt (årstidsstämpel som "2026" räknas frisk) |
+| Observerbarhet | 0.3 | Öppenhet – andel öppna dataset, sammansättning, publicerad grunddata | snitt ×100 |
+
+**Per-källa mätare (varje mätare 0–1; komponenten är snittet över källorna som
+levererar den):**
+
+| Källa (takt) | Aktivitet | Kontinuitet | Observerbarhet |
+|--------------|-----------|-------------|----------------|
+| riksdagen (SE, vecko) | `log10(1 + events + 0.25·omröstn. + 0.15·anföranden)/2` | 1 vid ≥1 kommande kalenderhändelse, annars 0.2 | `0.6·(ledamöter/350) + 0.4·(kvinnor/ledamöter)` |
+| fdk (NO, vecko) | `nyregistrerade ≤365 d / 1000` | metadataändring ≤30 d > 0 → 1 / ≤365 d > 0 → 0.5 / annars 0.1 | andel öppna dataset |
+| retsinformation (DK, daglig) | `lagändringar 7 d / 500` | > 0 → 1, annars 0.4 | `dokumenttyper / 8` |
+| finlex (FI, vecko) | `nya lagar YTD / 300` | nya > 0 → 1, annars 0 | `(versioner YTD + nya + ändrade föreg. år) / 3000` |
+| ipu (5 länder, vecko) | `lagar per år / 800` | senaste val ≤7 år → 1 / ≤10 år → 0.5 / annars 0.2 | `0.5·kvinnor/ledamöter + 0.3·partier/15 + 0.2·anställda/700` |
+| dataportal (5 länder, månad) | `uppdaterade ≤30 d / 1000` | > 0 → 1, annars 0.2 | `√(total/25 000)` (mängderna skiljer ~40× mellan länderna → sqrt-skala) |
+| cellar (NORDIC, månad) | `EU-texter YTD / 3000` | > 0 → 1, annars 0 | som aktivitet |
+
+**Label: ≥75 Hög trygghet, 55–74,9 Stabilt, 35–54,9 Uppmärksamhet, <35 Svag,
+inget data Okänt.** NORDIC = snitt av de fem länderna (komponenterna var för sig,
+poängen över de länder som har en); `drivers` visar per land `XX: poäng (label)`
+och `countries` bär de fullständiga per-land-radiena till tabellen.
+
+**Kollektorer och flöden (alla nyckelfria):**
+
+- **Sveriges riksdag** (`riksdagen.js`) – ingen API-nyckel; ange alltid Sveriges
+  riksdag som källa. Fyra veckovisa flöden: kammarkalendern
+  `GET /kalender/?org=kamm&utformat=json` (URL:en ska sluta med snedstreck, annars
+  404; ~85 händelser: ~4 veckor bakåt + kommande sammanträden),
+  `votering-<kammarår>.json.zip` (ett JSON per omröstning med röster per
+  inställning) och `anforande-<kammarår>.json.zip` (rullande kammarårsfönster) samt
+  `person.json.zip` (historiskt register). Kammaråret (t.ex. 202627) härleds ur
+  datuman: sep–dec → `YYYY(YY+1)`, jan–aug → `(YYYY-1)YYYY`; 404 → prov på
+  föregående period. Zip-posterna bär UTF-8-filnamn (macOS `unzip` fastnar) →
+  egen nollberoendeläsare `lib/zip.js` (store + deflate, CRC32). Subflödesfel →
+  nollade "hämtfel"-records (comtrade-mönstret); källan är ok så snart minst ett
+  av fyra flöden levererar.
+- **DigDir Felles datakatalog** (`fdk.js`) – Norges öppna metadatakatalog, CC0.
+  Söks-API:t är officiellt internt/instabilt (OpenAPI-spec:
+  `search.api.fellesdatakatalog.digdir.no/v3/api-docs`) med 10 rpm (burst 20) →
+  6 s takt mellan anropen (`FDK_DELAY_MS`, nollas i tester).
+  `POST /search/datasets` (body `{query:"", filters, pagination:{size:1,page:0}}`);
+  `page.totalElements` är det sanna antalet (hits = en sida); verifierade filter
+  `lastXDaysModified`/`lastXDays` (Integer); `aggregations.openData` → andelen
+  öppna dataset. Fem frågor per körning: totalt, öppna antal + andel, ändrad
+  metadata ≤365 d, nyregistrerade ≤365 d, ändringar ≤30 d.
+- **Retsinformation** (`retsinformation.js`) – dansk lagändringar (Folketingets
+  lovsamling), ingen nyckel. `GET /v1/Documents?date=YYYY-MM-DD` (specifikt datum,
+  max 10 dagar bakåt; standardfönstret "senaste 24 h" undviks – det kan överlappa
+  igårs datedata); sju explicita `?date=`-anrop med 1,2 s takt (`RTI_DELAY_MS`),
+  dagens data klippad 03:00. Svaret är en bar JSON-array. API:et är instabilt
+  (non-JSON/tom kropp på slumpmässiga datum, verifierat live 2026-11-09) →
+  tre försök per dag med progressiv paus (1,2/2,4 s); även då fel →
+  "hämtfel"-record och delvis totalt (källan ej failed). Veckodagar ~100–150
+  dokument/dag; helger är normalt tomma – ett tomt fönster är data, inte ett fel
+  (value 0). Per dag + per dokumenttyp (BEK, LBK, SØF m.fl.) + de senaste 210
+  lagändringarna som händelser.
+- **Finlex** (`finlex.js`) – finländsk lagsättning via AKN-URI:er; nyckelfri men
+  User-Agent krävs. `GET …/akn/fi/act/statute/list?startYear&endYear&limit=10&page=N`:
+  page är ETTRABASERAD (page=0 → 400), svaret en bar array
+  `[{akn_uri, status:"NEW"|"MODIFIED"}]` utan totalt antal → räkna genom paginering
+  (`FINLEX_MAX_PAGES` 350 → "(estimat)" vid tak). Samma lag förekommer en gång per
+  språkversion (`/fin@`, `/swe@`) → avdubbling på lagenr. 429 (rate limit; fönstret efter
+  ~180–200 snabba anrop, verifierat 2026-11-09) → progressiv backoff,
+  kumulativt 5/15/30 s (fönstret öppnas efter ~30 s); misslyckas en sida
+  ändå bevaras de räknade som "(estimat)" (failed bara vid noll data).
+  Veckohämtning: löpande år (YTD) + föregående år (hela året). Rättspraxis
+  (HFD/KHO/HS) och HE/AS saknas som API → luckkort + renormalisering i analysen.
+- **IPU Parline** (`ipu.js`) – parlamenten som 5-länders grundbaslinje; ingen
+  nyckel, källtillkännagivande gäller (data: CC BY-NC-SA 4.0). Viktigt: bar
+  query-parametrar IGNORERAS → `filter=<fält>:<op>:<värde>` (`id:eq:SE`,
+  `id:eq:SE-LC01`, `political_party_country:eq:SE`); enveloppen `{data, meta,
+  links}`; attribut är tidsserier `[{value, date_from, …}]` → sist icke-nulla
+  värde; party-records är platta; IS saknar `meta.total` → inget partier-record
+  (panelen visar "–"); valen returneras stigande → hämta alla (≤25/land) och ta
+  senaste. 20 anrop per körning, 1 s takt (`IPU_DELAY_MS`).
+- **data.europa.eu Data Portal** (`dataportal.js`) – hub-sök, ingen auth.
+  `q=`-syntax och `sort=` ändrar INTE resultatantalet; landfiltrering görs med
+  `facets={"country":["se"]}` (JSON som string) + `filters=dataset`;
+  `countOnly=true` → `{result:{index,count}}` (billiga räkningar); `minDate` +
+  `dateType=modified` = uppdaterade ≤30 dagar. Tre anrop per land: total, ≤30 d,
+  tre nyaste (som händelser med lokaliserad titel). IS via EFTA-kataloger i
+  portalen. Månadshämtning, 1,5 s takt (`DATAPORTAL_DELAY_MS`).
+- **EUR-Lex / Cellar** (`cellar.js`) – unionsrättsliga texter via publik
+  SPARQL-slutpunkt: `POST publications.europa.eu/webapi/rdf/sparql` (body
+  `query=`, CDM-prefix). Virtuoso saknar glob-operator → `FILTER REGEX(?celex,
+  "^32026")`. CELEX `32YYYY` = EU-rättsliga handlingar från år YYYY (L direktiv,
+  R förordningar, D beslut); fyra räkningar: YTD-totalt + per typ. EU:s
+  upphovsrätt – fri återanvändning med källtillkännagivande. Månadshämtning.
+
+Uteslutna från den utökade källlistan: OECD (inget område-12-signal), norden.org
+(403, ingen öppen feed) och EUR-Lex-webservice:t (kräver registrering) – Cellars
+SPARQL täcker EU-sidan.
+
+**API:** `/api/forvaltning/status?country=` (beräknat Förvaltningsindex +
+komponenter + drivfaktorer; NORDIC ger dessutom `countries`) och
+`/api/forvaltning/data?country=ALL|<land>` (records per källa + källstatus för
+panelerna; landsvy inkluderar NORDIC-records). Båda synkrona derivationer ur
+`store.js` – svarstiden är obefintlig.
+
+**Frontend:** `ForvaltningView` (två 120 s-feeds: status + data, dependens på
+valda land) distribuerar records + `meta {loading, error, fetchedAt, onRetry}`
+till presentationella paneler (`ForvaltningPanels.jsx`) – en panel per källa
+(riksdagen, FDK, Retsinformation, Finlex, IPU, data.europa.eu, EUR-Lex/Cellar) +
+statuspanelen. Landsvyn visar landets nationella källa + gemensamma paneler; IS
+har ingen nationell källa (Althinget har inget öppet API) → luckkort
+(`IslandGapCard`), parlamentet täcks ändå via IPU. Nordic-vyn visar
+sammanfattning + samtliga sju källor + kända luckor (krisinformation &
+varningssystem, Finlex rättspraxis/HE/AS, IPU partier för IS, OECD/Norden).
+Datafelet visar fel i alla sju recordbaserade panelerna (records blir null, inte
+[]), retry hämtar datat igen.
+
+**Live-status 2026-11-08/09:** samtliga sju källor verifierade live.
+Riksdagen: 4 omröstningar (rullande fönster) / 451 anföranden / 3 527 personer i
+registret (316 tjänstgörande), ~85 kalenderhändelser. FDK: 9 227 dataset, varav
+9 101 öppna (98,6 %), 8 768 med uppdaterad metadata ≤365 d, 799 nyregistrerade
+≤365 d. Retsinformation: 2026-11-06 = 125 dokument. Finlex 2026 (löpande):
+882 nya lagar, 121 ändrade, 1 938 versioner YTD. data.europa.eu: se 25 085
+(1 161 ≤30 d), no 9 559, dk 3 707, fi 2 959, is 611. Cellar 2026 (YTD): 2 736
+EU-rättsliga texter (L 412 / R 1 288 / D 847). Fixtures i
+`server/testdata/forvaltning/` är formverifierade mot live med syntetiska värden.
+
+**Tester:** `server/test/forvaltning.test.js` (38 tester: renfunktioner –
+kammarår/iCal/zip/unzip/`openDataShare`/`summarizeDay`/`lastNDays`/`statuteNumber`/
+`lastVal` m.fl., kollektorer mot 11 fixtures med URL-rutad fetch-mock +
+Finlex-429-regression (backoff→retry, ihållande 429→estimat, noll data→failed),
+RTI-503-regression (retry→fullt totalt, ihållande→hämtfel + delvis totalt),
+inminnes- ZIP-skribent som matchar `lib/zip.js`, Förvaltningsindex-regressionvärden
+per land + NORDIC (SE 82,0 / NO 73,0 / DK 62,1 / FI 57,8 / IS 56,3 / NORDIC 66,2)
++ `forvaltningData`) + webbtest (`ForvaltningPanels.test.jsx`, 28 tester – alla
+panelers ok/fel/loading-lägen + `ForvaltningView`:s koppling till
+`/api/forvaltning/*`, IS-luckkortet och datafel som propagerar till de sju
+panelerna).
+
 ## Nycklar och kredensials (`.env`)
 
 ```
@@ -684,6 +842,31 @@ SMHI_FCST_CACHE_DIR=…   # M8 – diskcache (standard server/cache/smhi-forecas
   webbtest (industryPanels.test.jsx + DashboardPage) – fulla suite grön:
   166 servertester, 24 webbfiler / 226 webbtester. Se "Industri (M10, område 7)".
 
+- **M11 (klart 2026-11-08):** offentlig förvaltning (område 12) – sju nya
+  kollektorer, alla nyckelfria: Sveriges riksdag (kammarkalendern JSON +
+  votering/anförande-zips + personregister; egen nollberoendeläsare
+  `lib/zip.js` – zipsens UTF-8-filnamn bryter `unzip`), DigDir:s Felles
+  datakatalog (söks-API, CC0, 10 rpm → 6 s takt), Retsinformation (explicita
+  `?date=`-anrop, sju dagar; helger tomma = data), Finlex (AKN-listor,
+  ettrabaserad paginering utan totalt, avdubblad språkversioner, progressiv
+  429-backoff med bevarat delvis totalt "(estimat)"),
+  IPU Parline (parlament som 5-länders bas, `filter=`-syntax, CC BY-NC-SA 4.0),
+  data.europa.eu hub-sök (`facets`/`countOnly`) och EUR-Lex/Cellar SPARQL
+  (CELEX `32YYYY`-räkning). Rent analyslager `lib/forvaltning.js` beräknar
+  Förvaltningsindex 0–100 per land + NORDIC i tre komponenter (aktivitet 0.4 /
+  kontinuitet 0.3 / observerbarhet 0.3, per-källa mätare + datafreshness;
+  vikterna renormaliseras vid saknad källa); två synkrona endpointar
+  `/api/forvaltning/status` + `/api/forvaltning/data`. Frontend: per-källa-paneler
+  + statuswidget – landsvy detalj (IS: luckkort – ingen nationell källa),
+  nordisk vy sammanfattning + luckkort – ersätter de generiska tabellerna;
+  övriga 11 områden oförändrade. Plus fix av existerande setTimeout-överskott
+  i `lib/scheduler.js` (månadstakter > 2^31-1 ms clampades av Node till 1 ms →
+  back-to-back-polling; delay kläms nu, scheduler.test.js). Samtliga sju
+  källor verifierade live 2026-11-08/09. Servertester (forvaltning.test.js,
+  38 st + scheduler.test.js, 2 st) + webbtest (ForvaltningPanels.test.jsx,
+  28 st) – fulla suite grön: 215 servertester (1 förväntad skip), 26
+  webbfiler / 279 webbtester. Se "Förvaltning (M11, område 12)".
+
 ## Datakällor och villkor
 
 - OSM-data: ODbL – tillståndskravl gäller (M3).
@@ -723,5 +906,25 @@ SMHI_FCST_CACHE_DIR=…   # M8 – diskcache (standard server/cache/smhi-forecas
   nede 2026-11-07 – canary och status, se "Industri (M10, område 7)".
 - Statistics Iceland (M10): 429 vid anrop tättare än ~8 s → 9 s paus mellan
   struktur- och datafrågan (`STATICE_DELAY_MS`, standard 9000).
+- Sveriges riksdag (M11): nyckelfri öppendata; ange alltid Sveriges riksdag som
+  källa. Zipsens UTF-8-filnamn läses av `lib/zip.js` (macOS `unzip` fastnar).
+- DigDir Felles datakatalog (M11): CC0. Söks-API:t är officiellt internt/instabilt;
+  10 rpm (burst 20) → 6 s takt mellan anropen (`FDK_DELAY_MS`, nollas i tester).
+- Retsinformation (M11): nyckelfri. `?date=` max 10 dagar bakåt, dagens data
+  klippad 03:00; sju anrop per körning med 1,2 s takt (`RTI_DELAY_MS`).
+  Instabilt API (non-JSON/tom kropp) → 3 försök per dag med progressiv paus;
+  kvarvarande fel → "hämtfel"-record, totalt blir delvis.
+- Finlex (M11): nyckelfri men User-Agent krävs. 429 (rate limit; fönstret
+  öppnas efter ~30 s) → progressiv backoff, kumulativt 5/15/30 s; misslyckad
+  sida → bevarat delvis totalt "(estimat)". Pagineringsatak `FINLEX_MAX_PAGES`
+  (standard 350) → "(estimat)".
+- IPU Parline (M11): datat är CC BY-NC-SA 4.0 → källtillkännagivande gäller
+  (panelen bär tillkännagivandet). Bar query-parametrar ignoreras –
+  `filter=<fält>:<op>:<värde>`; 20 anrop per körning med 1 s takt
+  (`IPU_DELAY_MS`).
+- data.europa.eu (M11): nyckelfri; billiga räkningar via `countOnly=true`;
+  3 anrop/land med 1,5 s takt (`DATAPORTAL_DELAY_MS`).
+- EUR-Lex/Cellar (M11): EU:s upphovsrätt – fri återanvändning mot
+  källtillkännagivande ("Publications Office of the European Union").
 - Övrigt enligt respektive källas villkor – se API-katalogen
   (`nordic_critical_infrastructure_api_catalog_utokad.xlsx`).

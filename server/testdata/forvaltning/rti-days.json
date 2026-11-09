@@ -1,0 +1,154 @@
+[
+  [
+    {
+      "documentId": "ri-001",
+      "accessionsnummer": "2026-11-01",
+      "reasonForChange": "Bekendtgørelse om ændring af bekendtgørelse om forvaltningen af visse stoffe",
+      "documentType": { "shortName": "BEK", "id": 1 },
+      "href": "https://www.retsinformation.dk/ripsa/view.php?pid=rw20261101"
+    },
+    {
+      "documentId": "ri-002",
+      "accessionsnummer": "2026-11-02",
+      "reasonForChange": "Bekendtgørelse om tilsyn med finansiel virksomhed",
+      "documentType": { "shortName": "BEK", "id": 1 },
+      "href": "https://www.retsinformation.dk/ripsa/view.php?pid=rw20261102"
+    },
+    {
+      "documentId": "ri-003",
+      "accessionsnummer": "2026-11-03",
+      "reasonForChange": "Lov om ændring af lov om aktieselskaber",
+      "documentType": { "shortName": "LBK", "id": 2 },
+      "href": "https://www.retsinformation.dk/ripsa/view.php?pid=rw20261103"
+    },
+    {
+      "documentId": "ri-004",
+      "accessionsnummer": "2026-11-04",
+      "reasonForChange": "Vedtagelse af vejledning til lov om tilskud til energiinvesteringer",
+      "documentType": { "shortName": "VEJ", "id": 3 },
+      "href": "https://www.retsinformation.dk/ripsa/view.php?pid=rw20261104"
+    }
+  ],
+  [
+    {
+      "documentId": "ri-005",
+      "accessionsnummer": "2026-11-05",
+      "reasonForChange": "Bekendtgørelse om registreringspligt for visse erhvervsdrivende",
+      "documentType": { "shortName": "BEK", "id": 1 },
+      "href": "https://www.retsinformation.dk/ripsa/view.php?pid=rw20261105"
+    },
+    {
+      "documentId": "ri-006",
+      "accessionsnummer": "2026-11-06",
+      "reasonForChange": "Bekendtgørelse om ændring af bekendtgørelse om arbejdsmiljø",
+      "documentType": { "shortName": "BEK", "id": 1 },
+      "href": "https://www.retsinformation.dk/ripsa/view.php?pid=rw20261106"
+    },
+    {
+      "documentId": "ri-007",
+      "accessionsnummer": "2026-11-07",
+      "reasonForChange": "Lov om ændring af lov om socialservice",
+      "documentType": { "shortName": "LBK", "id": 2 },
+      "href": "https://www.retsinformation.dk/ripsa/view.php?pid=rw20261107"
+    },
+    {
+      "documentId": "ri-008",
+      "accessionsnummer": "2026-11-08",
+      "reasonForChange": "Vedtagelse af vejledning til lov om forundersøgelse af jord",
+      "documentType": { "shortName": "VEJ", "id": 3 },
+      "href": "https://www.retsinformation.dk/ripsa/view.php?pid=rw20261108"
+    },
+    {
+      "documentId": "ri-009",
+      "accessionsnummer": "2026-11-09",
+      "reasonForChange": "Lov om kritiske råvarer og batterier",
+      "documentType": { "shortName": "LOV", "id": 4 },
+      "href": "https://www.retsinformation.dk/ripsa/view.php?pid=rw20261109"
+    },
+    {
+      "documentId": "ri-010",
+      "accessionsnummer": "2026-11-10",
+      "reasonForChange": "Søgsmålsoplæg vedrørende høring om ændringer i planloven",
+      "documentType": { "shortName": "SØF", "id": 5 },
+      "href": "https://www.retsinformation.dk/ripsa/view.php?pid=rw20261110"
+    }
+  ],
+  [
+    {
+      "documentId": "ri-011",
+      "accessionsnummer": "2026-11-11",
+      "reasonForChange": "Bekendtgørelse om ændring af bekendtgørelse om skattemæssige fradragsbegrænsninger",
+      "documentType": { "shortName": "BEK", "id": 1 },
+      "href": "https://www.retsinformation.dk/ripsa/view.php?pid=rw20261111"
+    },
+    {
+      "documentId": "ri-012",
+      "accessionsnummer": "2026-11-12",
+      "reasonForChange": "Lov om ændring af lov om udbud på det offentlige marked",
+      "documentType": { "shortName": "LBK", "id": 2 },
+      "href": "https://www.retsinformation.dk/ripsa/view.php?pid=rw20261112"
+    },
+    {
+      "documentId": "ri-013",
+      "accessionsnummer": "2026-11-13",
+      "reasonForChange": "Vedtagelse af vejledning til bekendtgørelse om arbejdstid",
+      "documentType": { "shortName": "VEJ", "id": 3 },
+      "href": "https://www.retsinformation.dk/ripsa/view.php?pid=rw20261113"
+    },
+    {
+      "documentId": "ri-014",
+      "accessionsnummer": "2026-11-14",
+      "reasonForChange": "Lov om ændring af lov om sygesikring",
+      "documentType": { "shortName": "LOV", "id": 4 },
+      "href": "https://www.retsinformation.dk/ripsa/view.php?pid=rw20261114"
+    },
+    {
+      "documentId": "ri-015",
+      "accessionsnummer": "2026-11-15",
+      "reasonForChange": "Bekendtgørelse om ændring af bekendtgørelse om miljødeklaration",
+      "documentType": { "shortName": "BEK", "id": 1 },
+      "href": "https://www.retsinformation.dk/ripsa/view.php?pid=rw20261115"
+    }
+  ],
+  [
+    {
+      "documentId": "ri-016",
+      "accessionsnummer": "2026-11-16",
+      "reasonForChange": "Bekendtgørelse om ændring af bekendtgørelse om værn om personlige oplysninger",
+      "documentType": { "shortName": "BEK", "id": 1 },
+      "href": "https://www.retsinformation.dk/ripsa/view.php?pid=rw20261116"
+    },
+    {
+      "documentId": "ri-017",
+      "accessionsnummer": "2026-11-17",
+      "reasonForChange": "Lov om ændring af lov om datastrømme i den civile luftfart",
+      "documentType": { "shortName": "LBK", "id": 2 },
+      "href": "https://www.retsinformation.dk/ripsa/view.php?pid=rw20261117"
+    },
+    {
+      "documentId": "ri-018",
+      "accessionsnummer": "2026-11-18",
+      "reasonForChange": "Bekendtgørelse om ændring af bekendtgørelse om sikkerhedskrav til maskiner",
+      "documentType": { "shortName": "BEK", "id": 1 },
+      "href": "https://www.retsinformation.dk/ripsa/view.php?pid=rw20261118"
+    }
+  ],
+  [
+    {
+      "documentId": "ri-019",
+      "accessionsnummer": "2026-11-19",
+      "reasonForChange": "Bekendtgørelse om ændring af bekendtgørelse om fødevarekontrol",
+      "documentType": { "shortName": "BEK", "id": 1 },
+      "href": "https://www.retsinformation.dk/ripsa/view.php?pid=rw20261119"
+    },
+    {
+      "documentId": "ri-020",
+      "accessionsnummer": "2026-11-20",
+      "reasonForChange": "Vedtagelse af vejledning til lov om miljøvurdering",
+      "documentType": { "shortName": "VEJ", "id": 3 },
+      "href": "https://www.retsinformation.dk/ripsa/view.php?pid=rw20261120"
+    }
+  ],
+  [],
+  []
+]

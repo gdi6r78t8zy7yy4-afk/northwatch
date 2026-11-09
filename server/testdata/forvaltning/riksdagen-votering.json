@@ -1,0 +1,39 @@
+[
+  {
+    "dokvotering": {
+      "votering": [
+        { "rost": "Ja", "namn": "A. Andersson", "parti": "S" },
+        { "rost": "Ja", "namn": "B. Björk", "parti": "MP" },
+        { "rost": "Ja", "namn": "C. Chen", "parti": "L" },
+        { "rost": "Nej", "namn": "D. Dahl", "parti": "M" },
+        { "rost": "Nej", "namn": "E. Eklund", "parti": "KD" },
+        { "rost": "Frånvarande", "namn": "F. Forsberg", "parti": "SD" }
+      ]
+    }
+  },
+  {
+    "dokvotering": {
+      "votering": [
+        { "rost": "Ja", "namn": "A. Andersson", "parti": "S" },
+        { "rost": "Ja", "namn": "B. Björk", "parti": "MP" },
+        { "rost": "Ja", "namn": "G. Gustafsson", "parti": "C" },
+        { "rost": "Ja", "namn": "C. Chen", "parti": "L" },
+        { "rost": "Nej", "namn": "D. Dahl", "parti": "M" },
+        { "rost": "Frånvarande", "namn": "E. Eklund", "parti": "KD" },
+        { "rost": "Frånvarande", "namn": "H. Hagman", "parti": "S" }
+      ]
+    }
+  },
+  {
+    "dokvotering": {
+      "votering": [
+        { "rost": "Ja", "namn": "B. Björk", "parti": "MP" },
+        { "rost": "Ja", "namn": "G. Gustafsson", "parti": "C" },
+        { "rost": "Nej", "namn": "D. Dahl", "parti": "M" },
+        { "rost": "Nej", "namn": "E. Eklund", "parti": "KD" },
+        { "rost": "Nej", "namn": "F. Forsberg", "parti": "SD" },
+        { "rost": "Avstått", "namn": "I. Ilmarinen", "parti": "V" }
+      ]
+    }
+  }
+]

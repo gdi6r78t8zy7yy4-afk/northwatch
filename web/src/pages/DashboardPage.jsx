@@ -11,6 +11,7 @@ import CyberKevPanel from '../components/CyberKevPanel.jsx';
 import CyberOsvPanel from '../components/CyberOsvPanel.jsx';
 import CyberPrioritizedPanel from '../components/CyberPrioritizedPanel.jsx';
 import IndustryView from '../components/IndustryView.jsx';
+import ForvaltningView from '../components/ForvaltningView.jsx';
 
 export default function DashboardPage({ country }) {
   const { id } = useParams();
@@ -148,7 +149,15 @@ export default function DashboardPage({ country }) {
         />
       )}
 
-      {area.id === 7 ? (
+      {area.id === 12 ? (
+        // M11: offentlig förvaltning (område 12) – Förvaltningsindex per land
+        // (aktivitet/kontinuitet/observerbarhet) + per-källa-widgeter
+        // (Riksdagen, FDK, Retsinformation, Finlex, IPU, data.europa.eu,
+        // EUR-Lex/Cellar). Landsvy visar nationell källa + gemensamma källor;
+        // NORDIC/ALL visar sammanfattning + alla källor + luckkort.
+        // ERSÄTTER de generiska tabellerna.
+        <ForvaltningView country={country} />
+      ) : area.id === 7 ? (
         // M10: industri (område 7) – per-källa-widgeter (Eurostat, OECD,
         // RMIS, Comtrade, nationella statistikbyråer) + beräknad
         // industristatus per land. Landsvy visar detalj, NORDIC/ALL visar

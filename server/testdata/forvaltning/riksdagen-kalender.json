@@ -1,0 +1,55 @@
+{
+  "kalenderlista": {
+    "@antal": 6,
+    "kalender": [
+      {
+        "UID": "u-20260915-1",
+        "SUMMARY": "Söndagar (provisorisk)",
+        "CATEGORIES": "Söndagar",
+        "LOCATION": "Riksdagshuset",
+        "DTSTART": "20260915T100000",
+        "DTEND": "20260915T110000"
+      },
+      {
+        "UID": "u-20261027-1",
+        "SUMMARY": "Voteringar: budgetproposition",
+        "CATEGORIES": "Voteringar",
+        "LOCATION": "Kammarsalen",
+        "DTSTART": "20261027T100000",
+        "DTEND": "20261027T120000"
+      },
+      {
+        "UID": "u-20261103-1",
+        "SUMMARY": "Regeringens framträdande",
+        "CATEGORIES": "Regeringen",
+        "LOCATION": "Kammarsalen",
+        "DTSTART": "20261103T090000",
+        "DTEND": "20261103T100000"
+      },
+      {
+        "UID": "u-20261110-1",
+        "SUMMARY": "Plenarie: budgetdebatt",
+        "CATEGORIES": "Plenarie",
+        "LOCATION": "Kammarsalen",
+        "DTSTART": "20261110T090000",
+        "DTEND": "20261110T140000"
+      },
+      {
+        "UID": "u-20261117-1",
+        "SUMMARY": "Taletid",
+        "CATEGORIES": "Taletid",
+        "LOCATION": "Kammarsalen",
+        "DTSTART": "20261117T090000",
+        "DTEND": "20261117T120000"
+      },
+      {
+        "UID": "u-20261124-1",
+        "SUMMARY": "Utskottsammanträde, utrikesutskottet",
+        "CATEGORIES": "Utskott",
+        "LOCATION": "Riksdagshuset",
+        "DTSTART": "20261124T140000",
+        "DTEND": "20261124T150000"
+      }
+    ]
+  }
+}

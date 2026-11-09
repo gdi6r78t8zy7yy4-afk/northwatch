@@ -1,0 +1,25 @@
+{
+  "base": {
+    "page": {
+      "totalElements": 9227,
+      "hits": [
+        { "id": "fdk-ds-0001", "name": "Test dataset" }
+      ]
+    },
+    "aggregations": {
+      "openData": [
+        { "key": "true", "count": 9101 },
+        { "key": "false", "count": 126 }
+      ]
+    }
+  },
+  "m365": {
+    "page": { "totalElements": 8768 }
+  },
+  "n365": {
+    "page": { "totalElements": 799 }
+  },
+  "m30": {
+    "page": { "totalElements": 1 }
+  }
+}
