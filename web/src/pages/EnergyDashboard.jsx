@@ -491,7 +491,7 @@ export default function EnergyDashboard({ country = 'ALL', onCountryChange }) {
         <div className="energy-assessment-row"><span className="mut">Mätvärden</span><b>{data?.coverage?.metricCount ?? '—'}</b></div>
         <div className="energy-assessment-row"><span className="mut">Flödeslänkar</span><b>{data?.coverage?.flowCount ?? '—'}</b></div>
         <div className="energy-note"><b>Datatolkning</b><p>Värden visas med källans mättid. Fördröjda, frysta eller framtida leveransblock ska inte tolkas som momentan driftstatus.</p></div>
-        <div className="energy-note"><b>Coverage gaps</b><p>Verified live coverage remains uneven. Finland requires a Fingrid API key and configured datasets. Iceland's Landsnet feed currently provides a latest generation snapshot only; it does not provide demand or historical series here. Market-price and generation-mix coverage is not complete across all countries.</p></div>
+        <div className="energy-note"><b>Coverage gaps</b><p>Verified live coverage remains uneven. Finland requires a Fingrid API key and configured datasets. Iceland's Landsnet feed is currently blocked upstream (HTTP 403) and provides no observations; when reachable it reports generation components only — never demand or historical series. Norway's national production and consumption are completed daily totals in MWh per day, not instantaneous MW.</p></div>
       </section>
     </div>
     <EnergyCountryCoverage metrics={metrics}/>

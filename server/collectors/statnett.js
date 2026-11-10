@@ -6,7 +6,11 @@
 //     → [{OutAreaElspotId, InAreaElspotId, Value (MW), MeasureDate (ms)}]
 //   /restapi/ProductionConsumption/GetData?From=YYYY-MM-DD
 //     → {StartPointUTC, EndPointUTC, PeriodTickMs, Production[], Consumption[]}
-// Production/Consumption är nationella norska MW-serier med timupplösning.
+// Endpointen svarar med DAGSBUKTER i MWh (PeriodTickMs = 86 400 000; verifierat
+// live 2026-11-10: ~470–520 t MWh/dygn ≈ 20 GW medeleffekt). Parametrarna To och
+// PeriodType ignoreras – ingen timupplöst variant finns. Dagens påbörjade buket
+// är en partiell summa och hoppas alltid över; senaste HELT avslutade dygn används.
+// Enheten härleds ur PeriodTickMs: dagsbuketer → MWh/dygn, finare upplösning → MW.
 // Statnett anger 1–2 % felmarginal och att förbrukning beräknas från
 // produktion plus import/minus export. Dessa serier visar inte produktionsmix.
 import { jjson, now } from '../lib/http.js';
@@ -23,7 +27,7 @@ function utcDateDaysAgo(days, date = new Date()) {
   return d.toISOString().slice(0, 10);
 }
 
-export function normalizeProductionConsumption(payload) {
+export function normalizeProductionConsumption(payload, now = Date.now()) {
   const start = Number(payload?.StartPointUTC);
   const tick = Number(payload?.PeriodTickMs);
   const production = payload?.Production;
@@ -32,14 +36,19 @@ export function normalizeProductionConsumption(payload) {
       !Array.isArray(production) || !Array.isArray(consumption)) {
     throw new Error('Statnett ProductionConsumption: invalid time-series envelope');
   }
+  // Dagsbuketer är MWh-summor; finare upplösning (om endpointen ändras) är MW.
+  const unit = tick >= 86_400_000 ? 'MWh/dygn' : 'MW';
   const latest = (values, indicator) => {
     for (let i = values.length - 1; i >= 0; i -= 1) {
       const value = Number(values[i]);
       if (values[i] == null || (typeof values[i] === 'string' && !values[i].trim()) || !Number.isFinite(value)) continue;
       const timestamp = start + i * tick;
       if (!Number.isFinite(timestamp) || timestamp <= 0) continue;
+      // Buketens period måste vara helt avslutad – en påbörjad dagsbucket är
+      // en partiell summa och får aldrig presenteras som ett fullständigt värde.
+      if (timestamp + tick > now) continue;
       return { t: 'm', area: 1, country: 'NO', source: 'statnett',
-        indicator, value, unit: 'MW', ts: new Date(timestamp).toISOString() };
+        indicator, value, unit, ts: new Date(timestamp).toISOString() };
     }
     throw new Error(`Statnett ProductionConsumption: no valid values for ${indicator}`);
   };
