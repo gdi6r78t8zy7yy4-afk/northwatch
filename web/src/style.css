@@ -626,3 +626,52 @@ tr.detail-row > td { background: var(--mut-bg); padding: 10px 12px; font-size: 1
 .energy-price-profile-coverage { display:flex; flex-wrap:wrap; gap:4px 10px; margin-top:7px; padding-top:7px; border-top:1px solid var(--bd); color:var(--mut); font-size:9px; line-height:1.45; }
 .energy-price-profile-coverage b { color:var(--tx); font-variant-numeric:tabular-nums; }
 .energy-price-gap-warning { color:#e5b66b; }
+
+/* —— Energidashboardens widgetgrid och modalförstoring (M13) ———————— */
+.nw-widget-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(290px, 1fr)); gap:14px; margin:14px 0 18px; }
+.nw-widget { position:relative; background:var(--card); border:1px solid var(--bd); border-radius:12px; padding:13px 15px 14px; cursor:pointer; overflow:hidden; transition:transform .16s ease, box-shadow .16s ease, border-color .16s ease; }
+.nw-widget::before { content:''; position:absolute; inset:0 0 auto 0; height:3px; background:linear-gradient(90deg, var(--accent), transparent 70%); opacity:.55; transition:opacity .16s ease; }
+.nw-widget:hover, .nw-widget:focus-visible { transform:translateY(-2px); border-color:var(--accent); box-shadow:0 8px 22px rgba(0,0,0,.18); }
+.nw-widget:hover::before, .nw-widget:focus-visible::before { opacity:1; }
+.nw-widget:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
+.nw-widget-wide { grid-column:1 / -1; }
+.nw-widget-head { display:flex; align-items:center; justify-content:space-between; gap:10px; }
+.nw-widget-head h2 { margin:0; font-size:14px; letter-spacing:.01em; }
+.nw-widget-open { color:var(--mut); font-size:13px; opacity:.45; transition:opacity .16s ease, color .16s ease; }
+.nw-widget:hover .nw-widget-open, .nw-widget:focus-visible .nw-widget-open { opacity:1; color:var(--accent); }
+.nw-widget-hint { margin-top:2px; color:var(--mut); font-size:11px; line-height:1.4; }
+.nw-widget-body { margin-top:10px; min-height:56px; }
+.nw-widget-ts { font-size:10px; letter-spacing:.04em; margin:-2px 0 7px; }
+.nw-widget-cells { display:grid; grid-template-columns:repeat(auto-fill, minmax(128px, 1fr)); gap:8px; }
+.nw-widget-rows { display:flex; flex-direction:column; gap:6px; }
+.nw-cell-label { font-size:9.5px; font-weight:800; letter-spacing:.09em; text-transform:uppercase; color:var(--mut); }
+.nw-widget-item { display:flex; flex-direction:column; align-items:flex-start; gap:2px; width:100%; text-align:left; background:var(--mut-bg); border:1px solid transparent; border-radius:9px; padding:8px 10px; color:var(--tx); font:inherit; cursor:pointer; transition:border-color .14s ease, background .14s ease; }
+.nw-widget-item b { font-size:13.5px; font-variant-numeric:tabular-nums; }
+.nw-widget-item .mut { font-size:10px; line-height:1.35; }
+.nw-widget-item:hover, .nw-widget-item:focus-visible { border-color:var(--accent); background:var(--card); }
+.nw-widget-item:focus-visible { outline:2px solid var(--accent); outline-offset:1px; }
+.nw-widget-item.on { border-color:var(--accent); }
+.nw-widget-row-static { display:flex; align-items:center; gap:8px; background:var(--mut-bg); border-radius:9px; padding:7px 10px; font-size:12px; }
+.nw-widget-spread { text-align:center; padding:6px 0 2px; }
+.nw-widget-spread b { display:block; font-size:24px; font-variant-numeric:tabular-nums; letter-spacing:.01em; }
+.nw-widget-spread .mut { font-size:10.5px; }
+
+/* Modal */
+.nw-modal-backdrop { position:fixed; inset:0; z-index:60; display:flex; align-items:center; justify-content:center; padding:18px; background:rgba(8,12,18,.64); backdrop-filter:blur(3px); }
+.nw-modal { width:min(780px, 100%); max-height:90vh; overflow:auto; background:var(--card); color:var(--tx); border:1px solid var(--bd); border-radius:14px; box-shadow:0 24px 60px rgba(0,0,0,.45); padding:18px 20px 20px; }
+.nw-modal:focus-visible { outline:none; }
+.nw-modal-head { display:flex; align-items:flex-start; justify-content:space-between; gap:14px; border-bottom:1px solid var(--bd); padding-bottom:12px; margin-bottom:12px; }
+.nw-modal-head h2 { margin:0 0 3px; font-size:17px; }
+.nw-modal-head p { margin:0; font-size:11.5px; }
+.nw-modal-close { flex:none; width:30px; height:30px; border-radius:50%; border:1px solid var(--bd); background:var(--mut-bg); color:var(--tx); font-size:13px; line-height:1; cursor:pointer; }
+.nw-modal-close:hover { border-color:var(--err); color:var(--err); }
+.nw-modal-close:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
+.nw-range-switch { display:inline-flex; gap:3px; background:var(--mut-bg); border-radius:9px; padding:3px; margin-bottom:12px; }
+.nw-range-btn { border:none; background:transparent; color:var(--mut); font:inherit; font-size:11.5px; font-weight:700; padding:5px 13px; border-radius:7px; cursor:pointer; }
+.nw-range-btn.on { background:var(--accent); color:#fff; }
+.nw-range-btn:focus-visible { outline:2px solid var(--accent); outline-offset:1px; }
+.nw-modal-charts { grid-template-columns:repeat(auto-fill, minmax(300px, 1fr)); margin-bottom:6px; }
+.nw-modal-subhead { font-size:11px; font-weight:800; letter-spacing:.1em; text-transform:uppercase; color:var(--mut); border-top:1px solid var(--bd); padding-top:14px; margin:16px 0 9px; }
+.nw-modal-caveats { margin:0; padding-left:18px; color:var(--mut); font-size:11px; line-height:1.55; }
+.nw-modal-caveats li { margin-bottom:4px; }
+@media (max-width:640px) { .nw-widget-grid { grid-template-columns:1fr; } .nw-modal { padding:14px 13px 16px; } }

@@ -9,6 +9,8 @@
 //   191 – hydro production
 //   188 – nuclear production
 //   202 – industrial cogeneration (CHP)
+// Dataset 337 (day-ahead electricity price, EUR/MWh, hourly) is listed in the
+// Fingrid catalog; it cannot be verified live until a key is configured.
 // Component series are additional indicators, not an exhaustive generation
 // mix. Do not add them together to reconstruct total production.
 // API access requires a registered key; it is never exposed to the browser.
@@ -21,6 +23,7 @@ const DEFAULT_DATASETS = [
   [191, 'Vattenkraftproduktion (FI)'],
   [188, 'Kärnkraftsproduktion (FI)'],
   [202, 'Industriell kraftvärmeproduktion (FI)'],
+  [337, 'Dag-ahead-pris FI'],
 ];
 
 export function configuredDatasets(value = process.env.FINGRID_DATASETS) {

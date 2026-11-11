@@ -49,6 +49,7 @@ import digitraffic from './digitraffic.js';
 import entsoe from './entsoe.js';
 import statnett from './statnett.js';
 import energidataservice from './energidataservice.js';
+import edsDayahead from './eds-dayahead.js';
 import energinetLive from './energinet-live.js';
 import landsnet from './landsnet.js';
 import peeringdb from './peeringdb.js';
@@ -105,6 +106,7 @@ export const COLLECTORS = [
   entsoe,
   statnett,
   energidataservice,
+  edsDayahead,
   energinetLive,
   landsnet,
   trafikverket,

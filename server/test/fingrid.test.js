@@ -53,6 +53,7 @@ test('Fingrid defaults include total production/consumption and separately ident
     [191, 'Vattenkraftproduktion (FI)'],
     [188, 'Kärnkraftsproduktion (FI)'],
     [202, 'Industriell kraftvärmeproduktion (FI)'],
+    [337, 'Dag-ahead-pris FI'],
   ]);
 });
 

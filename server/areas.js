@@ -11,7 +11,7 @@ export const COUNTRIES = [
 export const AREAS = [
   { id: 1, slug: 'energi', name: 'Elförsörjning och energisystem', short: 'Energi', geo: true,
     scope: 'Elnät, produktion, förbrukning, överföring, priser, reserver, avbrott, fjärrvärme, gas, olja, bränsle',
-    gaps: 'Gas, olja, fjärrvärme och bränsle saknas i katalogen; IS saknar energikälla (Nordiskt täcks av ENTSO-E/Statnett/Energinet)' },
+    gaps: 'Gas, olja, fjärrvärme och bränsle saknas i katalogen. SE saknar nationell produktions-/förbrukningsaggregat; NO priser endast zon NO2 (Energi Data Service); FI kräver gratis Fingrid-nyckel (FINGRID_KEY) – kollektorn är klar; IS: Landsnet Amper svarar 403 (WAF), alternativ Orkustofnun/Statistics Iceland' },
   { id: 2, slug: 'digital', name: 'Elektronisk kommunikation och digital infrastruktur', short: 'Digital infrastruktur', geo: true,
     scope: 'Telekom, mobilnät, internet, fiber, datacenter, DNS, IXP, undervattenskablar, moln',
     gaps: 'Bara PeeringDB (struktur). Ingen driftstatus, DNS, datacenter eller kablar' },

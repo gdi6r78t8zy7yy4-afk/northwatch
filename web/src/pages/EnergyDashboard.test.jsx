@@ -1,7 +1,8 @@
 import { test, expect, describe, beforeEach, vi } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
 import React from 'react';
-import EnergyDashboard, { formatEnergyMetricAge } from './EnergyDashboard.jsx';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
+import EnergyDashboard from './EnergyDashboard.jsx';
 
 vi.mock('../api.js', () => ({
   fetchEnergyOverview: vi.fn(),
@@ -12,299 +13,129 @@ vi.mock('../api.js', () => ({
 }));
 
 import {
-  fetchEnergyOverview,
-  fetchEnergyHistory,
-  fetchEnergyAnalysis,
-  fetchAssets,
-  fetchStaticGeo,
+  fetchEnergyOverview, fetchEnergyHistory, fetchEnergyAnalysis, fetchAssets, fetchStaticGeo,
 } from '../api.js';
 
-const MOCK_TIMESTAMP = '2026-11-07T12:00:00.000Z';
+const TS = '2026-11-11T12:00:00.000Z';
 
 const MOCK_OVERVIEW = {
-  generatedAt: MOCK_TIMESTAMP,
-  country: 'ALL',
+  generatedAt: TS, country: 'ALL',
   metrics: [
-    { indicator: 'Svensk nettoexport (SE1–SE4)', value: 1250, unit: 'MW', ts: MOCK_TIMESTAMP, country: 'SE', source: 'svk', sourceName: 'Svenska kraftnät' },
-    { indicator: 'Total produktion (SE)', value: 16000, unit: 'MW', ts: MOCK_TIMESTAMP, country: 'SE', source: 'svk', sourceName: 'Svenska kraftnät' },
-    { indicator: 'Total förbrukning (SE)', value: 14500, unit: 'MW', ts: MOCK_TIMESTAMP, country: 'SE', source: 'svk', sourceName: 'Svenska kraftnät' },
-    { indicator: 'Total produktion (DK)', value: 3400, unit: 'MW', ts: MOCK_TIMESTAMP, country: 'DK', source: 'energinet', sourceName: 'Energi Data Service' },
-    { indicator: 'Total förbrukning (DK)', value: 3100, unit: 'MW', ts: MOCK_TIMESTAMP, country: 'DK', source: 'energinet', sourceName: 'Energi Data Service' },
-    { indicator: 'Vindproduktion (DK)', value: 1800, unit: 'MW', ts: MOCK_TIMESTAMP, country: 'DK', source: 'energinet', sourceName: 'Energi Data Service' },
-    { indicator: 'Solproduktion (DK)', value: 400, unit: 'MW', ts: MOCK_TIMESTAMP, country: 'DK', source: 'energinet', sourceName: 'Energi Data Service' },
-    { indicator: 'Vindproduktion (FI)', value: 100, unit: 'MW', ts: MOCK_TIMESTAMP, country: 'FI', source: 'fingrid', sourceName: 'Fingrid' },
-    { indicator: 'Vattenkraftproduktion (FI)', value: 250, unit: 'MW', ts: MOCK_TIMESTAMP, country: 'FI', source: 'fingrid', sourceName: 'Fingrid' },
-    { indicator: 'Kärnkraftsproduktion (FI)', value: 300, unit: 'MW', ts: MOCK_TIMESTAMP, country: 'FI', source: 'fingrid', sourceName: 'Fingrid' },
-    { indicator: 'Industriell kraftvärmeproduktion (FI)', value: 50, unit: 'MW', ts: MOCK_TIMESTAMP, country: 'FI', source: 'fingrid', sourceName: 'Fingrid' },
-    { indicator: 'Total produktion (FI)', value: 900, unit: 'MW', ts: MOCK_TIMESTAMP, country: 'FI', source: 'fingrid', sourceName: 'Fingrid' },
-    { indicator: 'Geotermisk produktion (IS)', value: 200, unit: 'MW', ts: MOCK_TIMESTAMP, country: 'IS', source: 'landsnet', sourceName: 'Landsnet' },
-    { indicator: 'Vattenkraftproduktion (IS)', value: 300, unit: 'MW', ts: MOCK_TIMESTAMP, country: 'IS', source: 'landsnet', sourceName: 'Landsnet' },
-    { indicator: 'Oljeproduktion (IS)', value: 10, unit: 'MW', ts: MOCK_TIMESTAMP, country: 'IS', source: 'landsnet', sourceName: 'Landsnet' },
-    { indicator: 'Förnybar produktion (IS)', value: 500, unit: 'MW', ts: MOCK_TIMESTAMP, country: 'IS', source: 'landsnet', sourceName: 'Landsnet' },
-    { indicator: 'Total produktion (IS)', value: 510, unit: 'MW', ts: MOCK_TIMESTAMP, country: 'IS', source: 'landsnet', sourceName: 'Landsnet' },
-    { indicator: 'CO2-intensitet (DK)', value: 45, unit: 'g/kWh', ts: MOCK_TIMESTAMP, country: 'DK', source: 'energinet', sourceName: 'Energi Data Service' },
-    { indicator: 'Dag-ahead-pris SE3', value: 24.5, unit: 'EUR/MWh', ts: MOCK_TIMESTAMP, country: 'SE', source: 'svk', sourceName: 'Svenska kraftnät' },
-    { indicator: 'Dag-ahead-pris DK1', value: 29.8, unit: 'EUR/MWh', ts: MOCK_TIMESTAMP, country: 'DK', source: 'energinet', sourceName: 'Energi Data Service' },
-    { indicator: 'aFRR-kapacitet SE3 up', value: 120, unit: 'MW', ts: MOCK_TIMESTAMP, country: 'SE', source: 'svk', sourceName: 'Svenska kraftnät' },
-    { indicator: 'aFRR-kapacitetspris SE3 up', value: 15.2, unit: 'EUR/MW', ts: MOCK_TIMESTAMP, country: 'SE', source: 'svk', sourceName: 'Svenska kraftnät' },
+    { t: 'm', area: 1, country: 'SE', source: 'elprisetjustnu', sourceName: 'Elpriset just nu', indicator: 'Dag-ahead-pris SE1', value: 0.42, unit: 'SEK/kWh', ts: TS },
+    { t: 'm', area: 1, country: 'SE', source: 'elprisetjustnu', sourceName: 'Elpriset just nu', indicator: 'Dag-ahead-pris SE2', value: 0.38, unit: 'SEK/kWh', ts: TS },
+    { t: 'm', area: 1, country: 'NO', source: 'eds-dayahead', sourceName: 'Energi Data Service – Dag-ahead-priser', indicator: 'Dag-ahead-pris NO2', value: 145.2, unit: 'EUR/MWh', ts: TS },
+    { t: 'm', area: 1, country: 'DK', source: 'energidataservice', sourceName: 'Energi Data Service', indicator: 'Total produktion (DK)', value: 3400, unit: 'MW', ts: TS },
+    { t: 'm', area: 1, country: 'DK', source: 'energidataservice', sourceName: 'Energi Data Service', indicator: 'Total förbrukning (DK)', value: 3100, unit: 'MW', ts: TS },
+    { t: 'm', area: 1, country: 'DK', source: 'energidataservice', sourceName: 'Energi Data Service', indicator: 'Vindproduktion (DK)', value: 1500, unit: 'MW', ts: TS },
+    { t: 'm', area: 1, country: 'DK', source: 'energidataservice', sourceName: 'Energi Data Service', indicator: 'Solproduktion (DK)', value: 300, unit: 'MW', ts: TS },
+    { t: 'm', area: 1, country: 'DK', source: 'energinet-live', sourceName: 'Energinet Right Now', indicator: 'CO2-intensitet (DK)', value: 105.4, unit: 'g CO2/kWh', ts: TS },
+    { t: 'm', area: 1, country: 'SE', source: 'svk', sourceName: 'Svenska kraftnät', indicator: 'aFRR-kapacitet SE4 up', value: 250, unit: 'MW', ts: TS },
+    { t: 'm', area: 1, country: 'SE', source: 'svk', sourceName: 'Svenska kraftnät', indicator: 'aFRR-kapacitetspris SE4 up', value: 187.5, unit: 'EUR/MWh', ts: TS },
   ],
-  flows: [
-    {
-      source: 'statnett',
-      name: 'NO1-SE3',
-      sourceName: 'Statnett',
-      updated: MOCK_TIMESTAMP,
-      attrs: { from: 'NO1', to: 'SE3', mw: 450 },
-    },
-  ],
-  marketComparisons: [
-    {
-      asOf: MOCK_TIMESTAMP,
-      unit: 'EUR/MWh',
-      zoneCount: 2,
-      low: { zone: 'SE3', country: 'SE', value: 24.5 },
-      high: { zone: 'DK1', country: 'DK', value: 29.8 },
-      spread: 5.3,
-      observations: [
-        { zone: 'SE3', country: 'SE', value: 24.5, unit: 'EUR/MWh', ts: MOCK_TIMESTAMP, source: 'svk', sourceName: 'Svenska kraftnät' },
-        { zone: 'DK1', country: 'DK', value: 29.8, unit: 'EUR/MWh', ts: MOCK_TIMESTAMP, source: 'energinet', sourceName: 'Energi Data Service' },
-      ],
-    },
-  ],
+  flows: [{ t: 'a', area: 1, country: 'NORDIC', source: 'svk', type: 'flow', name: 'SE3→DK1',
+    attrs: { mw: -420, from: 'SE3', to: 'DK1' }, updated: TS, sourceName: 'Svenska kraftnät' }],
+  marketComparisons: [{ asOf: Date.parse(TS), unit: 'SEK/kWh', zoneCount: 2, spread: 0.04,
+    low: { zone: 'SE2', value: 0.38, country: 'SE' }, high: { zone: 'SE1', value: 0.42, country: 'SE' },
+    observations: [{ zone: 'SE1', country: 'SE', value: 0.42, sourceName: 'Elpriset just nu' }] }],
   sources: [
-    { id: 'svk', name: 'Svenska kraftnät', country: 'SE', status: 'ok', every: '5m', lastOk: MOCK_TIMESTAMP, error: null, records: 4 },
-    { id: 'energinet', name: 'Energi Data Service', country: 'DK', status: 'ok', every: '5m', lastOk: MOCK_TIMESTAMP, error: null, records: 5 },
+    { id: 'svk', name: 'Svenska kraftnät', country: 'SE', status: 'ok', every: 900, lastOk: TS, records: 120 },
+    { id: 'fingrid', name: 'Fingrid Open Data', country: 'FI', status: 'no_key', every: 600, lastOk: null, records: 0 },
   ],
-  coverage: { sourceCount: 2, reportingSources: 2, metricCount: 9, flowCount: 1, countries: ['DK', 'SE'] },
+  coverage: { sourceCount: 5, reportingSources: 4, metricCount: 80, flowCount: 12 },
 };
 
+const MOCK_HISTORY = { series: [{ country: 'SE', source: 'elprisetjustnu', indicator: 'Dag-ahead-pris SE1', unit: 'SEK/kWh', points: [
+  { ts: '2026-11-11T10:00:00.000Z', value: 40 }, { ts: '2026-11-11T11:00:00.000Z', value: 50 }] }], count: 2 };
+
+const MOCK_ANALYSIS = { observations: [{ id: 'obs-1', severity: 'info', title: 'Prisspridning SE1–SE2',
+  summary: 'Sammanfattning', observedAt: TS, confidence: 'high', caveat: 'Obs!', evidence: [] }], methodology: 'Deterministisk metod.' };
+
+function renderDashboard(entry = '/energy') {
+  return render(<MemoryRouter initialEntries={[entry]}><EnergyDashboard country="ALL" onCountryChange={vi.fn()}/></MemoryRouter>);
+}
+
 beforeEach(() => {
-  vi.mocked(fetchEnergyOverview).mockReset();
-  vi.mocked(fetchEnergyHistory).mockReset();
-  vi.mocked(fetchEnergyAnalysis).mockReset();
-  vi.mocked(fetchAssets).mockReset();
-  vi.mocked(fetchStaticGeo).mockReset();
-
-  vi.mocked(fetchEnergyOverview).mockResolvedValue(MOCK_OVERVIEW);
-  vi.mocked(fetchEnergyHistory).mockResolvedValue({ series: [], count: 0 });
-  vi.mocked(fetchEnergyAnalysis).mockResolvedValue({ observations: [] });
-  vi.mocked(fetchAssets).mockResolvedValue({ assets: [] });
-  vi.mocked(fetchStaticGeo).mockResolvedValue(null);
+  fetchEnergyOverview.mockReset().mockResolvedValue(structuredClone(MOCK_OVERVIEW));
+  fetchEnergyHistory.mockReset().mockResolvedValue(structuredClone(MOCK_HISTORY));
+  fetchEnergyAnalysis.mockReset().mockResolvedValue(structuredClone(MOCK_ANALYSIS));
+  fetchAssets.mockReset().mockResolvedValue({ assets: [] });
+  fetchStaticGeo.mockReset().mockResolvedValue({});
 });
 
-describe('EnergyDashboard metric age', () => {
-  test('formats past, future and invalid observation timestamps precisely', () => {
-    const now = Date.parse('2026-11-08T10:00:00.000Z');
-    expect(formatEnergyMetricAge('2026-11-08T09:45:00.000Z', now)).toBe('15m ago');
-    expect(formatEnergyMetricAge('2026-11-08T12:01:00.000Z', now)).toBe('2h 1m ahead');
-    expect(formatEnergyMetricAge('2026-11-08T11:01:00.000Z', now)).toBe('1h 1m ahead');
-    expect(formatEnergyMetricAge('2026-11-08T10:01:00.000Z', now)).toBe('1 min ahead');
-    expect(formatEnergyMetricAge('2026-11-09T11:00:00.000Z', now)).toBe('1d 1h ahead');
-    expect(formatEnergyMetricAge('2026-11-07T09:00:00.000Z', now)).toBe('1d 1h ago');
-    expect(formatEnergyMetricAge('2026-11-08T10:00:00.000Z', now)).toBe('just now');
-    expect(formatEnergyMetricAge('invalid-timestamp', now)).toBe('age unavailable');
-    expect(formatEnergyMetricAge(null, now)).toBe('age unavailable');
-  });
-});
-
-describe('EnergyDashboard', () => {
-  test('gives the Nordic grid map a full dashboard row and large default viewport', async () => {
-    localStorage.removeItem('nw-energy-mapsize');
-    const { container } = render(<EnergyDashboard country="ALL" />);
-    expect(await screen.findByText('Nordic Energy Situation')).toBeInTheDocument();
-    const mainGrid = container.querySelector('.energy-main-grid');
-    expect(mainGrid.firstElementChild).toHaveClass('energy-map-card');
-    expect(mainGrid.lastElementChild).toHaveClass('energy-assessment');
-    expect(container.querySelector('.energy-map-card .mapbox')).toHaveClass('mapbox-size-L');
-    expect(container.querySelector('.energy-map-card .map-workspace')).toBeInTheDocument();
+describe('Energiwidget-dashboarden', () => {
+  test('renderar hela widgetgrupperingen i fast ordning', async () => {
+    const { container } = renderDashboard();
+    await screen.findByText('Dag-spotpriser');
+    expect(container.querySelectorAll('.nw-widget').length).toBe(11);
+    for (const title of ['Nordiskt elnät', 'Produktion & förbrukning', 'Inrikesbalans', 'Produktionsmix',
+      'CO₂-intensitet', 'Gränsflöden', 'Reservmarknad', 'Prisspridning elområden', 'Analysobservationer', 'Källor & täckning'])
+      expect(screen.getByText(title)).toBeInTheDocument();
   });
 
-  test('renders energy dashboard and KPI sections with data', async () => {
-    render(<EnergyDashboard country="ALL" />);
-    expect(await screen.findByText('Nordic Energy Situation')).toBeInTheDocument();
-    expect(screen.getByText('Production · Sverige')).toBeInTheDocument();
-    expect(screen.getByText('Consumption · Sverige')).toBeInTheDocument();
-    expect(screen.getByText('Day-ahead price · Sverige')).toBeInTheDocument();
-    expect(screen.getByText('Renewable output · Danmark')).toBeInTheDocument();
-    expect(screen.getAllByLabelText('Danmarks produktionsmix')).toHaveLength(2);
-    expect(screen.getByLabelText('Finlands produktionsmix')).toBeInTheDocument();
-    expect(screen.getByLabelText('Islands produktionsmix')).toBeInTheDocument();
-    expect(screen.getByText('Generation mix · reported country technologies')).toBeInTheDocument();
-    expect(screen.getByRole('table', { name: 'Nordic energy data coverage' })).toBeInTheDocument();
-    expect(screen.getAllByText('4 indicators').length).toBeGreaterThan(0);
-    expect(screen.getAllByText('No measurement').length).toBeGreaterThan(0);
+  test('visar senaste priser, balans och flöden med källans enheter', async () => {
+    renderDashboard();
+    await screen.findByText('Dag-spotpriser');
+    expect(screen.getByText(/145,2/)).toBeInTheDocument(); // NO2 EUR/MWh behålls
+    expect(screen.getByText('+300 MW')).toBeInTheDocument(); // DK inrikesbalans
+    expect(screen.getByText('DK1 → SE3')).toBeInTheDocument(); // negativt flöde vänder etiketten
   });
 
-  test('country selector in the energy heading updates the global country scope', async () => {
-    const onCountryChange = vi.fn();
-    render(<EnergyDashboard country="SE" onCountryChange={onCountryChange} />);
-    const selector = await screen.findByRole('combobox', { name: 'Select energy dashboard country' });
-    expect(selector).toHaveValue('SE');
-    fireEvent.change(selector, { target: { value: 'NO' } });
-    expect(onCountryChange).toHaveBeenCalledWith('NO');
+  test('klick på kort öppnar modalförstoring med historik och stänger med Esc', async () => {
+    renderDashboard();
+    const card = (await screen.findByText('Dag-spotpriser')).closest('.nw-widget');
+    fireEvent.click(card);
+    await screen.findByRole('dialog');
+    expect(fetchEnergyHistory).toHaveBeenCalledWith('ALL', '24h');
+    await waitFor(() => expect(screen.getAllByText('Dag-ahead-pris SE1').length).toBeGreaterThan(0));
+    fireEvent.keyDown(screen.getByRole('dialog'), { key: 'Escape' });
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
   });
 
-  test('country scope control is placed in a prominent toolbar below the page heading', async () => {
-    const { container } = render(<EnergyDashboard country="SE" />);
-    const toolbar = container.querySelector('.energy-country-toolbar');
-    expect(toolbar).toBeInTheDocument();
-    expect(toolbar.querySelector('select')).toHaveValue('SE');
-    expect(toolbar).toHaveTextContent('Showing country-specific indicators for Sverige');
+  test('klick på en elområdescell öppnar modalen filtrerad på zonen', async () => {
+    renderDashboard();
+    await screen.findByText('Dag-spotpriser');
+    fireEvent.click(screen.getByText(/^SE1 · SE$/));
+    const dialog = await screen.findByRole('dialog');
+    expect(dialog).toHaveAccessibleName(/Dag-spotpriser/);
+    expect(dialog.textContent).toContain('· SE1');
   });
 
-  test('historical trend and price movement widgets exclude other countries in a selected scope', async () => {
-    vi.mocked(fetchEnergyHistory).mockResolvedValue({
-      count: 4,
-      series: [
-        { country:'SE', source:'svk', indicator:'Total produktion (SE)', unit:'MW',
-          points:[{ value:100, ts:'2026-11-07T08:00:00Z' }, { value:120, ts:'2026-11-07T09:00:00Z' }] },
-        { country:'DK', source:'energinet', indicator:'Total produktion (DK)', unit:'MW',
-          points:[{ value:200, ts:'2026-11-07T08:00:00Z' }, { value:220, ts:'2026-11-07T09:00:00Z' }] },
-        { country:'SE', source:'svk', indicator:'Dag-ahead-pris SE3', unit:'SEK/MWh',
-          points:[{ value:30, ts:'2026-11-07T08:00:00Z' }, { value:35, ts:'2026-11-07T09:00:00Z' }] },
-        { country:'DK', source:'energinet', indicator:'Dag-ahead-pris DK1', unit:'DKK/MWh',
-          points:[{ value:20, ts:'2026-11-07T08:00:00Z' }, { value:25, ts:'2026-11-07T09:00:00Z' }] },
-      ],
-    });
-    render(<EnergyDashboard country="SE" />);
-    expect(await screen.findByText('SE · Production')).toBeInTheDocument();
-    expect(screen.queryByText('DK · Production')).not.toBeInTheDocument();
-    expect(screen.getByText('SE · SE3')).toBeInTheDocument();
-    expect(screen.queryByText('DK · DK1')).not.toBeInTheDocument();
+  test('djuplänk via ?w=pris öppnar modalen direkt', async () => {
+    renderDashboard('/energy?w=pris');
+    const dialog = await screen.findByRole('dialog');
+    expect(dialog).toHaveAccessibleName(/Dag-spotpriser/);
   });
 
-  test('country selection renders only country-specific generation and KPI measurements', async () => {
-    render(<EnergyDashboard country="SE" />);
-    expect(await screen.findByText('Generation & demand · Sverige')).toBeInTheDocument();
-    expect(screen.getByText('Production · Sverige')).toBeInTheDocument();
-    expect(screen.queryByText('Production · Danmark')).not.toBeInTheDocument();
-    expect(screen.queryByText('Wind + solar · Denmark')).not.toBeInTheDocument();
-    expect(screen.queryByText('Denmark (regional overview)')).not.toBeInTheDocument();
-    expect(fetchEnergyOverview).toHaveBeenCalledWith('SE');
-    expect(fetchEnergyHistory).toHaveBeenCalledWith('SE', '24h');
-    expect(fetchEnergyAnalysis).toHaveBeenCalledWith('SE');
-    expect(fetchAssets).toHaveBeenCalledWith(1, 'SE');
+  test('källwidgeten visar källor utan nyckel och modalen listar kollektorkuren', async () => {
+    renderDashboard('/energy?w=kallor');
+    const dialog = await screen.findByRole('dialog');
+    expect(dialog.textContent).toContain('Fingrid Open Data');
+    expect(dialog.textContent).toContain('Svenska kraftnät');
   });
 
-  test('historical measurements only offer and chart the selected country series', async () => {
-    vi.mocked(fetchEnergyHistory).mockResolvedValue({
-      count: 4,
-      series: [
-        { country:'SE', source:'svk', indicator:'Total produktion (SE)', unit:'MW',
-          points:[{ value:100, ts:'2026-11-07T08:00:00Z' }, { value:120, ts:'2026-11-07T09:00:00Z' }] },
-        { country:'DK', source:'energinet', indicator:'Total produktion (DK)', unit:'MW',
-          points:[{ value:200, ts:'2026-11-07T08:00:00Z' }, { value:220, ts:'2026-11-07T09:00:00Z' }] },
-      ],
-    });
-    render(<EnergyDashboard country="SE" />);
-    expect(await screen.findByRole('button', { name:/SE Total produktion \(SE\)/ })).toBeInTheDocument();
-    expect(screen.queryByRole('button', { name:/DK Total produktion \(DK\)/ })).not.toBeInTheDocument();
-    expect(screen.getByText('SE · svk · MW')).toBeInTheDocument();
-    expect(screen.queryByText('DK · energinet · MW')).not.toBeInTheDocument();
+  test('tomma dataluckor benämner saknad källa i stället för nollor', async () => {
+    fetchEnergyOverview.mockResolvedValue({ ...structuredClone(MOCK_OVERVIEW), metrics: [], flows: [] });
+    renderDashboard();
+    await screen.findByText(/Finska priser saknas|Inga dag-ahead-prisintervall/);
   });
 
-  test('historical trend chart labels both axes and exposes exact point readings', async () => {
-    vi.mocked(fetchEnergyHistory).mockResolvedValue({
-      count: 2,
-      series: [{
-        country:'SE', source:'svk', indicator:'Total produktion (SE)', unit:'MW',
-        points:[
-          { value:100, ts:'2026-11-07T08:00:00Z' },
-          { value:120, ts:'2026-11-07T09:00:00Z' },
-        ],
-      }],
-    });
-    const { container } = render(<EnergyDashboard country="SE" />);
-    const chart = await screen.findByRole('img', {
-      name:/Total produktion \(SE\) historical trend, value axis in MW, time axis in UTC/,
-    });
-    expect(chart).toBeInTheDocument();
-    expect(container.querySelector('.energy-chart svg text')).toHaveTextContent('MW');
-    expect(container.querySelector('.energy-chart svg')).toHaveTextContent('Time (UTC)');
-    const pointTitles = [...container.querySelectorAll('.energy-chart svg circle title')].map(node => node.textContent);
-    expect(pointTitles).toHaveLength(2);
-    expect(pointTitles[0]).toContain('100 MW');
-    expect(pointTitles[1]).toContain('120 MW');
-    expect(pointTitles[1]).toContain('2026-11-07');
-    expect(container.querySelector('.energy-chart-freshness')).toHaveTextContent('Latest observation:');
-    expect(container.querySelector('.energy-chart-freshness')).toHaveTextContent('2026-11-07');
+  test('analysobservationer visas på kort och i modal', async () => {
+    renderDashboard('/energy?w=analys');
+    const dialog = await screen.findByRole('dialog');
+    expect(dialog.textContent).toContain('Prisspridning SE1–SE2');
+    expect(dialog.textContent).toContain('Deterministisk metod.');
   });
 
-  test('historical charts sort observations by timestamp and exclude invalid points', async () => {
-    vi.mocked(fetchEnergyHistory).mockResolvedValue({
-      count: 3,
-      series: [{
-        country:'SE', source:'svk', indicator:'Total produktion (SE)', unit:'MW',
-        points:[
-          { value:130, ts:'2026-11-08T10:00:00Z' },
-          { value:100, ts:'2026-11-08T08:00:00Z' },
-          { value:'not-a-number', ts:'2026-11-08T09:00:00Z' },
-        ],
-      }],
-    });
-    const { container } = render(<EnergyDashboard country="SE" />);
-    await screen.findByText('SE · Production');
-    const chart = await screen.findByRole('img', {
-      name:/Total produktion \(SE\) historical trend/,
-    });
-    const pointTitles = [...chart.querySelectorAll('circle title')].map(node => node.textContent);
-    expect(pointTitles).toHaveLength(2);
-    expect(pointTitles[0]).toContain('100 MW');
-    expect(pointTitles[0]).toContain('2026-11-08 08:00 UTC');
-    expect(pointTitles[1]).toContain('130 MW');
-    expect(pointTitles[1]).toContain('2026-11-08 10:00 UTC');
-    expect(container.querySelector('.energy-chart-freshness')).toHaveTextContent('2026-11-08');
-    expect(container.querySelector('.energy-chart-warning')).toHaveTextContent('1 invalid observation');
-  });
-
-  test('Finland shows its reported wind, hydro, nuclear and CHP components', async () => {
-    render(<EnergyDashboard country="FI" />);
-    expect(await screen.findByText('Reported generation technologies · Finland')).toBeInTheDocument();
-    expect(screen.getAllByLabelText('Finlands produktionsmix')).toHaveLength(2);
-    expect(screen.getAllByText(/Hydro: 250 MW/)).toHaveLength(2);
-    expect(screen.getAllByText(/Nuclear: 300 MW/)).toHaveLength(2);
-    expect(screen.getAllByText(/not an exhaustive generation mix/)).toHaveLength(2);
-    expect(screen.getByText('Reported renewable components · Finland')).toBeInTheDocument();
-    expect(screen.getByText('Wind + hydro (reported)')).toBeInTheDocument();
-    expect(screen.getByText(/partial coverage, not a full renewable share/)).toBeInTheDocument();
-  });
-
-  test('Iceland shows geothermal, hydro and oil instead of a wind/solar placeholder', async () => {
-    render(<EnergyDashboard country="IS" />);
-    expect(await screen.findByText('Reported generation technologies · Island')).toBeInTheDocument();
-    expect(screen.getAllByLabelText('Islands produktionsmix')).toHaveLength(2);
-    expect(screen.getAllByText(/Geothermal: 200 MW/)).toHaveLength(2);
-    expect(screen.getAllByText(/Hydro: 300 MW/)).toHaveLength(2);
-    expect(screen.getAllByText(/Oil: 10 MW/)).toHaveLength(2);
-  });
-
-  test('renders market comparisons and price spread list without error', async () => {
-    render(<EnergyDashboard country="ALL" />);
-    expect(await screen.findByText('Aligned Nordic price spreads')).toBeInTheDocument();
-    expect(screen.getByText(/5,3 EUR\/MWh/)).toBeInTheDocument();
-    expect(screen.getByText(/2 bidding zones/)).toBeInTheDocument();
-  });
-
-  test('renders empty comparisons gracefully without crashing', async () => {
-    vi.mocked(fetchEnergyOverview).mockResolvedValue({
-      ...MOCK_OVERVIEW,
-      marketComparisons: [],
-    });
-    render(<EnergyDashboard country="ALL" />);
-    expect(await screen.findByText('Aligned Nordic price spreads')).toBeInTheDocument();
-    expect(screen.getByText(/No aligned bidding-zone price snapshots yet/)).toBeInTheDocument();
-  });
-
-  test('renders reserve capacity table', async () => {
-    render(<EnergyDashboard country="ALL" />);
-    expect(await screen.findByText('Reserve capacity market · aFRR / mFRR')).toBeInTheDocument();
-    expect(screen.getByText('Published capacity')).toBeInTheDocument();
-    expect(screen.getByText('aFRR')).toBeInTheDocument();
-  });
-
-  test('displays error message when overview fetch fails', async () => {
-    vi.mocked(fetchEnergyOverview).mockRejectedValue(new Error('Network offline'));
-    render(<EnergyDashboard country="ALL" />);
-    expect(await screen.findByText(/Kunde inte uppdatera energivyn: Network offline/)).toBeInTheDocument();
+  test('återhämtning av historik cachelagras per land och intervall', async () => {
+    renderDashboard();
+    const card = (await screen.findByText('Dag-spotpriser')).closest('.nw-widget');
+    fireEvent.click(card);
+    await waitFor(() => expect(fetchEnergyHistory).toHaveBeenCalledTimes(1));
+    fireEvent.click(screen.getByRole('button', { name: '7 d' }));
+    await waitFor(() => expect(fetchEnergyHistory).toHaveBeenCalledWith('ALL', '7d'));
+    // tillbaka till 24 h ska träffa cache, inte nätet
+    fireEvent.click(screen.getByRole('button', { name: '24 h' }));
+    await new Promise(resolve => setTimeout(resolve, 0));
+    expect(fetchEnergyHistory).toHaveBeenCalledTimes(2);
   });
 });

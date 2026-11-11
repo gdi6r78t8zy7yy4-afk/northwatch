@@ -209,12 +209,13 @@ asset  { t:'a', area, country, source, type, name, id?, geometry, attrs?, update
 | MITRE ATT&CK (Enterprise) | 5 Cyber (Nordiskt) | ok – veckovis, ETag-cache |
 | Svenska kraftnät Data Service (data.svk.se, CKAN datastore) | 1 Energi (SE) | ok – nyckelfri (resurs-id är publika); fysiska gränsflöden 15 min (senaste steget → mätvärde per zonpar + "Svensk nettoexport"-KPI + kartlinjer mellan elspotzoner, DELU ritas ej), aFRR/mFRR-leveransblock, sista FCR-bidmätningen; verifierat live 2026-11-03 |
 | Svenska kraftnät – historiska dataset (data.svk.se) | 1 Energi (SE) | ok – nyckelfri; fyra frusna dataset (FCR-aktiverad energi, FCR-kapacitet, FCR aggregerade volymer, dagstima-priser) med sista värdet var 6:e timme; varje post bär dataens egen tidstämpel så åldern syns i tabellen; verifierat 2026-11-03 |
-| Fingrid Open Data | 1 Energi (FI) | kräver `FINGRID_KEY`; standarduppsättning: total produktion/förbrukning + vind, vattenkraft, kärnkraft och industriell kraftvärme (MW, 3 min; dataset 192/193/181/191/188/202); `FINGRID_DATASETS` kan ersätta urvalet; produktionsslagen är delindikatorer, inte en fullständig mix |
+| Fingrid Open Data | 1 Energi (FI) | kräver `FINGRID_KEY`; standarduppsättning: total produktion/förbrukning + vind, vattenkraft, kärnkraft och industriell kraftvärme (MW, 3 min; dataset 192/193/181/191/188/202) + dag-ahead-pris FI (EUR/MWh, tim; dataset 337); `FINGRID_DATASETS` kan ersätta urvalet; produktionsslagen är delindikatorer, inte en fullständig mix |
 | Elprisetjustnu.se (API v1) | 1 Energi (SE) | nyckelfritt – day-ahead-priser per 15 min (SE1–SE4), SEK/kWh, dagens + morgondagens publicerade intervall; exkl. moms/skatter/påslag; synlig källhänvisning i dashboarden |
 | ENTSO-E Transparency Platform | 1 Energi (SE/NO/FI) | struktur verifierad; datalagret tomt 2026-11-01 (kollektorn aktiverar sig automatiskt när data finns) |
 | Statnett driftsdata | 1 Energi (NO/Nordiskt) | nyckelfritt – fysiska gränsflöden per zon + norsk nationell produktion/förbrukning som **dagsbuketer i MWh** (`PeriodTickMs` = 86 400 000; verifierat live 2026-11-10 – ingen timupplöst variant, `To`/`PeriodType` ignoreras); påbörjad dagbukett (partiell summa) hoppas alltid över → senaste hela dygn rapporteras som MWh/dygn; 1–2 % felmarginal; förbrukning beräknas från produktion och nettoimport/export |
 | Energi Data Service | 1 Energi (DK) | ok – produktion/förbrukning/nettoflöde/CO₂ per 15 min; kompletteras av Energinet PowerSystemRightNow (1 min, SCADA-baserat, approximativt) |
-| Landsnet Amper (Iceland) | 1 Energi (IS) | publikt JSON-endpoint som används av Electricity Maps – senaste produktionsmixen geotermisk/vattenkraft/olja (MW); endast aktuell snapshot, ingen historik eller förbrukningsserie; naiva tidsstämplar tolkas som Islandstid (UTC) |
+| Energi Data Service – Dag-ahead-priser (`eds-dayahead`) | 1 Energi (DK/NO) | ok – nyckelfritt; `DayAheadPrices` per 15 min (DK1/DK2 i DKK/kWh + NO2 i EUR/MWh), gårdag → morgondagens publicerade intervall; verifierat live 2026-11-11. Föregångaren `Elspotprices` lades ner vid EU:s 15-minutersomställning 2025-09-30 (sista raden 2025-09-30T21:00 UTC). Datasetet innehåller även SE3/SE4 men de utesluts – elprisetjustnu täcker alla fyra SE-zoner i SEK. NO2 = Oslo-området, partiell norsk täckning (NO1/NO3–NO5 saknas) |
+| Landsnet Amper (Iceland) | 1 Energi (IS) | blockerad – publikt JSON-endpoint som används av Electricity Maps, men svarar 403 ("blocked", WAF) för alla header-varianter från nätverket (verifierat upprepat 2026-11-11); dokumenterad produktionsmix-källa geotermisk/vattenkraft/olja (MW) när den nås; endast aktuell snapshot, ingen historik eller förbrukningsserie; naiva tidsstämplar tolkas som Islandstid (UTC). Alternativ som utreds: Orkustofnun, Statistics Iceland |
 | Trafikverket öppna dataplattform (datacache v2) | 3 Transport (SE) | kräver `TRAFIKVERKET_KEY` – omskriven till datacache-API:t 2026-11-02 (M5); väg, väglag, trafikflöden, vägväder, järnväg, färjor + speedkameror på huvudvägar (kartlager), järnvägskorsningar i drift, aktiva stationmeddelanden och ersättningsbussar för inställda tåg (M7) |
 | Digitraffic vägtrafikmeddelanden | 3 Transport (FI) | ok – v1/messages verifierad 2026-11-01 |
 | PeeringDB (IX) | 2 Digital infrastruktur (Nordiskt) | ok – verifierad 2026-11-01 |
@@ -1007,6 +1008,28 @@ LLM_MODEL=…             # M12 – modellnamn (standard qwen3.8-flash-next)
   live 2026-11-09. Servertester (gnss.test.js, 40 st) + webbtest (GnssPanels.test.jsx,
   30 st) – fulla suite grön: 255 servertester (1 förväntad skip), 27 webbfiler / 309 webbtester.
   Se "GNSS/Rymd (M12, område 10)".
+- **M13 (klart 2026-11-11):** energidashboarden (område 1) byggs om till en interaktiv
+  widgetgrid. Nytt rent register `web/src/lib/energyWidgets.js` (widgets i kurerad ordning:
+  karta → pris → produktion → balans → mix → CO₂ → flöden → reserv → prisspridning → analys
+  → källor, med selektorer som behåller källornas enheter och ärliga "Saknas"-anteckningar
+  som namnger bristande källa per widget och land); komponenterna `EnergyWidget.jsx`
+  (hela kortet klickbart + delposter), `WidgetDetailModal.jsx` (en återanvändbar
+  modalförstoring med intervallväljare 6 h/24 h/7 d/30 d, fokusfälla, Esc, scrollås och
+  djuplänk `#/energy?w=<id>&i=<post>` via searchParams) och `TrendChart.jsx`. Historik
+  cachelagras per land+intervall (60 s TTL) och hämtas lazigt vid intervallbyte. Nya
+  källor i samma pass: kollektorn `eds-dayahead.js` (Energi Data Service –
+  DayAheadPrices; det gamla Elspotprices-datasetet avvecklades i samband med EU:s
+  15-minutersövergång, sista rad 2025-09-30) som historiserar DK1/DK2 i DKK/kWh och NO2 i
+  EUR/MWh varje timme, samt Fingrid-dataset 337 (day-ahead FI, EUR/MWh) – kräver
+  `FINGRID_KEY`. Landsnet (IS) svarar fortfarande 403 bakom WAF. De fem gamla panelerna
+  (EnergySourceHealth, EnergyCountryCoverage, EnergyPriceProfiles,
+  EnergyPriceMovementAnalysis, EnergyGenerationDemandTrends) och
+  energyHistoryExplorer.js tas bort – allt deras innehåll ryms i widgetarna och modalen.
+  Certifierad live mot alla widgets via registerselektorerna: samtliga SE/NO/DK-data
+  ifyllda (7 priszoner, NO+DK-balans, DK-mix, CO₂, flöden, aFRR/mFRR, spridningar), FI/IS
+  visar korrekta luckanteckningar. Tester: server 263 (ny eds-dayahead.test.js), webb
+  294 st / 23 filer (nya energyWidgets.test.js, WidgetDetailModal.test.jsx, omskriven
+  EnergyDashboard.test.jsx).
 
 ## Datakällor och villkor
 
