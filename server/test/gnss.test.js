@@ -40,6 +40,7 @@ const rj = f => JSON.parse(rd(f));
 let celestrakFailOnce = false; // gps-ops: första anropet 503, andra OK (retry-test)
 let celestrakDown = false;     // alla gp.php-anrop 503 (totalsykt-test)
 let m3gDown = null;            // 'DNK' | '*' – M3G-anrop för landet falska
+let m3gFailOnce = null;        // 'SWE' – landets första rutnätsanrop 500, sedan OK (retry-test)
 let apodEmpty = false;         // APOD svarar [] (tomlistan kastar i kollektorn)
 let fdkFailQuery = null;       // 'posisjonering' | '*' – FDK-sökning falsk
 const calls = [];              // {url, method} för anropsräknings-anspråk
@@ -77,6 +78,7 @@ globalThis.fetch = async (url, opt = {}) => {
   m = u.match(/gnss-metadata\.eu\/v1\/sitelog\/.*country=(\w{3})/);
   if (m) {
     const cc = m[1];
+    if (m3gFailOnce === cc) { m3gFailOnce = null; return err(500); } // första rutnätet falskt → retry
     if (m3gDown === cc || m3gDown === '*') return err(500);
     const q = new URL(u).searchParams;
     const [minlat, maxlat, minlon, maxlon] = ['minlat', 'maxlat', 'minlon', 'maxlon'].map(k => Number(q.get(k)));
@@ -296,11 +298,29 @@ describe('gnss-metadata', () => {
     assert.equal(CAP, 20);
   });
 
+  test('retry: SWE första rutnätsanropet svarar 500, andra försöket OK (2026-11-11-regress)', async () => {
+    // Övergående fel hos M3G får inte slå ut ett helt land – rutan hämtas om.
+    m3gFailOnce = 'SWE';
+    const n0 = calls.length;
+    const r = await gnssMetadata.fetch();
+    assert.equal(metric(r.filter(x => x.country === 'SE'), /^GNSS-stationer \(M3G\)$/).value, 70);
+    assert.ok(!r.some(x => x.t === 'e' && x.source === 'gnss-metadata')); // inget fel rapporterat
+    const swe = calls.slice(n0).filter(c => c.url.includes('country=SWE')).length;
+    assert.equal(swe, 8 + 1); // 8 rutor + ett retry
+    m3gFailOnce = null;
+  });
+
   test('sjukt land → null-metric för det landet, övriga OK; alla sjuka kastar', async () => {
     m3gDown = 'DNK';
     const r = await gnssMetadata.fetch();
     assert.equal(metric(r.filter(x => x.country === 'DK'), /^GNSS-stationer/).value, null);
     assert.equal(metric(r.filter(x => x.country === 'SE'), /^GNSS-stationer/).value, 70);
+    // Felet ska vara diagnosticerbart – källstatus-händelse med feltexten.
+    const ev = r.find(x => x.t === 'e' && x.source === 'gnss-metadata');
+    assert.ok(ev && ev.kind === 'datakälla' && ev.severity === 'warn');
+    assert.equal(ev.country, 'DK');
+    assert.match(ev.title, /^M3G gav inga GNSS-stationer för DK$/);
+    assert.match(ev.detail, /HTTP 500 gnss-metadata\.eu/);
     m3gDown = '*';
     await assert.rejects(gnssMetadata.fetch(), /svarade inte för något land/);
     m3gDown = null;

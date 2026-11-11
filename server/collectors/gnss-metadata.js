@@ -11,6 +11,10 @@
 // i fyra kvadranter. Rutor som fortfarande är mättade efter delningen gör att
 // landets antal rapporteras som "minst". Island täcks här – althingi.is och
 // data.althingi.is svarar 403 resp. unreachable (2026-11-09).
+// Varje ruta får ett retry-försök: en övergående 503/timeout hos M3G slog ut
+// hela SWE+NOR i den planerade körningen 2026-11-11 (null-metrar i 24 h), medan
+// samma rutnät svarade felfritt minuter senare. Ett land som felar efter
+// retry rapporteras med null-metric + källstatus-händelse så felet syns.
 import { jjson, now, sleep } from '../lib/http.js';
 
 const BASE = 'https://gnss-metadata.eu/v1/sitelog/gnss-metadata';
@@ -59,8 +63,17 @@ async function fetchCountry(cc, tiles, delayMs) {
   const byId = new Map();
   let capped = false;
   const run = async tile => {
-    const d = await jjson(tileUrl(cc, tile), { timeout: 30000 });
-    return (d?.features ?? []).map(parseStation).filter(Boolean);
+    // Ett retry per ruta – se huvudkommentaren om 2026-11-11-inciden.
+    for (let attempt = 0; attempt < 2; attempt++) {
+      try {
+        const d = await jjson(tileUrl(cc, tile), { timeout: 30000 });
+        return (d?.features ?? []).map(parseStation).filter(Boolean);
+      } catch (e) {
+        if (attempt === 1) throw e;
+        await sleep(delayMs ? delayMs * 2 : 0); // paus mellan retries; nollas i tester
+      }
+    }
+    return []; // unreachable
   };
   for (const tile of tiles) {
     if (delayMs > 0) await sleep(delayMs);
@@ -102,6 +115,13 @@ export default {
         res = await fetchCountry(cc3, tiles, delay);
       } catch (e) {
         records.push({ t: 'm', area: 10, country: cc, source: 'gnss-metadata', indicator: 'GNSS-stationer (M3G)', value: null, unit: 'st', ts });
+        records.push({
+          t: 'e', area: 10, country: cc, source: 'gnss-metadata',
+          kind: 'datakälla', severity: 'warn',
+          title: `M3G gav inga GNSS-stationer för ${cc}`,
+          detail: `Rutnätet för ${cc3} svarade inte ens efter retry – felet var: ${String(e?.message ?? e)}. Landet visas utan stationer tills nästa lyckade poll (var 24:e timme).`,
+          start: ts,
+        });
         continue;
       }
       okCountries++;
