@@ -105,6 +105,9 @@ tr.area-row:hover td { background: var(--mut-bg); }
 .mapbox {
   width: 100%; min-width: 0; border: 1px solid var(--bd);
   border-radius: 8px; background: var(--mut-bg);
+  /* Leaflet-pane/controls har z-index upp till 1000 – isolering skapar en
+     egen stackingcontext så kartan aldrig tränger fram över modaler. */
+  position: relative; isolation: isolate;
 }
 .mapbox-size-S { height: 260px; }
 .mapbox-size-M { height: 420px; }
@@ -657,8 +660,9 @@ tr.detail-row > td { background: var(--mut-bg); padding: 10px 12px; font-size: 1
 .nw-widget-spread .mut { font-size:10.5px; }
 
 /* Modal */
-.nw-modal-backdrop { position:fixed; inset:0; z-index:60; display:flex; align-items:center; justify-content:center; padding:18px; background:rgba(8,12,18,.64); backdrop-filter:blur(3px); }
+.nw-modal-backdrop { position:fixed; inset:0; z-index:2000; display:flex; align-items:center; justify-content:center; padding:18px; background:rgba(8,12,18,.64); backdrop-filter:blur(3px); }
 .nw-modal { width:min(780px, 100%); max-height:90vh; overflow:auto; background:var(--card); color:var(--tx); border:1px solid var(--bd); border-radius:14px; box-shadow:0 24px 60px rgba(0,0,0,.45); padding:18px 20px 20px; }
+.nw-modal-wide { width:min(1080px, 96vw); }
 .nw-modal:focus-visible { outline:none; }
 .nw-modal-head { display:flex; align-items:flex-start; justify-content:space-between; gap:14px; border-bottom:1px solid var(--bd); padding-bottom:12px; margin-bottom:12px; }
 .nw-modal-head h2 { margin:0 0 3px; font-size:17px; }

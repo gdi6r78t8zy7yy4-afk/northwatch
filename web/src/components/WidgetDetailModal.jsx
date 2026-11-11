@@ -48,7 +48,7 @@ function useFocusTrap(onClose) {
 // trendgrafer ur det gemensamma historikarkivet, råa observationer och
 // källmetadata. Widgets utan serier (karta, källor, analys) renderar egen
 // content via children.
-export default function WidgetDetailModal({ widget, item = null, country, getSeries, observations = [], onClose, children }) {
+export default function WidgetDetailModal({ widget, item = null, country, getSeries, observations = [], onClose, children, wide = false }) {
   const [range, setRange] = useState('24h');
   const [series, setSeries] = useState(null);
   const [error, setError] = useState(null);
@@ -69,7 +69,7 @@ export default function WidgetDetailModal({ widget, item = null, country, getSer
   const hasCharts = Boolean(getSeries);
 
   return <div className="nw-modal-backdrop" onMouseDown={event => { if (event.target === event.currentTarget) onClose(); }}>
-    <div className="nw-modal" role="dialog" aria-modal="true" aria-label={`${widget.title} – detaljer`} tabIndex={-1} ref={dialogRef}>
+    <div className={'nw-modal' + (wide ? ' nw-modal-wide' : '')} role="dialog" aria-modal="true" aria-label={`${widget.title} – detaljer`} tabIndex={-1} ref={dialogRef}>
       <header className="nw-modal-head">
         <div>
           <h2>{widget.title}{item ? <> · {item.label}</> : null}</h2>

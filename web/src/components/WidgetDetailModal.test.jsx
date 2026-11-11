@@ -84,13 +84,21 @@ describe('WidgetDetailModal', () => {
     expect(document.body.style.overflow).not.toBe('hidden');
   });
 
-  test('widgets without series render children instead of charts', () => {
+  test('widgets utan serier renderar children i stället för grafer', () => {
     render(<WidgetDetailModal widget={{ id: 'karta', title: 'Nordiskt elnät', hint: 'Karta' }}
       country="ALL" onClose={vi.fn()}>
       <p>Kartinnehåll</p>
     </WidgetDetailModal>);
     expect(screen.getByText('Kartinnehåll')).toBeInTheDocument();
     expect(screen.queryByRole('group', { name: 'Tidsintervall' })).not.toBeInTheDocument();
+  });
+
+  test('wide ger bredare dialogpanel för kartwidgeten', () => {
+    render(<WidgetDetailModal widget={{ id: 'karta', title: 'Nordiskt elnät', hint: 'Karta' }}
+      country="ALL" onClose={vi.fn()} wide>
+      <p>Kartinnehåll</p>
+    </WidgetDetailModal>);
+    expect(document.querySelector('.nw-modal')).toHaveClass('nw-modal-wide');
   });
 
   test('failed history fetch shows an honest error instead of empty charts', async () => {

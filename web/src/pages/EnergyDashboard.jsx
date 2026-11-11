@@ -199,7 +199,7 @@ function SourcesModalContent({ ctx }) {
 function MapModalContent({ ctx }) {
   return <>
     <MapPanel area={ENERGY_AREA} country={ctx.country} assets={ctx.assets} staticGeo={ctx.geo} events={[]}
-      defaultSize="L" sizeStorageKey="nw-energy-mapsize"/>
+      defaultSize="L" sizeStorageKey="nw-energy-mapmodal-size"/>
     <p className="mut">Kartan visar det nordiska nät perspektivet även när ett enskilt land är valt. Zonankare och vissa länkar är schematiska approximationer, inte verifierad fysisk nätgeometri.</p>
   </>;
 }
@@ -306,7 +306,7 @@ export default function EnergyDashboard({ country = 'ALL', onCountryChange }) {
 
     {widget ? <WidgetDetailModal widget={widget} item={itemId ? { id: itemId, label: itemId } : null}
       country={country} getSeries={modalHasSeries ? getSeries : undefined} observations={observations}
-      onClose={closeWidget}>
+      wide={widget.id === 'karta'} onClose={closeWidget}>
       {widget.id === 'karta' ? <MapModalContent ctx={ctx}/> : null}
       {widget.id === 'prisspridning' ? <SpreadModalContent ctx={ctx}/> : null}
       {widget.id === 'analys' ? <AnalysisModalContent ctx={ctx}/> : null}

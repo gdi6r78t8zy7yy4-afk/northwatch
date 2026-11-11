@@ -106,6 +106,12 @@ describe('Energiwidget-dashboarden', () => {
     expect(dialog).toHaveAccessibleName(/Dag-spotpriser/);
   });
 
+  test('kartwidgetens modal är bred så kartan får rimlig yta', async () => {
+    renderDashboard('/energy?w=karta');
+    const dialog = await screen.findByRole('dialog');
+    expect(dialog).toHaveClass('nw-modal-wide');
+  });
+
   test('källwidgeten visar källor utan nyckel och modalen listar kollektorkuren', async () => {
     renderDashboard('/energy?w=kallor');
     const dialog = await screen.findByRole('dialog');
